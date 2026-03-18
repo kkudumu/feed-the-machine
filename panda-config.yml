@@ -1,0 +1,2 @@
+name: panda-config
+description: Configure panda skill settings including model profiles, execution preferences, and defaults. Use when user says "panda config", "panda settings", "set panda profile", "panda model", or wants to change how panda skills behave.

@@ -1,0 +1,43 @@
+# Panda Skills Configuration
+# Edit this file or use /panda-config to modify settings
+
+# Model profiles control which model is used at each stage
+# Options: opus, sonnet, haiku, inherit (use session default)
+profile: balanced  # quality | balanced | budget | custom | inherit
+
+profiles:
+  quality:
+    planning: opus      # brainstorm, research, plan generation
+    execution: opus     # agent task implementation
+    review: sonnet      # audit, debug review, council synthesis
+
+  balanced:
+    planning: opus
+    execution: sonnet
+    review: sonnet
+
+  budget:
+    planning: sonnet
+    execution: sonnet
+    review: haiku
+
+  inherit:
+    planning: inherit
+    execution: inherit
+    review: inherit
+
+  custom:
+    planning: opus
+    execution: sonnet
+    review: haiku
+
+# Execution preferences
+execution:
+  max_parallel_agents: 5          # max agents dispatched simultaneously
+  auto_audit: true                # run panda-audit after each executor task
+  progress_tracking: true         # write PROGRESS.md during execution
+
+# Session management
+session:
+  auto_pause_on_exit: false       # automatically save state when conversation ends
+  state_retention_days: 7         # archive states older than this

@@ -1,0 +1,87 @@
+{
+  "skill_name": "socratic-brainstorm",
+  "evals": [
+    {
+      "id": 0,
+      "name": "fresh-idea",
+      "prompt": "I'm thinking about building an app that helps people find study buddies at their university. Like Tinder but for studying.",
+      "expected_output": "Phase 0 repo awareness, Phase 1 intake with one question, no Phase 2 yet (STOP rule)",
+      "files": [],
+      "assertions": [
+        {"name": "one_question_intake", "description": "Phase 1 asks exactly ONE question, not multiple"},
+        {"name": "multiple_choice", "description": "The intake question offers labeled options (A/B/C)"},
+        {"name": "repo_noted_irrelevant", "description": "Phase 0 acknowledges current repo is unrelated to the idea"},
+        {"name": "no_phase2_in_first_turn", "description": "Does NOT dispatch research agents or present 5 suggestions in this first turn — STOP after intake question"},
+        {"name": "closing_question_single", "description": "Ends with ONE targeted question (not 2-3)"}
+      ]
+    },
+    {
+      "id": 1,
+      "name": "brain-dump",
+      "prompt": "help me build all the suggestions in this chat: [brain dump about eng-buddy]",
+      "expected_output": "Path B structured extraction with repo context, confirmation gate, no Phase 2 yet",
+      "files": ["brain-dump-input.md"],
+      "assertions": [
+        {"name": "decided_section", "description": "Contains a 'Decided' or 'Decisions already made' section listing committed choices"},
+        {"name": "open_questions_section", "description": "Contains an 'Open questions' or 'Gaps' section"},
+        {"name": "contradiction_found", "description": "Identifies at least 1 contradiction from the brain dump"},
+        {"name": "repo_files_referenced", "description": "References actual files/modules from the eng-buddy repo (e.g., brain.py, planner/, playbook_engine/)"},
+        {"name": "no_basic_questions", "description": "Does NOT ask basic 'what are you building?' questions already answered by the paste"},
+        {"name": "confirmation_gate", "description": "Ends with a confirmation question before proceeding to research"},
+        {"name": "assumptions_validated", "description": "Flags assumptions from the brain dump and notes where the codebase is further along than assumed"},
+        {"name": "no_phase2_research", "description": "Does NOT proceed to Phase 2 research or present 5 suggestions"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "non-software",
+      "prompt": "I want to create an automated content pipeline for my YouTube channel -- research trending topics, generate scripts, create thumbnails, schedule uploads.",
+      "expected_output": "Phase 0 repo awareness, Phase 1 intake with one question, no Phase 2 yet (STOP rule)",
+      "files": [],
+      "assertions": [
+        {"name": "not_assumed_coding", "description": "Does not assume this is a software engineering project by default"},
+        {"name": "repo_noted_irrelevant", "description": "Notes the current repo is unrelated to a YouTube pipeline"},
+        {"name": "one_question_intake", "description": "Asks ONE question at intake, not multiple"},
+        {"name": "multiple_choice", "description": "The question offers labeled options (A/B/C/D)"},
+        {"name": "no_phase2_in_first_turn", "description": "Does NOT dispatch research agents or present suggestions — stops after intake question"},
+        {"name": "closing_question_single", "description": "Ends with ONE targeted question"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "brain-dump-phase2",
+      "prompt": "Yeah that looks right, go ahead and research it",
+      "expected_output": "Phase 2 research with brain dump mode: novelty map, 5 suggestions with citations, challenges",
+      "files": ["brain-dump-input.md"],
+      "multi_turn_context": "This is turn 2 of a brain dump conversation. Turn 1 was: user pasted eng-buddy brain dump, skill extracted structured summary and asked for confirmation. User now confirms.",
+      "assertions": [
+        {"name": "novelty_map_present", "description": "Contains a Novelty Map table categorizing brain dump claims as solved/partially solved/novel"},
+        {"name": "recommendation_first", "description": "Suggestion #1 is labeled RECOMMENDED with a 'Why I'd pick this' rationale"},
+        {"name": "five_suggestions", "description": "Presents up to 5 numbered suggestions (may be fewer if research is thin, per weak-results guardrail)"},
+        {"name": "real_citations", "description": "At least 5 unique URLs to real repos/articles/products"},
+        {"name": "brain_dump_claims_researched", "description": "Agents searched for specific architectural claims from the brain dump, not just broad topic searches"},
+        {"name": "challenge_present", "description": "At least one challenge/pushback is raised after suggestions"},
+        {"name": "closing_question_single", "description": "Ends with ONE targeted question"},
+        {"name": "existing_tools_referenced", "description": "References existing tools/products that already solve parts of the brain dump proposals"}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "phase3-plan-generation",
+      "prompt": "Ok I think I know what I want. Let's turn this into a plan.",
+      "expected_output": "Phase 3: incremental plan presentation with approval gates, saved plan file, plan-executor prompt",
+      "files": [],
+      "multi_turn_context": "This is turn 4+ of a brainstorming conversation. Previous turns explored a study-buddy app concept, settled on a React Native app with Firebase backend, matching algorithm based on course schedules and study styles. User is now ready for Phase 3.",
+      "assertions": [
+        {"name": "vision_summary", "description": "Presents a brief vision summary of what was decided before generating the full plan"},
+        {"name": "incremental_presentation", "description": "Presents plan in sections (vision/architecture, then tasks, then agents/waves) — not all at once"},
+        {"name": "approval_gate", "description": "Asks for user confirmation after presenting the first section before continuing"},
+        {"name": "tasks_have_acceptance_criteria", "description": "Each task has specific, testable acceptance criteria (not vague 'make it work')"},
+        {"name": "agent_assignments", "description": "Tasks are assigned to specific agent types (frontend-developer, backend-architect, etc.)"},
+        {"name": "wave_structure", "description": "Execution order uses waves for parallel tasks with explicit dependencies"},
+        {"name": "plan_file_path", "description": "Mentions saving to ~/.claude/plans/ directory"},
+        {"name": "plan_executor_prompt", "description": "Provides the exact /plan-executor command to run in a new chat"}
+      ]
+    }
+  ]
+}

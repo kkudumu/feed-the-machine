@@ -1,0 +1,23 @@
+{
+  "current_task": {
+    "id": null,
+    "description": null,
+    "type": null,
+    "started_at": null,
+    "status": null
+  },
+  "recent_decisions": [],
+  "active_constraints": [],
+  "user_preferences": {
+    "communication_style": null,
+    "approval_gates": null,
+    "default_model_profile": null
+  },
+  "session_metadata": {
+    "started_at": null,
+    "last_updated": null,
+    "conversation_id": null,
+    "messages_count": 0,
+    "skills_invoked": []
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "entries": [],
+  "metadata": {
+    "total_count": 0,
+    "last_updated": null,
+    "max_entries": 200,
+    "pruning_strategy": "remove_oldest_low_confidence"
+  }
+}
