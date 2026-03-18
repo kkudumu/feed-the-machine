@@ -21,10 +21,10 @@ description: Deep multi-vector debugging war room that launches parallel agent t
 
 Before starting, load context from the blackboard:
 
-1. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
-2. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` — filter entries by task_type="bug" and tags matching the current error domain
+1. Read `~/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
+2. Read `~/.claude/panda-state/blackboard/experiences/index.json` — filter entries by task_type="bug" and tags matching the current error domain
 3. Load top 3-5 matching experience files for known fixes and failed approaches
-4. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/patterns.json` — check recurring_issues for matching symptoms and codebase_insights for relevant file patterns
+4. Read `~/.claude/panda-state/blackboard/patterns.json` — check recurring_issues for matching symptoms and codebase_insights for relevant file patterns
 
 If index.json is empty or no matches found, proceed normally without experience-informed shortcuts.
 
@@ -901,12 +901,12 @@ The war room is powerful but not omniscient. Sometimes the bug requires domain k
 
 After completing, update the blackboard:
 
-1. Update `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json`:
+1. Update `~/.claude/panda-state/blackboard/context.json`:
    - Set current_task status to "complete"
    - Append decision summary to recent_decisions (cap at 10)
    - Update session_metadata.skills_invoked and last_updated
-2. Write an experience file to `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json` capturing root cause, hypotheses tested, fix approach, and what to check first next time
-3. Update `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` with the new entry
+2. Write an experience file to `~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json` capturing root cause, hypotheses tested, fix approach, and what to check first next time
+3. Update `~/.claude/panda-state/blackboard/experiences/index.json` with the new entry
 4. Emit `task_completed` event
 
 ## Anti-Pattern: Asking the User to Do Agent Work

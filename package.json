@@ -1,0 +1,52 @@
+{
+  "name": "panda-skills",
+  "version": "1.0.0",
+  "description": "A unified intelligence layer for Claude Code — 16 skills with OODA-based reasoning, persistent memory, and multi-model deliberation",
+  "license": "MIT",
+  "author": "kkudumu",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kkudumu/panda-brain.git"
+  },
+  "homepage": "https://github.com/kkudumu/panda-brain",
+  "keywords": [
+    "claude-code",
+    "ai-agents",
+    "skills",
+    "ooda",
+    "multi-model",
+    "blackboard-architecture",
+    "agentic"
+  ],
+  "bin": {
+    "panda-skills": "bin/install.mjs"
+  },
+  "files": [
+    "bin/",
+    "install.sh",
+    "uninstall.sh",
+    "panda.yml",
+    "panda-*.yml",
+    "panda/",
+    "panda-mind/",
+    "panda-executor/",
+    "panda-debug/",
+    "panda-brainstorm/",
+    "panda-audit/",
+    "panda-council/",
+    "panda-codex-gate/",
+    "panda-retro/",
+    "panda-intent/",
+    "panda-diagram/",
+    "panda-browse/",
+    "panda-git/",
+    "panda-pause/",
+    "panda-resume/",
+    "panda-upgrade/",
+    "panda-config/",
+    "panda-state/",
+    "panda-config.default.yml",
+    "README.md",
+    "LICENSE"
+  ]
+}

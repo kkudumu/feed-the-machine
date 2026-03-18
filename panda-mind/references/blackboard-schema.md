@@ -283,7 +283,7 @@ Multiple executor agents may run in parallel during a panda-executor wave. To pr
 Always use the Read tool with the absolute path:
 
 ```
-Read: /Users/kioja.kudumu/.claude/panda-state/blackboard/context.json
+Read: ~/.claude/panda-state/blackboard/context.json
 ```
 
 Parse the JSON content mentally before acting on it. If the file is empty or malformed, treat it as if all fields are null/empty and proceed without crashing.
@@ -300,10 +300,10 @@ Never write partial files or append to JSON files. Every write is a full replace
 Use absolute paths:
 
 ```
-Write: /Users/kioja.kudumu/.claude/panda-state/blackboard/context.json
-Write: /Users/kioja.kudumu/.claude/panda-state/blackboard/patterns.json
-Write: /Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json
-Write: /Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json
+Write: ~/.claude/panda-state/blackboard/context.json
+Write: ~/.claude/panda-state/blackboard/patterns.json
+Write: ~/.claude/panda-state/blackboard/experiences/index.json
+Write: ~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json
 ```
 
 ### Validation Before Writing
@@ -321,8 +321,8 @@ Before writing, verify:
 
 | What | Absolute Path |
 |---|---|
-| Session state | `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json` |
-| Meta-patterns | `/Users/kioja.kudumu/.claude/panda-state/blackboard/patterns.json` |
-| Experience index | `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` |
-| Experience files | `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_slug.json` |
-| This document | `/Users/kioja.kudumu/.claude/skills/panda-mind/references/blackboard-schema.md` |
+| Session state | `~/.claude/panda-state/blackboard/context.json` |
+| Meta-patterns | `~/.claude/panda-state/blackboard/patterns.json` |
+| Experience index | `~/.claude/panda-state/blackboard/experiences/index.json` |
+| Experience files | `~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_slug.json` |
+| This document | `~/.claude/skills/panda-mind/references/blackboard-schema.md` |

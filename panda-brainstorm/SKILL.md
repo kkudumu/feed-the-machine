@@ -16,10 +16,10 @@ description: Research-powered Socratic brainstorming with parallel web/GitHub ag
 
 Before starting, load context from the blackboard:
 
-1. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
-2. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` — filter entries by task_type matching "feature" or "investigation" and tags overlapping with the current topic
+1. Read `~/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
+2. Read `~/.claude/panda-state/blackboard/experiences/index.json` — filter entries by task_type matching "feature" or "investigation" and tags overlapping with the current topic
 3. Load top 3-5 matching experience files for lessons on how past brainstorm cycles translated into plans
-4. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/patterns.json` — check execution_patterns for how past brainstorm→plan→execute cycles went and user_behavior for scope accuracy patterns
+4. Read `~/.claude/panda-state/blackboard/patterns.json` — check execution_patterns for how past brainstorm→plan→execute cycles went and user_behavior for scope accuracy patterns
 
 If index.json is empty or no matches found, proceed normally without experience-informed shortcuts.
 
@@ -703,10 +703,10 @@ This skill and `superpowers:brainstorming` serve different stages of the idea-to
 
 After completing, update the blackboard:
 
-1. Update `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json`:
+1. Update `~/.claude/panda-state/blackboard/context.json`:
    - Set current_task status to "complete"
    - Append decision summary to recent_decisions (cap at 10)
    - Update session_metadata.skills_invoked and last_updated
-2. Write an experience file to `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json` capturing the feature type, architectural direction chosen, research quality, and how well the scope estimate held up
-3. Update `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` with the new entry
+2. Write an experience file to `~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json` capturing the feature type, architectural direction chosen, research quality, and how well the scope estimate held up
+3. Update `~/.claude/panda-state/blackboard/experiences/index.json` with the new entry
 4. Emit `task_completed` event

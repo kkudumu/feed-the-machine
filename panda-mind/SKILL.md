@@ -62,7 +62,7 @@ At Observe time, note but do not finalize:
 
 Read:
 
-- `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json`
+- `~/.claude/panda-state/blackboard/context.json`
 
 Extract:
 
@@ -143,9 +143,9 @@ Read the blackboard in this order:
 
 Use these exact paths:
 
-- `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json`
-- `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json`
-- `/Users/kioja.kudumu/.claude/panda-state/blackboard/patterns.json`
+- `~/.claude/panda-state/blackboard/context.json`
+- `~/.claude/panda-state/blackboard/experiences/index.json`
+- `~/.claude/panda-state/blackboard/patterns.json`
 
 #### 2.1 `context.json`
 
@@ -171,7 +171,7 @@ Experience retrieval must be concrete, not hand-wavy.
 
 Protocol:
 
-1. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json`
+1. Read `~/.claude/panda-state/blackboard/experiences/index.json`
 2. Parse `entries`
 3. Derive a current `task_type`
 4. Derive current tags from the request and codebase context
@@ -180,7 +180,7 @@ Protocol:
    - there is at least one overlapping tag
 6. Sort filtered entries by `recorded_at` descending
 7. Load the top 3-5 matching experience files from:
-   - `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/{filename}`
+   - `~/.claude/panda-state/blackboard/experiences/{filename}`
 8. Prefer lessons from entries with:
    - `outcome: success`
    - higher `confidence`
@@ -275,7 +275,7 @@ Routing heuristic:
 
 Read:
 
-- `/Users/kioja.kudumu/.claude/skills/panda-mind/references/mcp-inventory.md`
+- `~/.claude/skills/panda-mind/references/mcp-inventory.md`
 
 Orient must know the available MCPs and their contextual triggers.
 

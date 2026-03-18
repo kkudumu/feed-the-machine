@@ -17,10 +17,10 @@ description: Codex CLI integration gate for adversarial code validation. Invokes
 
 Before starting, load context from the blackboard:
 
-1. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
-2. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` — filter entries by tags matching "validation", "codex", or "review"
+1. Read `~/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
+2. Read `~/.claude/panda-state/blackboard/experiences/index.json` — filter entries by tags matching "validation", "codex", or "review"
 3. Load top 3-5 matching experience files for patterns in what Codex commonly flags or auto-fixes
-4. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/patterns.json` — check recurring_issues for common validation failures and execution_patterns for typical fix types
+4. Read `~/.claude/panda-state/blackboard/patterns.json` — check recurring_issues for common validation failures and execution_patterns for typical fix types
 
 If index.json is empty or no matches found, proceed normally without experience-informed shortcuts.
 
@@ -275,12 +275,12 @@ If Status is FAIL or PASS_WITH_FIXES, include the full "Remaining Issues" and "I
 
 After completing, update the blackboard:
 
-1. Update `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json`:
+1. Update `~/.claude/panda-state/blackboard/context.json`:
    - Set current_task status to "complete"
    - Append decision summary to recent_decisions including the gate verdict (cap at 10)
    - Update session_metadata.skills_invoked and last_updated
-2. Write an experience file to `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json` capturing gate mode, verdict, tests formed/passed, fixes applied, and any INTENT.md conflicts found
-3. Update `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` with the new entry
+2. Write an experience file to `~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json` capturing gate mode, verdict, tests formed/passed, fixes applied, and any INTENT.md conflicts found
+3. Update `~/.claude/panda-state/blackboard/experiences/index.json` with the new entry
 4. Emit `task_completed` event
 
 ## Error Output Template

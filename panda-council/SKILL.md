@@ -16,10 +16,10 @@ description: Multi-AI deliberation council that sends problems to Claude, Codex,
 
 Before starting, load context from the blackboard:
 
-1. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
-2. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` — filter entries by tags matching the current decision domain
+1. Read `~/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
+2. Read `~/.claude/panda-state/blackboard/experiences/index.json` — filter entries by tags matching the current decision domain
 3. Load top 3-5 matching experience files for past council verdicts and how well they held up
-4. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/patterns.json` — check execution_patterns for what types of decisions benefited most from multi-model review
+4. Read `~/.claude/panda-state/blackboard/patterns.json` — check execution_patterns for what types of decisions benefited most from multi-model review
 
 If index.json is empty or no matches found, proceed normally without experience-informed shortcuts.
 
@@ -351,10 +351,10 @@ Make sure Codex and Gemini run from the same working directory as the current se
 
 After completing, update the blackboard:
 
-1. Update `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json`:
+1. Update `~/.claude/panda-state/blackboard/context.json`:
    - Set current_task status to "complete"
    - Append decision summary to recent_decisions including the verdict and which models agreed (cap at 10)
    - Update session_metadata.skills_invoked and last_updated
-2. Write an experience file to `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json` capturing decision domain, verdict, round reached, dissent summary, and whether the verdict held up
-3. Update `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` with the new entry
+2. Write an experience file to `~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json` capturing decision domain, verdict, round reached, dissent summary, and whether the verdict held up
+3. Update `~/.claude/panda-state/blackboard/experiences/index.json` with the new entry
 4. Emit `task_completed` event

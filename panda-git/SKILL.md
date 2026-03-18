@@ -20,10 +20,10 @@ description: Secret scanning and credential safety gate for git operations. Prev
 
 Before starting, load context from the blackboard:
 
-1. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
-2. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` — filter entries by task_type="security" or tags matching "secrets", "credentials", "api-keys", or "git-safety"
+1. Read `~/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
+2. Read `~/.claude/panda-state/blackboard/experiences/index.json` — filter entries by task_type="security" or tags matching "secrets", "credentials", "api-keys", or "git-safety"
 3. Load top 3-5 matching experience files for previously found secret patterns and effective remediation strategies
-4. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/patterns.json` — check recurring_issues for repeated secret leaks and execution_patterns for which files/directories tend to accumulate secrets
+4. Read `~/.claude/panda-state/blackboard/patterns.json` — check recurring_issues for repeated secret leaks and execution_patterns for which files/directories tend to accumulate secrets
 
 If index.json is empty or no matches found, proceed normally without experience-informed shortcuts.
 
@@ -340,7 +340,7 @@ The git-workflow agent should check with panda-git before executing any commit o
 
 After completing, update the blackboard:
 
-1. Update `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json`:
+1. Update `~/.claude/panda-state/blackboard/context.json`:
    - Set current_task status to "complete"
    - Append scan summary to recent_decisions (cap at 10)
    - Update session_metadata.skills_invoked and last_updated

@@ -18,10 +18,10 @@ description: Dual-purpose wiring audit that verifies all code is actually connec
 
 Before starting, load context from the blackboard:
 
-1. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
-2. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` — filter entries by task_type="test" or tags matching "audit" or "wiring"
+1. Read `~/.claude/panda-state/blackboard/context.json` — check current_task, recent_decisions, active_constraints
+2. Read `~/.claude/panda-state/blackboard/experiences/index.json` — filter entries by task_type="test" or tags matching "audit" or "wiring"
 3. Load top 3-5 matching experience files for commonly found issues and effective fix strategies
-4. Read `/Users/kioja.kudumu/.claude/panda-state/blackboard/patterns.json` — check recurring_issues for common wiring failures and execution_patterns for what types of code changes need more scrutiny
+4. Read `~/.claude/panda-state/blackboard/patterns.json` — check recurring_issues for common wiring failures and execution_patterns for what types of code changes need more scrutiny
 
 If index.json is empty or no matches found, proceed normally without experience-informed shortcuts.
 
@@ -441,12 +441,12 @@ When invoked (manually via `/panda-audit` or automatically post-task):
 
 After completing, update the blackboard:
 
-1. Update `/Users/kioja.kudumu/.claude/panda-state/blackboard/context.json`:
+1. Update `~/.claude/panda-state/blackboard/context.json`:
    - Set current_task status to "complete"
    - Append decision summary to recent_decisions (cap at 10)
    - Update session_metadata.skills_invoked and last_updated
-2. Write an experience file to `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json` capturing findings count, fix count, which wiring dimensions fired, and any manual interventions required
-3. Update `/Users/kioja.kudumu/.claude/panda-state/blackboard/experiences/index.json` with the new entry
+2. Write an experience file to `~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json` capturing findings count, fix count, which wiring dimensions fired, and any manual interventions required
+3. Update `~/.claude/panda-state/blackboard/experiences/index.json` with the new entry
 4. Emit `audit_complete` event
 
 ## Report Format

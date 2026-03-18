@@ -4,13 +4,21 @@ A unified intelligence layer for Claude Code. 16 skills that turn Claude from a 
 
 ## Install
 
+### Quick install (npm)
+
 ```bash
-git clone https://github.com/kkudumu/panda-skills.git ~/panda-skills
-cd ~/panda-skills
+npx panda-skills@latest
+```
+
+### Manual install (git)
+
+```bash
+git clone https://github.com/kkudumu/panda-brain.git ~/panda-brain
+cd ~/panda-brain
 ./install.sh
 ```
 
-That's it. The script symlinks everything into `~/.claude/skills/` where Claude Code discovers them. Run `install.sh` again after pulling updates or adding new skills.
+Both methods symlink skills into `~/.claude/skills/` where Claude Code discovers them. Run `install.sh` again after pulling updates.
 
 To remove: `./uninstall.sh` (only removes symlinks, keeps your data).
 
