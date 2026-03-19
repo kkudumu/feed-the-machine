@@ -107,6 +107,25 @@ $PB html
 
 Returns: `{ success, data: { html } }`
 
+**`eval <js-expression>`** — Execute arbitrary JavaScript in the page context. Returns the result as a JSON-serializable value. DOM elements are returned as `{ type: "element", tagName, id, text }`. Functions are returned as `{ type: "function", name }`. Errors inside the expression are caught and returned as `{ error: "..." }` rather than crashing the daemon.
+
+```bash
+$PB eval document.title
+$PB eval "document.querySelector('input[name=email]').value"
+$PB eval "Array.from(document.querySelectorAll('td')).map(td => td.textContent)"
+$PB eval window.location.href
+$PB eval "document.cookie"
+```
+
+Returns: `{ success, data: { result } }` — `result` is whatever the expression evaluated to.
+
+Use cases:
+- Reading hidden or programmatically-set form field values not visible in the ARIA tree
+- Extracting data from dynamic tables or rendered lists
+- Checking feature toggle states or global JS variables (`window.featureFlags`)
+- Inspecting `localStorage` or `sessionStorage` values
+- Querying computed DOM state not exposed via accessibility roles
+
 ---
 
 ### META commands
@@ -290,6 +309,83 @@ Note: When using `chain` with refs, you must have called `snapshot -i` first in 
 
 ---
 
+## Supervised Execution Mode
+
+When ftm-browse is executing browser steps within an approved plan (dispatched by ftm-executor or ftm-mind), activate supervised mode. This mode adds verification guardrails after every navigation action.
+
+### Activation
+
+Supervised mode activates automatically when:
+- The browse command is part of a plan step (context includes plan step reference)
+- The caller provides expected page state (title pattern, URL pattern, or element selector)
+
+### Post-Navigation Verification
+
+After every `goto`, `click` that triggers navigation, or `fill` + `submit` sequence:
+
+1. **Wait for page load** — wait for `networkidle` or 5-second timeout, whichever comes first
+2. **Check URL** — if expected URL pattern was provided, verify current URL matches
+3. **Check title** — if expected title pattern was provided, verify page title matches
+4. **Check for error indicators** — scan for common error patterns:
+   - HTTP error codes in title (403, 404, 500, 502, 503)
+   - Error modals or alert dialogs
+   - "Access Denied", "Unauthorized", "Session Expired" text in page
+5. **Check for auth redirects** — if current URL contains `/login`, `/signin`, `/sso`, `/oauth`, or `/saml` when it wasn't the intended destination, flag as auth redirect
+
+### On Unexpected State
+
+When verification detects a mismatch or error:
+
+1. **Stop execution immediately** — do not proceed to the next browser step
+2. **Take a screenshot** — capture the current page state
+3. **Present the situation** to the user:
+
+```
+⚠ Unexpected browser state during plan step [N]:
+
+Expected: [expected URL/title/state]
+Actual: [current URL/title]
+Issue: [description — wrong page / error page / auth redirect / modal detected]
+
+Screenshot: [path to screenshot]
+
+Options:
+  1. retry  — navigate again
+  2. skip   — skip this browser step, continue plan
+  3. abort  — stop plan execution entirely
+  4. manual — open interactive browser for manual intervention
+```
+
+4. **Wait for user choice** — do not proceed without explicit selection
+
+### Auth Redirect Detection
+
+Authentication redirects are especially dangerous because silently following them can:
+- Leak credentials to unexpected domains
+- Complete OAuth flows the user didn't intend
+- Grant permissions the user didn't approve
+
+When an auth redirect is detected:
+- NEVER automatically follow it
+- Flag it prominently: "Auth redirect detected — redirected to [domain]"
+- The user must explicitly choose to proceed
+
+### Audit Trail
+
+Every browser step within a plan produces:
+- **Before screenshot** — taken just before the action
+- **After screenshot** — taken after the action completes (or after error)
+- **Timing** — how long the action took
+- **Verification result** — PASS or FAIL with details
+
+Screenshots saved to a temp directory, paths included in the step report.
+
+### Non-Plan Usage
+
+When ftm-browse is used directly (not within a plan), supervised mode is OFF by default. The user gets the raw browse experience. They can enable it manually with `--supervised` flag.
+
+---
+
 ## Error Handling
 
 | Symptom | Cause | Fix |
@@ -302,6 +398,7 @@ Note: When using `chain` with refs, you must have called `snapshot -i` first in 
 | `Daemon failed to start within 10 seconds` | Bun or binary issue | Check `~/.ftm-browse/` for logs; verify binary is executable |
 | Connection refused | Daemon died (idle timeout or crash) | Next command will auto-restart it |
 | `commands must be an array` | Bad JSON passed to chain | Validate JSON before passing to chain |
+| `Evaluation failed: ...` | Playwright could not serialize or run the expression | Check for syntax errors; wrap complex expressions in quotes |
 
 ---
 
@@ -315,3 +412,4 @@ Note: When using `chain` with refs, you must have called `snapshot -i` first in 
 - `$PB html` is useful when you need to inspect the raw DOM, check for hidden elements, or verify server-rendered markup.
 - The daemon uses a 1280x800 headless Chromium viewport with a standard Mac Chrome user-agent, so most sites render predictably.
 - To stop the daemon explicitly: `$PB stop`. It will auto-restart on next use.
+- `$PB eval` is the escape hatch for anything the ARIA tree doesn't expose — hidden inputs, JS globals, localStorage, computed values.

@@ -195,6 +195,16 @@ function parseArgs(argv: string[]): ParsedCommand {
       return { command: "tabs", args: {} };
     }
 
+    case "eval": {
+      if (!args[1]) {
+        console.error("Usage: ftm-browse eval <javascript-expression>");
+        process.exit(1);
+      }
+      // Join remaining args to support expressions with spaces
+      const expression = args.slice(1).join(" ");
+      return { command: "eval", args: { expression } };
+    }
+
     case "chain": {
       if (!args[1]) {
         console.error("Usage: ftm-browse chain <json-array>");
@@ -256,6 +266,7 @@ COMMANDS:
   text                       Get page text content
   html                       Get page HTML
   tabs                       List all open tabs
+  eval <js-expression>        Execute JavaScript in page context, returns JSON result
   chain <json-array>         Execute multiple commands sequentially
   health                     Check daemon health
   stop                       Stop the daemon
@@ -267,6 +278,8 @@ EXAMPLES:
   bun run cli.ts fill @e2 "hello world"
   bun run cli.ts press Enter
   bun run cli.ts screenshot --path /tmp/shot.png
+  bun run cli.ts eval document.title
+  bun run cli.ts eval "document.querySelector('input[name=email]').value"
   bun run cli.ts chain '[{"command":"goto","args":{"url":"https://example.com"}},{"command":"snapshot","args":{}}]'
 `);
 }

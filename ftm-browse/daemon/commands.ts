@@ -180,6 +180,51 @@ export async function htmlCommand(): Promise<CommandResult> {
   }
 }
 
+// ─── EVAL Command ───────────────────────────────────────────────────────────
+
+export async function evalCommand(args: {
+  expression: string;
+}): Promise<CommandResult> {
+  if (!args.expression) {
+    return { success: false, error: "expression is required" };
+  }
+
+  try {
+    const page = await browserManager.getPage();
+    const result = await page.evaluate((expr) => {
+      try {
+        // eslint-disable-next-line no-eval
+        const value = eval(expr);
+        // Handle non-serializable values
+        if (value instanceof HTMLElement) {
+          return {
+            type: "element",
+            tagName: value.tagName,
+            id: value.id,
+            text: value.textContent?.slice(0, 200),
+          };
+        }
+        if (typeof value === "function") {
+          return { type: "function", name: value.name || "anonymous" };
+        }
+        return value;
+      } catch (e) {
+        return { error: String(e) };
+      }
+    }, args.expression);
+
+    return {
+      success: true,
+      data: { result },
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error: `Evaluation failed: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
+}
+
 // ─── META Commands ──────────────────────────────────────────────────────────
 
 export async function snapshotCommand(args: {
@@ -357,6 +402,8 @@ export async function executeCommand(
       return tabsCommand();
     case "chain":
       return chainCommand(args);
+    case "eval":
+      return evalCommand(args);
     default:
       return { success: false, error: `Unknown command: ${command}` };
   }

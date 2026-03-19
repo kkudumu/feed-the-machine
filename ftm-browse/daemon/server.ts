@@ -96,11 +96,40 @@ async function handleRequest(req: Request, token: string): Promise<Response> {
   return sendJson(result, result.success ? 200 : 400);
 }
 
+// ─── CLI Argument Parsing ────────────────────────────────────────────────────
+
+function parseUserDataDir(): string | null {
+  const args = process.argv.slice(2);
+  const flagIndex = args.indexOf("--user-data-dir");
+  if (flagIndex === -1) return null;
+
+  // --user-data-dir [path] — optional path argument
+  const nextArg = args[flagIndex + 1];
+  if (nextArg && !nextArg.startsWith("--")) {
+    // Expand ~ to home directory
+    const expanded = nextArg.startsWith("~")
+      ? path.join(process.env.HOME || "~", nextArg.slice(1))
+      : nextArg;
+    return expanded;
+  }
+
+  // Flag present but no path provided — use default
+  return "default";
+}
+
 // ─── Server Entry Point ─────────────────────────────────────────────────────
 
 async function startServer(): Promise<void> {
   const port = getRandomPort();
   const token = generateToken();
+
+  // Configure session persistence if requested
+  const userDataDir = parseUserDataDir();
+  if (userDataDir) {
+    browserManager.setUserDataDir(userDataDir);
+    const displayDir = userDataDir === "default" ? "~/.ftm-browse/user-data (default)" : userDataDir;
+    console.log(`[ftm-browse] Session persistence enabled: ${displayDir}`);
+  }
 
   console.log(`[ftm-browse] Starting daemon on port ${port}`);
 

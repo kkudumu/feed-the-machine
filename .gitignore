@@ -20,3 +20,8 @@ evals/results/
 # Editors
 .vscode/
 .idea/
+
+# ftm-browse persistent session data (cookies, local storage, etc.)
+# Never commit — contains user credentials and auth tokens
+ftm-browse/user-data/
+~/.ftm-browse/user-data/
