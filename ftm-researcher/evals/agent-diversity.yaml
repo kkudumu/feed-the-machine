@@ -1,0 +1,17 @@
+# ftm-researcher/evals/agent-diversity.yaml
+description: Verify 7 finder agents produce non-overlapping results from different domains
+prompts:
+  - vars:
+      input: "Research how to implement WebSocket connections in a Node.js application"
+    assert:
+      - type: contains
+        value: "web_surveyor"
+      - type: contains
+        value: "github_miner"
+      - type: contains
+        value: "codebase_analyst"
+      - type: javascript
+        value: |
+          // Verify at least 5 different agent_roles appear in findings
+          const roles = new Set(output.findings?.map(f => f.agent_role) || []);
+          return roles.size >= 5;

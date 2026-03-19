@@ -1,0 +1,39 @@
+# ftm-researcher/evals/trigger-accuracy.yaml
+description: Verify ftm-researcher triggers on research requests and not on brainstorm/debug/other
+prompts:
+  - vars:
+      input: "research parallel agent architectures"
+    assert:
+      - type: contains
+        value: "ftm-researcher"
+  - vars:
+      input: "what's the state of the art on LLM fine-tuning"
+    assert:
+      - type: contains
+        value: "ftm-researcher"
+  - vars:
+      input: "find me examples of rate limiting in Go"
+    assert:
+      - type: contains
+        value: "ftm-researcher"
+  - vars:
+      input: "compare Redis vs Memcached"
+    assert:
+      - type: contains
+        value: "ftm-researcher"
+  # Should NOT trigger
+  - vars:
+      input: "I have an idea for a dashboard"
+    assert:
+      - type: not-contains
+        value: "ftm-researcher"
+  - vars:
+      input: "debug this flaky test"
+    assert:
+      - type: not-contains
+        value: "ftm-researcher"
+  - vars:
+      input: "help me brainstorm auth design"
+    assert:
+      - type: not-contains
+        value: "ftm-researcher"

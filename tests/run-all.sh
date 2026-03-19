@@ -151,6 +151,18 @@ if [ -f "$TESTS_DIR/evals/run-evals.sh" ]; then
 fi
 
 # ---------------------------------------------------------------------------
+# Category 2.5: Skill-Specific Tests
+# ---------------------------------------------------------------------------
+
+header "Category 2.5: Skill-Specific Tests"
+
+if command -v node &>/dev/null; then
+  if [ -f "$TESTS_DIR/ftm-researcher.test.mjs" ]; then
+    run_suite "ftm-researcher tests" "node --test $TESTS_DIR/ftm-researcher.test.mjs"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
 # Category 3: Runtime Unit Tests
 # ---------------------------------------------------------------------------
 
