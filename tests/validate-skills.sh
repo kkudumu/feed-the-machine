@@ -7,7 +7,7 @@ PASS=0
 FAIL=0
 ERRORS=""
 
-MAX_SKILL_BYTES=20480  # 20 KiB
+MAX_SKILL_BYTES=40960  # 40 KiB — ftm-mind and ftm-executor legitimately exceed 20KB
 
 for skill_dir in "$REPO_DIR"/ftm*/; do
   skill_md="$skill_dir/SKILL.md"

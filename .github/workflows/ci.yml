@@ -80,7 +80,13 @@ jobs:
         run: node bin/generate-manifest.mjs
 
       - name: Check manifest is up to date
-        run: git diff --exit-code ftm-manifest.json
+        run: |
+          DIFF_LINES=$(git diff ftm-manifest.json | grep '^[+-]' | grep -v '^[+-][+-][+-]' | grep -v 'generated_at' | wc -l)
+          if [ "$DIFF_LINES" -gt 0 ]; then
+            echo "ERROR: ftm-manifest.json is out of date. Run 'npm run generate-manifest' and commit."
+            git diff ftm-manifest.json
+            exit 1
+          fi
 
   commitlint:
     runs-on: ubuntu-latest
@@ -122,16 +128,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      - uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install browse daemon dependencies
+        working-directory: ftm-browse/daemon
+        run: bun install
 
       - name: TypeScript check for ftm-browse daemon
-        run: npx tsc --noEmit --project ftm-browse/daemon/tsconfig.json
+        working-directory: ftm-browse/daemon
+        run: bun run tsc --noEmit
 
   validate-blackboard:
     runs-on: ubuntu-latest
@@ -148,19 +153,6 @@ jobs:
 
       - name: Validate blackboard files against schemas
         run: node tests/validate-blackboard.mjs
-
-  typecheck-browse:
-    name: TypeScript Check (ftm-browse)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-      - name: Install browse daemon dependencies
-        working-directory: ftm-browse/daemon
-        run: bun install
-      - name: TypeScript check
-        working-directory: ftm-browse/daemon
-        run: bun run tsc --noEmit
 
   validate-frontmatter:
     name: Validate Skill Frontmatter
@@ -203,14 +195,19 @@ jobs:
         with:
           node-version: '20'
       - name: Install dependencies
-        run: npm ci
+        run: npm install --ignore-scripts
       - name: Regenerate manifest
         run: node bin/generate-manifest.mjs
-      - name: Check for drift
+      - name: Check for drift (ignoring timestamp)
         run: |
-          if ! git diff --exit-code ftm-manifest.json; then
-            echo "ERROR: ftm-manifest.json is out of date. Run 'npm run generate-manifest' and commit."
-            exit 1
+          if ! git diff --exit-code -- ftm-manifest.json ':!*generated_at*' 2>/dev/null; then
+            # Check if only generated_at changed
+            DIFF_LINES=$(git diff ftm-manifest.json | grep '^[+-]' | grep -v '^[+-][+-][+-]' | grep -v 'generated_at' | wc -l)
+            if [ "$DIFF_LINES" -gt 0 ]; then
+              echo "ERROR: ftm-manifest.json has structural drift. Run 'npm run generate-manifest' and commit."
+              git diff ftm-manifest.json
+              exit 1
+            fi
           fi
 
   test-runtime:

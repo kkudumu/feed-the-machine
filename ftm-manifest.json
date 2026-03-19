@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19T08:11:02.442Z",
+  "generated_at": "2026-03-19T15:57:35.219Z",
   "skills": [
     {
       "name": "ftm",
@@ -155,6 +155,22 @@
       "references": [],
       "has_evals": false,
       "size_bytes": 7788,
+      "enabled": true
+    },
+    {
+      "name": "ftm-dashboard",
+      "description": "Session and weekly analytics dashboard for the FTM skill ecosystem. Reads events.log and blackboard state to show skills invoked, plans presented, approval rates, experiences recorded, and patterns promoted. Use when user says \"dashboard\", \"analytics\", \"stats\", \"ftm-dashboard\", \"show session stats\", or \"how's the system doing\".",
+      "trigger_file": "ftm-dashboard.yml",
+      "skill_directory": "ftm-dashboard/",
+      "events_emits": [],
+      "events_listens": [
+        "task_completed"
+      ],
+      "blackboard_reads": [],
+      "blackboard_writes": [],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 3781,
       "enabled": true
     },
     {

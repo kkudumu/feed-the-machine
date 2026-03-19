@@ -383,27 +383,27 @@ export async function executeCommand(
 ): Promise<CommandResult> {
   switch (command) {
     case "goto":
-      return gotoCommand(args);
+      return gotoCommand(args as { url: string });
     case "click":
-      return clickCommand(args);
+      return clickCommand(args as { ref: string });
     case "fill":
-      return fillCommand(args);
+      return fillCommand(args as { ref: string; value: string });
     case "press":
-      return pressCommand(args);
+      return pressCommand(args as { key: string });
     case "text":
       return textCommand();
     case "html":
       return htmlCommand();
     case "snapshot":
-      return snapshotCommand(args);
+      return snapshotCommand(args as { interactive_only?: boolean });
     case "screenshot":
-      return screenshotCommand(args);
+      return screenshotCommand(args as { path?: string });
     case "tabs":
       return tabsCommand();
     case "chain":
-      return chainCommand(args);
+      return chainCommand(args as { commands: ChainStep[] });
     case "eval":
-      return evalCommand(args);
+      return evalCommand(args as { expression: string });
     default:
       return { success: false, error: `Unknown command: ${command}` };
   }

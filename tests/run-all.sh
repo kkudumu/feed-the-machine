@@ -31,9 +31,6 @@ header() {
 run_suite() {
   local name="$1"
   local cmd="$2"
-  local suite_label
-  suite_label="$(basename "$cmd" | sed 's/\.[^.]*$//')"
-
   echo ""
   echo "--- $name ---"
 
