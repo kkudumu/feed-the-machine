@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Bring panda-brain from 37.5/50 to 48+/50 by adding CI, eval runner, versioning, docs, and fixing remaining repo name references.
+**Goal:** Bring ftm-brain from 37.5/50 to 48+/50 by adding CI, eval runner, versioning, docs, and fixing remaining repo name references.
 
 **Architecture:** Shell-based eval runner that validates evals.json assertions via pattern matching on Claude Code output. GitHub Actions CI runs evals, shellcheck, and JSON validation on every push. Docs added as markdown files at repo root.
 
@@ -17,42 +17,42 @@
 | `tests/run-evals.sh` | Eval runner — reads evals.json, validates structure, reports pass/fail |
 | `tests/validate-skills.sh` | Validates all SKILL.md files have required frontmatter and no hardcoded paths |
 | `.github/workflows/ci.yml` | CI pipeline — shellcheck, JSON lint, skill validation, eval structure check |
-| `panda-version.txt` | Semantic version file for panda-upgrade to read |
+| `ftm-version.txt` | Semantic version file for ftm-upgrade to read |
 | `CHANGELOG.md` | Release history |
 | `CONTRIBUTING.md` | Contributor guide |
 | `docs/QUICKSTART.md` | 5-minute getting-started guide |
 
 ---
 
-### Task 1: Fix remaining `panda-skills` repo references
+### Task 1: Fix remaining `ftm-skills` repo references
 
 **Files:**
-- Modify: `panda-upgrade/scripts/check-version.sh`
-- Modify: `panda-upgrade/scripts/upgrade.sh`
-- Modify: `panda-upgrade/SKILL.md`
+- Modify: `ftm-upgrade/scripts/check-version.sh`
+- Modify: `ftm-upgrade/scripts/upgrade.sh`
+- Modify: `ftm-upgrade/SKILL.md`
 
 - [ ] **Step 1: Fix check-version.sh**
 
-Replace `REPO="kkudumu/panda-skills"` with `REPO="kkudumu/panda-brain"` and update cache dir from `panda-skills` to `panda-brain`.
+Replace `REPO="kkudumu/ftm-skills"` with `REPO="kkudumu/ftm-brain"` and update cache dir from `ftm-skills` to `ftm-brain`.
 
 - [ ] **Step 2: Fix upgrade.sh**
 
-Replace `REPO="kkudumu/panda-skills"` with `REPO="kkudumu/panda-brain"` and update cache reference.
+Replace `REPO="kkudumu/ftm-skills"` with `REPO="kkudumu/ftm-brain"` and update cache reference.
 
-- [ ] **Step 3: Fix panda-upgrade/SKILL.md**
+- [ ] **Step 3: Fix ftm-upgrade/SKILL.md**
 
-Replace all `panda-skills` references with `panda-brain` (repo name in prose, cache paths, etc.). Keep `panda-skills` only where it refers to the npm package name.
+Replace all `ftm-skills` references with `ftm-brain` (repo name in prose, cache paths, etc.). Keep `ftm-skills` only where it refers to the npm package name.
 
 - [ ] **Step 4: Verify no stale references remain**
 
-Run: `grep -r "kkudumu/panda-skills" --include="*.sh" --include="*.md" .`
+Run: `grep -r "kkudumu/ftm-skills" --include="*.sh" --include="*.md" .`
 Expected: Only hits in package.json (npm name) and README (npx command), zero in scripts or SKILL.md files.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add panda-upgrade/
-git commit -m "Fix repo name references in upgrade scripts (panda-skills → panda-brain)"
+git add ftm-upgrade/
+git commit -m "Fix repo name references in upgrade scripts (ftm-skills → ftm-brain)"
 ```
 
 ---
@@ -60,10 +60,10 @@ git commit -m "Fix repo name references in upgrade scripts (panda-skills → pan
 ### Task 2: Create version file and changelog
 
 **Files:**
-- Create: `panda-version.txt`
+- Create: `ftm-version.txt`
 - Create: `CHANGELOG.md`
 
-- [ ] **Step 1: Create panda-version.txt**
+- [ ] **Step 1: Create ftm-version.txt**
 
 ```
 1.0.0
@@ -84,10 +84,10 @@ Single line, no trailing content. This is what `check-version.sh` reads.
 - Multi-model council (Claude + Codex + Gemini deliberation)
 - Complexity-adaptive execution (ADaPT: micro/small/medium/large)
 - Event mesh with 18 typed inter-skill events
-- Headless browser daemon (panda-browse)
-- Secret scanning git safety gate (panda-git)
-- Self-upgrade mechanism (panda-upgrade)
-- npm distribution (`npx panda-skills@latest`)
+- Headless browser daemon (ftm-browse)
+- Secret scanning git safety gate (ftm-git)
+- Self-upgrade mechanism (ftm-upgrade)
+- npm distribution (`npx ftm-skills@latest`)
 - Cross-platform Node.js installer
 
 ### Fixed
@@ -98,7 +98,7 @@ Single line, no trailing content. This is what `check-version.sh` reads.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add panda-version.txt CHANGELOG.md
+git add ftm-version.txt CHANGELOG.md
 git commit -m "Add version file and changelog for v1.0.0"
 ```
 
@@ -123,11 +123,11 @@ PASS=0
 FAIL=0
 ERRORS=""
 
-for skill_dir in "$REPO_DIR"/panda*/; do
+for skill_dir in "$REPO_DIR"/ftm*/; do
   skill_md="$skill_dir/SKILL.md"
   name=$(basename "$skill_dir")
 
-  [ "$name" = "panda-state" ] && continue
+  [ "$name" = "ftm-state" ] && continue
 
   if [ ! -f "$skill_md" ]; then
     ERRORS="${ERRORS}\n  FAIL  $name — missing SKILL.md"
@@ -165,10 +165,10 @@ for skill_dir in "$REPO_DIR"/panda*/; do
 done
 
 # Check .yml trigger files match skill directories
-for yml in "$REPO_DIR"/panda*.yml; do
+for yml in "$REPO_DIR"/ftm*.yml; do
   name=$(basename "$yml" .yml)
-  [ "$name" = "panda-config" ] && continue  # config yml is special
-  if [ ! -d "$REPO_DIR/$name" ] && [ "$name" != "panda-config.default" ]; then
+  [ "$name" = "ftm-config" ] && continue  # config yml is special
+  if [ ! -d "$REPO_DIR/$name" ] && [ "$name" != "ftm-config.default" ]; then
     ERRORS="${ERRORS}\n  FAIL  $name.yml — no matching skill directory"
     FAIL=$((FAIL + 1))
   fi
@@ -445,7 +445,7 @@ git commit -m "Add contributing guide for new skill authors"
 
 - [ ] **Step 1: Sync version to 1.0.0**
 
-Verify package.json version matches panda-version.txt (both 1.0.0).
+Verify package.json version matches ftm-version.txt (both 1.0.0).
 
 - [ ] **Step 2: Run final verification**
 

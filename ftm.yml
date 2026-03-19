@@ -1,0 +1,2 @@
+name: ftm
+description: Universal entry point for all ftm skills. Routes freeform text to the right ftm skill automatically. Use when user says "/ftm" followed by anything. ftm-mind is the default cognitive entry point for all unclassified input (OODA reasoning). Explicit prefixes route directly: brainstorm, execute, debug, audit, council, intent, diagram, codex-gate, pause, resume, browse, upgrade, retro, config, mind. Also use when user is unsure which ftm skill they need.

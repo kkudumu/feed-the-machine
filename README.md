@@ -1,11 +1,11 @@
-# Panda Skills
+# FTM Skills
 
 A unified intelligence layer for Claude Code. Sixteen skills that give Claude persistent memory, OODA-based reasoning, and autonomous execution — turning one-shot responses into a system that gets smarter with every session.
 
 ## Quick Start
 
 ```bash
-npx panda-skills@latest
+npx ftm-skills@latest
 ```
 
 Symlinks all skills into `~/.claude/skills/` where Claude Code discovers them automatically.
@@ -13,8 +13,8 @@ Symlinks all skills into `~/.claude/skills/` where Claude Code discovers them au
 ## Development Install
 
 ```bash
-git clone https://github.com/kkudumu/panda-brain.git ~/panda-brain
-cd ~/panda-brain
+git clone https://github.com/kkudumu/ftm-brain.git ~/ftm-brain
+cd ~/ftm-brain
 ./install.sh
 ```
 
@@ -24,28 +24,28 @@ Pull updates anytime with `git pull && ./install.sh`. To remove: `./uninstall.sh
 
 | Skill | Description |
 |-------|-------------|
-| **panda-mind** | OODA cognitive loop — the default entry point for all freeform input |
-| **panda-executor** | Autonomous plan execution with dynamically assembled agent teams |
-| **panda-debug** | Multi-vector debugging war room with parallel hypothesis testing |
-| **panda-brainstorm** | Socratic ideation with parallel web and GitHub research agents |
-| **panda-audit** | Wiring verification — knip static analysis plus adversarial LLM audit |
-| **panda-council** | Multi-model deliberation — Claude, Codex, and Gemini debate to 2-of-3 consensus |
-| **panda-codex-gate** | Adversarial Codex validation at executor wave boundaries |
-| **panda-retro** | Post-execution retrospectives and continuous micro-reflections |
-| **panda-intent** | INTENT.md documentation layer — function-level contracts, auto-updated |
-| **panda-diagram** | ARCHITECTURE.mmd mermaid diagrams — auto-updated after commits |
-| **panda-browse** | Headless browser — screenshots, ARIA inspection, visual verification |
-| **panda-git** | Secret scanning and credential safety gate for git operations |
-| **panda-pause** | Save current session state to blackboard |
-| **panda-resume** | Restore a paused session and continue where you left off |
-| **panda-upgrade** | Self-upgrade from GitHub releases |
-| **panda-config** | Configure model profiles and execution preferences |
+| **ftm-mind** | OODA cognitive loop — the default entry point for all freeform input |
+| **ftm-executor** | Autonomous plan execution with dynamically assembled agent teams |
+| **ftm-debug** | Multi-vector debugging war room with parallel hypothesis testing |
+| **ftm-brainstorm** | Socratic ideation with parallel web and GitHub research agents |
+| **ftm-audit** | Wiring verification — knip static analysis plus adversarial LLM audit |
+| **ftm-council** | Multi-model deliberation — Claude, Codex, and Gemini debate to 2-of-3 consensus |
+| **ftm-codex-gate** | Adversarial Codex validation at executor wave boundaries |
+| **ftm-retro** | Post-execution retrospectives and continuous micro-reflections |
+| **ftm-intent** | INTENT.md documentation layer — function-level contracts, auto-updated |
+| **ftm-diagram** | ARCHITECTURE.mmd mermaid diagrams — auto-updated after commits |
+| **ftm-browse** | Headless browser — screenshots, ARIA inspection, visual verification |
+| **ftm-git** | Secret scanning and credential safety gate for git operations |
+| **ftm-pause** | Save current session state to blackboard |
+| **ftm-resume** | Restore a paused session and continue where you left off |
+| **ftm-upgrade** | Self-upgrade from GitHub releases |
+| **ftm-config** | Configure model profiles and execution preferences |
 
 ## Architecture
 
 ```mermaid
 graph TD
-    User["User Input"] --> Mind["panda-mind\n(OODA Loop)"]
+    User["User Input"] --> Mind["ftm-mind\n(OODA Loop)"]
 
     Mind -->|Observe| BB_R["Blackboard Read\ncontext.json\nexperiences/\npatterns.json"]
     BB_R --> Mind
@@ -55,21 +55,21 @@ graph TD
     Size -->|Medium| Plan["Lightweight Plan\n+ Execute"]
     Size -->|Large| Route["Route to Skill"]
 
-    Route --> Exec["panda-executor"]
-    Route --> Debug["panda-debug"]
-    Route --> Storm["panda-brainstorm"]
-    Route --> Council["panda-council"]
-    Route --> Audit["panda-audit"]
+    Route --> Exec["ftm-executor"]
+    Route --> Debug["ftm-debug"]
+    Route --> Storm["ftm-brainstorm"]
+    Route --> Council["ftm-council"]
+    Route --> Audit["ftm-audit"]
 
     Direct --> BB_W["Blackboard Write\n(experience)"]
     Plan --> BB_W
     Exec --> BB_W
 
-    BB_W -->|code_committed| Intent["panda-intent"]
-    BB_W -->|code_committed| Diagram["panda-diagram"]
-    BB_W -->|task_completed| Retro["panda-retro\n(micro-reflection)"]
+    BB_W -->|code_committed| Intent["ftm-intent"]
+    BB_W -->|code_committed| Diagram["ftm-diagram"]
+    BB_W -->|task_completed| Retro["ftm-retro\n(micro-reflection)"]
 
-    Exec -->|wave boundary| Gate["panda-codex-gate"]
+    Exec -->|wave boundary| Gate["ftm-codex-gate"]
     Gate --> Exec
 ```
 
@@ -101,28 +101,28 @@ Cold start works fine. The blackboard bootstraps aggressively in the first ~10 i
 
 Skills communicate through 18 typed events. Two fire automatically on every relevant action:
 
-- `code_committed` → triggers panda-intent and panda-diagram
-- `task_completed` → triggers micro-reflection in panda-retro
+- `code_committed` → triggers ftm-intent and ftm-diagram
+- `task_completed` → triggers micro-reflection in ftm-retro
 
-All other events are mediated by panda-mind based on context.
+All other events are mediated by ftm-mind based on context.
 
 ## Usage
 
 ```
-/panda [anything]          # Mind figures out what to do
-/panda debug [problem]     # Deep debugging war room
-/panda brainstorm [idea]   # Research-backed ideation
-/panda execute [plan.md]   # Autonomous plan execution
-/panda audit               # Wiring verification
-/panda council [question]  # Multi-model deliberation
-/panda help                # Full command menu
+/ftm [anything]          # Mind figures out what to do
+/ftm debug [problem]     # Deep debugging war room
+/ftm brainstorm [idea]   # Research-backed ideation
+/ftm execute [plan.md]   # Autonomous plan execution
+/ftm audit               # Wiring verification
+/ftm council [question]  # Multi-model deliberation
+/ftm help                # Full command menu
 ```
 
 Or just describe what you need in plain language. Panda-mind reads the situation and picks the right approach.
 
 ## Configuration
 
-`install.sh` copies `panda-config.default.yml` to `~/.claude/panda-config.yml`. Edit it to set your preferred model profile:
+`install.sh` copies `ftm-config.default.yml` to `~/.claude/ftm-config.yml`. Edit it to set your preferred model profile:
 
 ```yaml
 profile: balanced    # quality | balanced | budget
@@ -139,17 +139,17 @@ Three profiles are included out of the box. Add your own or modify the defaults.
 ## Requirements
 
 - [Claude Code](https://claude.ai/code) CLI
-- **panda-council**: [Codex CLI](https://github.com/openai/codex) + [Gemini CLI](https://github.com/google/gemini-cli)
-- **panda-codex-gate**: Codex CLI
-- **panda-browse**: Playwright MCP (`npx @playwright/mcp@latest`)
+- **ftm-council**: [Codex CLI](https://github.com/openai/codex) + [Gemini CLI](https://github.com/google/gemini-cli)
+- **ftm-codex-gate**: Codex CLI
+- **ftm-browse**: Playwright MCP (`npx @playwright/mcp@latest`)
 
 All other skills work with Claude Code alone.
 
 ## Contributing
 
-Pull requests welcome. The architecture is intentional — each skill is self-contained, communicates through typed events, and writes learnings back to the blackboard. Before adding a new skill, read through `panda-mind/SKILL.md` to understand how routing and memory work.
+Pull requests welcome. The architecture is intentional — each skill is self-contained, communicates through typed events, and writes learnings back to the blackboard. Before adding a new skill, read through `ftm-mind/SKILL.md` to understand how routing and memory work.
 
-Bug reports and feature requests go in [GitHub Issues](https://github.com/kkudumu/panda-brain/issues).
+Bug reports and feature requests go in [GitHub Issues](https://github.com/kkudumu/ftm-brain/issues).
 
 ## License
 

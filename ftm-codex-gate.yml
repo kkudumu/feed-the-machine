@@ -1,0 +1,2 @@
+name: ftm-codex-gate
+description: Codex CLI integration gate for adversarial code validation. Invokes codex exec --yolo --ephemeral with gpt-5.4 to form test scenarios, review code quality, fix failures, and enforce STYLE.md patterns. Use when ftm-executor needs Codex validation at wave boundaries or task completion, or when user says "codex gate", "run codex", "validate with codex". Not for direct user interaction — primarily auto-invoked by ftm-executor.

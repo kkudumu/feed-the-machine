@@ -1,0 +1,2 @@
+name: ftm-pause
+description: Save the current ftm skill session state so work can be resumed in a new conversation. Use when user says "pause", "save state", "I need to stop", "continue later", "ftm pause", "save progress", or is about to end a session mid-workflow. Works with any ftm skill (brainstorm, executor, debug, council, audit).

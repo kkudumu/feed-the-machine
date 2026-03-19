@@ -1,0 +1,4 @@
+---
+name: ftm-browse
+description: Headless browser daemon for visual verification and web interaction. Gives agents the ability to navigate, screenshot, click, fill forms, and inspect ARIA trees via CLI commands. Use when user says "browse", "screenshot", "visual", "look at the app", "open browser", "check the page", "navigate to", "take a screenshot", "visual verification".
+---

@@ -102,7 +102,7 @@ trap 'rm -rf "$TMPDIR_ROOT"' EXIT
 FAKE_HOME="$TMPDIR_ROOT/home"
 FAKE_CLAUDE="$FAKE_HOME/.claude"
 FAKE_SKILLS="$FAKE_CLAUDE/skills"
-FAKE_STATE="$FAKE_CLAUDE/panda-state"
+FAKE_STATE="$FAKE_CLAUDE/ftm-state"
 
 mkdir -p "$FAKE_SKILLS"
 
@@ -119,10 +119,10 @@ echo "--- install.sh creates expected symlinks"
 
 run_install "$FAKE_HOME"
 
-# Every panda*.yml in the repo should be symlinked into FAKE_SKILLS
+# Every ftm*.yml in the repo should be symlinked into FAKE_SKILLS
 YML_COUNT=0
 YML_MISSING=0
-for yml in "$REPO_DIR"/panda*.yml; do
+for yml in "$REPO_DIR"/ftm*.yml; do
   name=$(basename "$yml")
   target="$FAKE_SKILLS/$name"
   YML_COUNT=$((YML_COUNT + 1))
@@ -133,15 +133,15 @@ for yml in "$REPO_DIR"/panda*.yml; do
 done
 
 if [ "$YML_MISSING" -eq 0 ]; then
-  pass "all $YML_COUNT panda*.yml files symlinked into skills dir"
+  pass "all $YML_COUNT ftm*.yml files symlinked into skills dir"
 fi
 
-# Every panda* directory (except panda-state) should be symlinked
+# Every ftm* directory (except ftm-state) should be symlinked
 DIR_COUNT=0
 DIR_MISSING=0
-for dir in "$REPO_DIR"/panda*/; do
+for dir in "$REPO_DIR"/ftm*/; do
   name=$(basename "$dir")
-  [ "$name" = "panda-state" ] && continue
+  [ "$name" = "ftm-state" ] && continue
   target="$FAKE_SKILLS/$name"
   DIR_COUNT=$((DIR_COUNT + 1))
   if ! [ -L "$target" ]; then
@@ -151,13 +151,13 @@ for dir in "$REPO_DIR"/panda*/; do
 done
 
 if [ "$DIR_MISSING" -eq 0 ]; then
-  pass "all $DIR_COUNT panda* skill directories symlinked into skills dir"
+  pass "all $DIR_COUNT ftm* skill directories symlinked into skills dir"
 fi
 
-# panda-state directory itself must NOT be symlinked into skills dir
+# ftm-state directory itself must NOT be symlinked into skills dir
 assert_not_exists \
-  "panda-state is not symlinked into skills dir" \
-  "$FAKE_SKILLS/panda-state"
+  "ftm-state is not symlinked into skills dir" \
+  "$FAKE_SKILLS/ftm-state"
 
 # ---------------------------------------------------------------------------
 # Test group: install.sh — symlinks resolve to correct targets
@@ -167,7 +167,7 @@ echo ""
 echo "--- symlinks resolve to correct repo targets"
 
 # Spot-check a few known skills
-for name in panda.yml panda-executor.yml panda-audit.yml; do
+for name in ftm.yml ftm-executor.yml ftm-audit.yml; do
   target="$FAKE_SKILLS/$name"
   if [ -L "$target" ]; then
     resolved="$(readlink "$target")"
@@ -179,7 +179,7 @@ for name in panda.yml panda-executor.yml panda-audit.yml; do
   fi
 done
 
-for name in panda-executor panda-audit panda-mind; do
+for name in ftm-executor ftm-audit ftm-mind; do
   target="$FAKE_SKILLS/$name"
   if [ -L "$target" ]; then
     resolved="$(readlink "$target")"
@@ -199,9 +199,9 @@ done
 echo ""
 echo "--- SKILL.md files accessible through symlinks"
 
-for dir in "$REPO_DIR"/panda*/; do
+for dir in "$REPO_DIR"/ftm*/; do
   name=$(basename "$dir")
-  [ "$name" = "panda-state" ] && continue
+  [ "$name" = "ftm-state" ] && continue
 
   skill_md_in_repo="$dir/SKILL.md"
   [ ! -f "$skill_md_in_repo" ] && continue
@@ -222,7 +222,7 @@ echo ""
 echo "--- blackboard state initialized"
 
 assert_true \
-  "blackboard directory created at panda-state/blackboard" \
+  "blackboard directory created at ftm-state/blackboard" \
   "[ -d '$FAKE_STATE/blackboard' ]"
 
 assert_true \
@@ -261,14 +261,14 @@ fi
 # ---------------------------------------------------------------------------
 
 echo ""
-echo "--- panda-config.yml initialized from default"
+echo "--- ftm-config.yml initialized from default"
 
-if [ -f "$REPO_DIR/panda-config.default.yml" ]; then
+if [ -f "$REPO_DIR/ftm-config.default.yml" ]; then
   assert_regular_file \
-    "panda-config.yml created at ~/.claude/ from default template" \
-    "$FAKE_CLAUDE/panda-config.yml"
+    "ftm-config.yml created at ~/.claude/ from default template" \
+    "$FAKE_CLAUDE/ftm-config.yml"
 else
-  echo "  SKIP  panda-config.default.yml not present in repo — skipping config test"
+  echo "  SKIP  ftm-config.default.yml not present in repo — skipping config test"
 fi
 
 # ---------------------------------------------------------------------------
@@ -279,7 +279,7 @@ echo ""
 echo "--- install.sh idempotency (re-run is safe)"
 
 # Record the readlink target for a yml before second run
-SAMPLE_YML="panda.yml"
+SAMPLE_YML="ftm.yml"
 LINK_BEFORE="$(readlink "$FAKE_SKILLS/$SAMPLE_YML" 2>/dev/null || echo "missing")"
 
 # Run install a second time
@@ -317,13 +317,13 @@ else
 fi
 
 # config file should not be overwritten if it already exists
-if [ -f "$FAKE_CLAUDE/panda-config.yml" ]; then
-  echo "sentinel-do-not-overwrite: true" >> "$FAKE_CLAUDE/panda-config.yml"
+if [ -f "$FAKE_CLAUDE/ftm-config.yml" ]; then
+  echo "sentinel-do-not-overwrite: true" >> "$FAKE_CLAUDE/ftm-config.yml"
   run_install "$FAKE_HOME"
-  if grep -q "sentinel-do-not-overwrite" "$FAKE_CLAUDE/panda-config.yml"; then
-    pass "re-running install does not overwrite existing panda-config.yml"
+  if grep -q "sentinel-do-not-overwrite" "$FAKE_CLAUDE/ftm-config.yml"; then
+    pass "re-running install does not overwrite existing ftm-config.yml"
   else
-    fail "re-running install does not overwrite existing panda-config.yml" \
+    fail "re-running install does not overwrite existing ftm-config.yml" \
       "sentinel line was removed — config was overwritten"
   fi
 fi
@@ -335,7 +335,7 @@ fi
 echo ""
 echo "--- install.sh only creates symlinks (no real files copied to skills dir)"
 
-for entry in "$FAKE_SKILLS"/panda*; do
+for entry in "$FAKE_SKILLS"/ftm*; do
   [ -e "$entry" ] || continue
   name=$(basename "$entry")
   if [ ! -L "$entry" ]; then
@@ -343,32 +343,32 @@ for entry in "$FAKE_SKILLS"/panda*; do
       "$name is a real file/dir in skills dir, expected symlink"
   fi
 done
-pass "all panda* entries in skills dir are symlinks"
+pass "all ftm* entries in skills dir are symlinks"
 
 # ---------------------------------------------------------------------------
-# Test group: uninstall.sh — removes all panda* symlinks
+# Test group: uninstall.sh — removes all ftm* symlinks
 # ---------------------------------------------------------------------------
 
 echo ""
-echo "--- uninstall.sh removes panda* symlinks"
+echo "--- uninstall.sh removes ftm* symlinks"
 
 # Count symlinks before uninstall
 BEFORE_COUNT=0
-for link in "$FAKE_SKILLS"/panda*; do
+for link in "$FAKE_SKILLS"/ftm*; do
   [ -L "$link" ] && BEFORE_COUNT=$((BEFORE_COUNT + 1))
 done
 
 run_uninstall "$FAKE_HOME"
 
 AFTER_COUNT=0
-for link in "$FAKE_SKILLS"/panda*; do
+for link in "$FAKE_SKILLS"/ftm*; do
   [ -L "$link" ] 2>/dev/null && AFTER_COUNT=$((AFTER_COUNT + 1)) || true
 done
 
 if [ "$AFTER_COUNT" -eq 0 ]; then
-  pass "uninstall removes all $BEFORE_COUNT panda* symlinks from skills dir"
+  pass "uninstall removes all $BEFORE_COUNT ftm* symlinks from skills dir"
 else
-  fail "uninstall removes all panda* symlinks" \
+  fail "uninstall removes all ftm* symlinks" \
     "$AFTER_COUNT symlink(s) remain after uninstall"
 fi
 
@@ -377,22 +377,22 @@ fi
 # ---------------------------------------------------------------------------
 
 echo ""
-echo "--- uninstall.sh does not touch panda-state data"
+echo "--- uninstall.sh does not touch ftm-state data"
 
 assert_true \
-  "panda-state/blackboard directory preserved after uninstall" \
+  "ftm-state/blackboard directory preserved after uninstall" \
   "[ -d '$FAKE_STATE/blackboard' ]"
 
 assert_true \
-  "panda-state/blackboard/context.json preserved after uninstall" \
+  "ftm-state/blackboard/context.json preserved after uninstall" \
   "[ -f '$FAKE_STATE/blackboard/context.json' ]"
 
 assert_true \
-  "panda-state/blackboard/patterns.json preserved after uninstall" \
+  "ftm-state/blackboard/patterns.json preserved after uninstall" \
   "[ -f '$FAKE_STATE/blackboard/patterns.json' ]"
 
 assert_true \
-  "panda-state/blackboard/experiences/index.json preserved after uninstall" \
+  "ftm-state/blackboard/experiences/index.json preserved after uninstall" \
   "[ -f '$FAKE_STATE/blackboard/experiences/index.json' ]"
 
 # Confirm our sentinel value survived uninstall
@@ -405,21 +405,21 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# Test group: uninstall.sh — preserves panda-config.yml
+# Test group: uninstall.sh — preserves ftm-config.yml
 # ---------------------------------------------------------------------------
 
 echo ""
-echo "--- uninstall.sh does not touch panda-config.yml"
+echo "--- uninstall.sh does not touch ftm-config.yml"
 
-if [ -f "$FAKE_CLAUDE/panda-config.yml" ]; then
+if [ -f "$FAKE_CLAUDE/ftm-config.yml" ]; then
   assert_regular_file \
-    "panda-config.yml survives uninstall" \
-    "$FAKE_CLAUDE/panda-config.yml"
+    "ftm-config.yml survives uninstall" \
+    "$FAKE_CLAUDE/ftm-config.yml"
 
-  if grep -q "sentinel-do-not-overwrite" "$FAKE_CLAUDE/panda-config.yml"; then
-    pass "panda-config.yml content unchanged after uninstall"
+  if grep -q "sentinel-do-not-overwrite" "$FAKE_CLAUDE/ftm-config.yml"; then
+    pass "ftm-config.yml content unchanged after uninstall"
   else
-    fail "panda-config.yml content unchanged after uninstall" \
+    fail "ftm-config.yml content unchanged after uninstall" \
       "sentinel line missing — file was modified"
   fi
 fi
@@ -431,9 +431,9 @@ fi
 echo ""
 echo "--- uninstall.sh only removes symlinks, never real files"
 
-# Plant a real file named panda-custom.yml in skills dir before uninstall
-REAL_FILE="$FAKE_SKILLS/panda-custom.yml"
-echo "name: panda-custom" > "$REAL_FILE"
+# Plant a real file named ftm-custom.yml in skills dir before uninstall
+REAL_FILE="$FAKE_SKILLS/ftm-custom.yml"
+echo "name: ftm-custom" > "$REAL_FILE"
 
 # Re-install to recreate symlinks, then uninstall again
 run_install "$FAKE_HOME"
@@ -458,7 +458,7 @@ echo "--- install/uninstall/reinstall cycle"
 run_install "$FAKE_HOME"
 
 REINSTALL_COUNT=0
-for link in "$FAKE_SKILLS"/panda*; do
+for link in "$FAKE_SKILLS"/ftm*; do
   [ -L "$link" ] && REINSTALL_COUNT=$((REINSTALL_COUNT + 1)) || true
 done
 
@@ -470,9 +470,9 @@ else
 fi
 
 # SKILL.md files still accessible after reinstall
-for dir in "$REPO_DIR"/panda*/; do
+for dir in "$REPO_DIR"/ftm*/; do
   name=$(basename "$dir")
-  [ "$name" = "panda-state" ] && continue
+  [ "$name" = "ftm-state" ] && continue
   skill_md_in_repo="$dir/SKILL.md"
   [ ! -f "$skill_md_in_repo" ] && continue
 
@@ -493,11 +493,11 @@ echo "--- uninstall.sh handles missing skills dir gracefully"
 EMPTY_HOME="$TMPDIR_ROOT/empty-home"
 mkdir -p "$EMPTY_HOME/.claude/skills"
 
-# Run uninstall with no panda* symlinks — should exit 0
+# Run uninstall with no ftm* symlinks — should exit 0
 if HOME="$EMPTY_HOME" bash "$UNINSTALL_SCRIPT" > /dev/null 2>&1; then
-  pass "uninstall exits 0 when no panda* symlinks exist"
+  pass "uninstall exits 0 when no ftm* symlinks exist"
 else
-  fail "uninstall exits 0 when no panda* symlinks exist" \
+  fail "uninstall exits 0 when no ftm* symlinks exist" \
     "uninstall.sh returned non-zero for empty skills dir"
 fi
 
@@ -547,7 +547,7 @@ assert_true \
   "[ -d '$FRESH_HOME/.claude/skills' ]"
 
 FRESH_LINK_COUNT=0
-for link in "$FRESH_HOME/.claude/skills"/panda*; do
+for link in "$FRESH_HOME/.claude/skills"/ftm*; do
   [ -L "$link" ] 2>/dev/null && FRESH_LINK_COUNT=$((FRESH_LINK_COUNT + 1)) || true
 done
 
@@ -555,7 +555,7 @@ if [ "$FRESH_LINK_COUNT" -gt 0 ]; then
   pass "install.sh creates symlinks in freshly created skills dir ($FRESH_LINK_COUNT links)"
 else
   fail "install.sh creates symlinks in freshly created skills dir" \
-    "no panda* symlinks found after install to fresh dir"
+    "no ftm* symlinks found after install to fresh dir"
 fi
 
 # ---------------------------------------------------------------------------

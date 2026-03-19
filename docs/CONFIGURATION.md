@@ -1,8 +1,8 @@
 # Panda Configuration Reference
 
-Configuration lives in `~/.claude/panda-config.yml`. This file controls model selection, execution behavior, skill routing, and session management.
+Configuration lives in `~/.claude/ftm-config.yml`. This file controls model selection, execution behavior, skill routing, and session management.
 
-The repository ships a complete default configuration at `panda-config.default.yml`. When you install panda, this file is copied to `~/.claude/panda-config.yml`. You can edit it directly or use `/panda-config` to make changes interactively.
+The repository ships a complete default configuration at `ftm-config.default.yml`. When you install ftm, this file is copied to `~/.claude/ftm-config.yml`. You can edit it directly or use `/ftm-config` to make changes interactively.
 
 ---
 
@@ -36,12 +36,12 @@ profile: balanced  # quality | balanced | budget | custom | inherit
 
 **Stages**:
 - `planning` — Used by brainstorm, research, and plan generation steps.
-- `execution` — Used by agent task implementation inside `panda-executor`.
+- `execution` — Used by agent task implementation inside `ftm-executor`.
 - `review` — Used by audit, debug review, and council synthesis.
 
 ### The `inherit` Value
 
-Setting a stage to `inherit` tells panda to use whatever model the current Claude Code session is running on. This is useful when you want panda to match the context you're already in, rather than switching models.
+Setting a stage to `inherit` tells ftm to use whatever model the current Claude Code session is running on. This is useful when you want ftm to match the context you're already in, rather than switching models.
 
 The `inherit` profile sets all three stages to `inherit`.
 
@@ -88,14 +88,14 @@ execution:
 **Type**: integer
 **Default**: `5`
 
-Maximum number of agents dispatched simultaneously during a `panda-executor` wave. Increase for faster execution on large plans. Decrease if you want more sequential, observable progress or if you're on a rate-limited API tier.
+Maximum number of agents dispatched simultaneously during a `ftm-executor` wave. Increase for faster execution on large plans. Decrease if you want more sequential, observable progress or if you're on a rate-limited API tier.
 
 ### `auto_audit`
 
 **Type**: boolean
 **Default**: `true`
 
-When `true`, `panda-audit` runs automatically after each `panda-executor` task completes. This catches dead code, broken imports, and wiring issues as they are introduced rather than at the end of a plan.
+When `true`, `ftm-audit` runs automatically after each `ftm-executor` task completes. This catches dead code, broken imports, and wiring issues as they are introduced rather than at the end of a plan.
 
 Set to `false` if you want to run audits manually or if the audit overhead is too slow for your workflow.
 
@@ -104,7 +104,7 @@ Set to `false` if you want to run audits manually or if the audit overhead is to
 **Type**: boolean
 **Default**: `true`
 
-When `true`, `panda-executor` writes a `PROGRESS.md` file to the blackboard during multi-agent runs. This file tracks wave progress and is used by `panda-resume` to restore mid-execution state.
+When `true`, `ftm-executor` writes a `PROGRESS.md` file to the blackboard during multi-agent runs. This file tracks wave progress and is used by `ftm-resume` to restore mid-execution state.
 
 ### `approval_mode`
 
@@ -128,26 +128,26 @@ Controls whether a plan is shown and approved before execution begins.
 
 ## Skills Section
 
-The `skills` section enables or disables individual skills for routing. A disabled skill is invisible to `panda-mind` — it will not be considered as a routing target.
+The `skills` section enables or disables individual skills for routing. A disabled skill is invisible to `ftm-mind` — it will not be considered as a routing target.
 
 ```yaml
 skills:
-  panda-brainstorm: { enabled: true }
-  panda-executor: { enabled: true }
-  panda-debug: { enabled: true }
-  panda-audit: { enabled: true }
-  panda-council: { enabled: true }
-  panda-codex-gate: { enabled: true }
-  panda-intent: { enabled: true }
-  panda-diagram: { enabled: true }
-  panda-browse: { enabled: true }
-  panda-pause: { enabled: true }
-  panda-resume: { enabled: true }
-  panda-upgrade: { enabled: true }
-  panda-retro: { enabled: true }
-  panda-config: { enabled: true }
-  panda-git: { enabled: true }
-  panda-mind: { enabled: true }
+  ftm-brainstorm: { enabled: true }
+  ftm-executor: { enabled: true }
+  ftm-debug: { enabled: true }
+  ftm-audit: { enabled: true }
+  ftm-council: { enabled: true }
+  ftm-codex-gate: { enabled: true }
+  ftm-intent: { enabled: true }
+  ftm-diagram: { enabled: true }
+  ftm-browse: { enabled: true }
+  ftm-pause: { enabled: true }
+  ftm-resume: { enabled: true }
+  ftm-upgrade: { enabled: true }
+  ftm-retro: { enabled: true }
+  ftm-config: { enabled: true }
+  ftm-git: { enabled: true }
+  ftm-mind: { enabled: true }
 ```
 
 ### Disabling a Skill
@@ -156,15 +156,15 @@ Set `enabled: false` to prevent routing to that skill:
 
 ```yaml
 skills:
-  panda-codex-gate: { enabled: false }  # skip Codex validation
-  panda-council: { enabled: false }     # skip multi-model deliberation
+  ftm-codex-gate: { enabled: false }  # skip Codex validation
+  ftm-council: { enabled: false }     # skip multi-model deliberation
 ```
 
 Disabled skills are still installed. They can be re-enabled at any time by changing the flag back to `true`.
 
-### Disabling `panda-mind`
+### Disabling `ftm-mind`
 
-Setting `panda-mind: { enabled: false }` removes the OODA routing loop from consideration. Use only if you are invoking individual skills directly and want no re-orientation pass.
+Setting `ftm-mind: { enabled: false }` removes the OODA routing loop from consideration. Use only if you are invoking individual skills directly and want no re-orientation pass.
 
 ---
 
@@ -181,9 +181,9 @@ session:
 **Type**: boolean
 **Default**: `false`
 
-When `true`, panda automatically saves session state (equivalent to running `/panda pause`) when the conversation ends. This preserves mid-execution state so it can be restored with `/panda resume` in a new conversation.
+When `true`, ftm automatically saves session state (equivalent to running `/ftm pause`) when the conversation ends. This preserves mid-execution state so it can be restored with `/ftm resume` in a new conversation.
 
-When `false`, you must manually run `/panda pause` before ending a session if you want to resume later.
+When `false`, you must manually run `/ftm pause` before ending a session if you want to resume later.
 
 ### `state_retention_days`
 
@@ -234,22 +234,22 @@ execution:
   approval_mode: auto
 
 skills:
-  panda-brainstorm: { enabled: true }
-  panda-executor: { enabled: true }
-  panda-debug: { enabled: true }
-  panda-audit: { enabled: true }
-  panda-council: { enabled: true }
-  panda-codex-gate: { enabled: true }
-  panda-intent: { enabled: true }
-  panda-diagram: { enabled: true }
-  panda-browse: { enabled: true }
-  panda-pause: { enabled: true }
-  panda-resume: { enabled: true }
-  panda-upgrade: { enabled: true }
-  panda-retro: { enabled: true }
-  panda-config: { enabled: true }
-  panda-git: { enabled: true }
-  panda-mind: { enabled: true }
+  ftm-brainstorm: { enabled: true }
+  ftm-executor: { enabled: true }
+  ftm-debug: { enabled: true }
+  ftm-audit: { enabled: true }
+  ftm-council: { enabled: true }
+  ftm-codex-gate: { enabled: true }
+  ftm-intent: { enabled: true }
+  ftm-diagram: { enabled: true }
+  ftm-browse: { enabled: true }
+  ftm-pause: { enabled: true }
+  ftm-resume: { enabled: true }
+  ftm-upgrade: { enabled: true }
+  ftm-retro: { enabled: true }
+  ftm-config: { enabled: true }
+  ftm-git: { enabled: true }
+  ftm-mind: { enabled: true }
 
 session:
   auto_pause_on_exit: false
@@ -290,7 +290,7 @@ execution:
 
 ```yaml
 skills:
-  panda-codex-gate: { enabled: false }
+  ftm-codex-gate: { enabled: false }
 ```
 
 ### Auto-save session state on every exit

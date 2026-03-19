@@ -4,8 +4,8 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-SCHEMAS="$REPO_DIR/panda-state/schemas"
-BLACKBOARD_TEMPLATES="$REPO_DIR/panda-state/blackboard"
+SCHEMAS="$REPO_DIR/ftm-state/schemas"
+BLACKBOARD_TEMPLATES="$REPO_DIR/ftm-state/blackboard"
 
 PASS=0
 FAIL=0
@@ -127,7 +127,7 @@ cat > "$VALID_EXP" <<'EOF'
     "fail": 0
   },
   "lessons_learned": [
-    "Always run schema validation before writing to panda-state",
+    "Always run schema validation before writing to ftm-state",
     "Experience files must include task_type and timestamp"
   ],
   "timestamp": "2026-03-18T10:00:00Z",
@@ -469,7 +469,7 @@ cat > "$CONTEXT_ACTIVE" <<'EOF'
     {
       "summary": "Use ajv-cli for schema validation in tests",
       "timestamp": "2026-03-18T09:05:00Z",
-      "skill": "panda-executor"
+      "skill": "ftm-executor"
     }
   ],
   "active_constraints": ["max 1000 lines per file", "no hardcoded paths"],
@@ -483,7 +483,7 @@ cat > "$CONTEXT_ACTIVE" <<'EOF'
     "last_updated": "2026-03-18T09:10:00Z",
     "conversation_id": "conv-abc123",
     "messages_count": 5,
-    "skills_invoked": ["panda-executor", "panda-audit"]
+    "skills_invoked": ["ftm-executor", "ftm-audit"]
   }
 }
 EOF
@@ -732,7 +732,7 @@ decisions = [
   {
     "summary": f"Decision {i}",
     "timestamp": "2026-03-18T10:00:00Z",
-    "skill": "panda-executor"
+    "skill": "ftm-executor"
   }
   for i in range(10)
 ]
@@ -776,7 +776,7 @@ decisions = [
   {
     "summary": f"Decision {i}",
     "timestamp": "2026-03-18T10:00:00Z",
-    "skill": "panda-executor"
+    "skill": "ftm-executor"
   }
   for i in range(11)
 ]

@@ -80,7 +80,7 @@ jobs:
         run: node bin/generate-manifest.mjs
 
       - name: Check manifest is up to date
-        run: git diff --exit-code panda-manifest.json
+        run: git diff --exit-code ftm-manifest.json
 
   commitlint:
     runs-on: ubuntu-latest
@@ -130,8 +130,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: TypeScript check for panda-browse daemon
-        run: npx tsc --noEmit --project panda-browse/daemon/tsconfig.json
+      - name: TypeScript check for ftm-browse daemon
+        run: npx tsc --noEmit --project ftm-browse/daemon/tsconfig.json
 
   validate-blackboard:
     runs-on: ubuntu-latest

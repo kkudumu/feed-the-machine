@@ -1,0 +1,2 @@
+name: ftm-intent
+description: Manages the hierarchical INTENT.md documentation layer — root index with architecture decisions and module map, plus per-module INTENT.md files with function-level entries (does/why/relationships/decisions). Use when creating or updating intent documentation, bootstrapping a new project's intent layer, or when user says "update intent", "document intent", "ftm-intent", "what does this function do". Auto-invoked by ftm-executor after every commit to keep intent documentation in sync with code changes.

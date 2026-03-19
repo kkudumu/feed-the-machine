@@ -22,9 +22,9 @@ Panda is a skill orchestration layer for Claude Code. It adds persistent memory,
 ```mermaid
 graph TD
     User["User request"]
-    Mind["panda-mind\n(OODA loop)"]
-    Blackboard["Blackboard Memory\n(~/.claude/panda-state/)"]
-    Manifest["panda-manifest.json\n(skill registry)"]
+    Mind["ftm-mind\n(OODA loop)"]
+    Blackboard["Blackboard Memory\n(~/.claude/ftm-state/)"]
+    Manifest["ftm-manifest.json\n(skill registry)"]
     Skills["Skill layer\n(17 skills)"]
     Events["Event Mesh"]
 
@@ -37,7 +37,7 @@ graph TD
     Skills --> Blackboard
 ```
 
-The entry point is always `panda-mind`. It loads memory, consults the manifest, sizes the task, and either acts directly or delegates to a skill. Skills communicate with each other through the event mesh and share state through the blackboard.
+The entry point is always `ftm-mind`. It loads memory, consults the manifest, sizes the task, and either acts directly or delegates to a skill. Skills communicate with each other through the event mesh and share state through the blackboard.
 
 ---
 
@@ -64,7 +64,7 @@ flowchart TD
 | `micro` | Single obvious edit, trivial blast radius | Direct action, no plan |
 | `small` | 1-3 files, one concern, clear done state | Direct action + verification |
 | `medium` | Multi-file, ordering matters, moderate uncertainty | Short plan, then execute |
-| `large` | Cross-domain, major uncertainty, existing plan doc | Route to `panda-brainstorm` (plan) or `panda-executor` (execute) |
+| `large` | Cross-domain, major uncertainty, existing plan doc | Route to `ftm-brainstorm` (plan) or `ftm-executor` (execute) |
 
 The ADaPT rule governs escalation: try the simpler tier first. Escalate only when the simple approach fails, the user explicitly asks for more, or the complexity is obvious from the start.
 
@@ -89,7 +89,7 @@ The blackboard is a file-based shared memory system. All skills read from and wr
 
 ```mermaid
 graph LR
-    subgraph Blackboard["~/.claude/panda-state/blackboard/"]
+    subgraph Blackboard["~/.claude/ftm-state/blackboard/"]
         ctx["context.json\nLive session state"]
         idx["experiences/index.json\nFast retrieval index"]
         exp["experiences/\nYYYY-MM-DD_slug.json\nPer-task learnings"]
@@ -100,7 +100,7 @@ graph LR
     Skills -->|"read"| idx
     Skills -->|"write"| exp
     Skills -->|"read"| pat
-    Retro["panda-retro"] -->|"promotes patterns after 2+ experiences"| pat
+    Retro["ftm-retro"] -->|"promotes patterns after 2+ experiences"| pat
     Retro -->|"writes"| exp
     Retro -->|"updates"| idx
 ```
@@ -117,31 +117,31 @@ graph LR
 ### Memory Lifecycle
 
 1. **During a task**: `context.json` is updated after each meaningful action.
-2. **After task completion**: `panda-retro` writes an experience file and updates the index.
-3. **Pattern promotion**: After 2+ experience files confirm the same insight, `panda-retro` promotes it to `patterns.json`. Confidence tracks from `low` (2 occurrences) → `medium` (4+) → `high` (8+).
+2. **After task completion**: `ftm-retro` writes an experience file and updates the index.
+3. **Pattern promotion**: After 2+ experience files confirm the same insight, `ftm-retro` promotes it to `patterns.json`. Confidence tracks from `low` (2 occurrences) → `medium` (4+) → `high` (8+).
 4. **Pruning**: The index caps at 200 entries. Automatic pruning removes oldest low-confidence entries first.
 
 ### Concurrency Rules
 
-During parallel `panda-executor` waves, only the orchestrator writes `index.json`. Individual executor agents write their own experience files (filenames are unique by slug). After wave completion, the orchestrator merges all new entries into the index in a single write.
+During parallel `ftm-executor` waves, only the orchestrator writes `index.json`. Individual executor agents write their own experience files (filenames are unique by slug). After wave completion, the orchestrator merges all new entries into the index in a single write.
 
 ### Schemas
 
-JSON schemas for all four blackboard files live at `panda-state/schemas/`. They are enforced by the schema validation step in CI.
+JSON schemas for all four blackboard files live at `ftm-state/schemas/`. They are enforced by the schema validation step in CI.
 
 ---
 
 ## Event Mesh
 
-Skills communicate through a typed event system. After completing an action, a skill emits one or more events. Other skills that declare they listen for that event are triggered by `panda-mind`.
+Skills communicate through a typed event system. After completing an action, a skill emits one or more events. Other skills that declare they listen for that event are triggered by `ftm-mind`.
 
 ```mermaid
 sequenceDiagram
-    participant Executor as panda-executor
-    participant Mind as panda-mind
-    participant Intent as panda-intent
-    participant Diagram as panda-diagram
-    participant Retro as panda-retro
+    participant Executor as ftm-executor
+    participant Mind as ftm-mind
+    participant Intent as ftm-intent
+    participant Diagram as ftm-diagram
+    participant Retro as ftm-retro
 
     Executor->>Mind: code_committed (fast-path)
     Mind->>Intent: trigger (INTENT.md sync)
@@ -151,7 +151,7 @@ sequenceDiagram
     Mind->>Retro: trigger (micro-reflection)
 
     Executor->>Mind: test_failed
-    Mind->>Mind: decide whether to trigger panda-debug
+    Mind->>Mind: decide whether to trigger ftm-debug
 ```
 
 ### Fast-Path vs Mediated Events
@@ -167,7 +167,7 @@ All other events are mediated.
 
 ### Event Registry
 
-The full event vocabulary — descriptions, emitters, listeners, payloads — is defined in `panda-mind/references/event-registry.md`. The event validator (`bin/validate-events.mjs`) checks that every event declared in a `SKILL.md` file exists in the registry and that every registry event is referenced by at least one skill.
+The full event vocabulary — descriptions, emitters, listeners, payloads — is defined in `ftm-mind/references/event-registry.md`. The event validator (`bin/validate-events.mjs`) checks that every event declared in a `SKILL.md` file exists in the registry and that every registry event is referenced by at least one skill.
 
 ### Key Events
 
@@ -175,7 +175,7 @@ The full event vocabulary — descriptions, emitters, listeners, payloads — is
 |-------|-----------|---------|
 | `code_committed` | executor | intent sync, diagram sync, codex-gate |
 | `task_completed` | all skills | retro micro-reflection |
-| `test_failed` | executor, debug | panda-debug auto-investigation |
+| `test_failed` | executor, debug | ftm-debug auto-investigation |
 | `bug_fixed` | debug | retro experience recording |
 | `audit_complete` | audit | executor result interpretation |
 | `secrets_found` | git | executor commit/push block |
@@ -185,13 +185,13 @@ The full event vocabulary — descriptions, emitters, listeners, payloads — is
 
 ## Skill Manifest
 
-`panda-manifest.json` is the machine-readable registry of all skills. It is the single source of truth `panda-mind` uses for routing decisions.
+`ftm-manifest.json` is the machine-readable registry of all skills. It is the single source of truth `ftm-mind` uses for routing decisions.
 
 ```mermaid
 flowchart LR
-    YML["skill-name/SKILL.md\n+ frontmatter"] -->|"bin/generate-manifest.mjs"| Manifest["panda-manifest.json"]
-    Config["panda-config.yml\nskills: section"] --> Mind
-    Manifest --> Mind["panda-mind\nrouting engine"]
+    YML["skill-name/SKILL.md\n+ frontmatter"] -->|"bin/generate-manifest.mjs"| Manifest["ftm-manifest.json"]
+    Config["ftm-config.yml\nskills: section"] --> Mind
+    Manifest --> Mind["ftm-mind\nrouting engine"]
 ```
 
 ### Manifest Contents
@@ -251,7 +251,7 @@ Reference files are internal. They are not part of the public API surface.
 
 ## Approval Flow
 
-The approval mode is set in `panda-config.yml` under `execution.approval_mode`. It controls whether the user sees and approves a plan before execution begins.
+The approval mode is set in `ftm-config.yml` under `execution.approval_mode`. It controls whether the user sees and approves a plan before execution begins.
 
 | Mode | Behavior |
 |------|---------|
@@ -282,7 +282,7 @@ Key configuration points:
 
 - **Profiles** (`quality` / `balanced` / `budget` / `custom` / `inherit`) control which model is used at each stage — planning, execution, and review.
 - **Execution settings** control parallelism, auto-audit, progress tracking, and the approval mode.
-- **Skills section** enables or disables individual skills for routing. A disabled skill is invisible to panda-mind.
+- **Skills section** enables or disables individual skills for routing. A disabled skill is invisible to ftm-mind.
 - **Session settings** control auto-pause behavior and how long state files are retained.
 
-The active configuration file is `~/.claude/panda-config.yml`. The default values ship as `panda-config.default.yml` in the repository.
+The active configuration file is `~/.claude/ftm-config.yml`. The default values ship as `ftm-config.default.yml` in the repository.

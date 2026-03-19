@@ -1,11 +1,11 @@
-# Contributing to Panda Skills
+# Contributing to FTM Skills
 
 ## Adding a New Skill
 
 ### 1. Create the skill directory
 
 ```
-panda-yourskill/
+ftm-yourskill/
   SKILL.md          # Required — skill instructions
   evals/
     evals.json      # Recommended — behavioral test cases
@@ -19,7 +19,7 @@ Every SKILL.md needs YAML frontmatter:
 
 ```yaml
 ---
-name: panda-yourskill
+name: ftm-yourskill
 description: What it does. Use when user says "trigger phrase 1", "trigger phrase 2", or "trigger phrase 3".
 ---
 ```
@@ -28,10 +28,10 @@ The `description` field is critical — Claude uses it to decide when to load yo
 
 ### 3. Create the trigger file
 
-Create `panda-yourskill.yml` at the repo root:
+Create `ftm-yourskill.yml` at the repo root:
 
 ```yaml
-name: panda-yourskill
+name: ftm-yourskill
 description: Same description as in SKILL.md frontmatter.
 ```
 
@@ -41,9 +41,9 @@ If your skill should read/write persistent memory, add these sections to SKILL.m
 
 ```markdown
 ## Blackboard Read
-1. Read `~/.claude/panda-state/blackboard/context.json` — check current_task
-2. Read `~/.claude/panda-state/blackboard/experiences/index.json` — filter relevant entries
-3. Read `~/.claude/panda-state/blackboard/patterns.json` — check for relevant patterns
+1. Read `~/.claude/ftm-state/blackboard/context.json` — check current_task
+2. Read `~/.claude/ftm-state/blackboard/experiences/index.json` — filter relevant entries
+3. Read `~/.claude/ftm-state/blackboard/patterns.json` — check for relevant patterns
 
 ## Blackboard Write
 1. Update context.json with task status
@@ -55,11 +55,11 @@ Use `~/` paths, never hardcoded home directories.
 
 ### 5. Add evals (recommended)
 
-Create `panda-yourskill/evals/evals.json`:
+Create `ftm-yourskill/evals/evals.json`:
 
 ```json
 {
-  "skill_name": "panda-yourskill",
+  "skill_name": "ftm-yourskill",
   "evals": [
     {
       "id": 1,
@@ -118,15 +118,15 @@ tests/validate-evals.sh
 ## Project Structure
 
 ```
-panda-brain/
-  panda.yml                    # Router skill trigger
-  panda/SKILL.md               # Router skill
-  panda-mind.yml               # Mind skill trigger
-  panda-mind/SKILL.md          # OODA cognitive loop
-  panda-mind/references/       # Blackboard schema, event registry
-  panda-[skill].yml            # Trigger files
-  panda-[skill]/SKILL.md       # Skill instructions
-  panda-state/blackboard/      # Template state files
+ftm-brain/
+  ftm.yml                    # Router skill trigger
+  ftm/SKILL.md               # Router skill
+  ftm-mind.yml               # Mind skill trigger
+  ftm-mind/SKILL.md          # OODA cognitive loop
+  ftm-mind/references/       # Blackboard schema, event registry
+  ftm-[skill].yml            # Trigger files
+  ftm-[skill]/SKILL.md       # Skill instructions
+  ftm-state/blackboard/      # Template state files
   tests/                       # Validation scripts
   .github/workflows/ci.yml     # CI pipeline
 ```

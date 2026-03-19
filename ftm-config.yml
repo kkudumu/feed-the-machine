@@ -1,0 +1,2 @@
+name: ftm-config
+description: Configure ftm skill settings including model profiles, execution preferences, and defaults. Use when user says "ftm config", "ftm settings", "set ftm profile", "ftm model", or wants to change how ftm skills behave.

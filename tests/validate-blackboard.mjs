@@ -8,8 +8,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO = join(__dirname, '..');
-const SCHEMAS = join(REPO, 'panda-state', 'schemas');
-const BLACKBOARD = join(REPO, 'panda-state', 'blackboard');
+const SCHEMAS = join(REPO, 'ftm-state', 'schemas');
+const BLACKBOARD = join(REPO, 'ftm-state', 'blackboard');
 
 // ---------------------------------------------------------------------------
 // Schema-to-data pairs (fixed mappings)

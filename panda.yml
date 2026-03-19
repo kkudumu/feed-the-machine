@@ -1,2 +1,0 @@
-name: panda
-description: Universal entry point for all panda skills. Routes freeform text to the right panda skill automatically. Use when user says "/panda" followed by anything. panda-mind is the default cognitive entry point for all unclassified input (OODA reasoning). Explicit prefixes route directly: brainstorm, execute, debug, audit, council, intent, diagram, codex-gate, pause, resume, browse, upgrade, retro, config, mind. Also use when user is unsure which panda skill they need.

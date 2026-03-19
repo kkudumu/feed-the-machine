@@ -1,2 +1,0 @@
-name: panda-retro
-description: Post-execution self-assessment skill. Automatically triggered after panda-executor completes a plan. Scores execution across 5 dimensions, identifies what went well and what was slow, writes structured report with improvement suggestions. Use when user says "retro", "retrospective", "how did that go", "execution review", "self-assessment", "panda retro".

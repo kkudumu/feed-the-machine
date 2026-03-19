@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Removes panda skill symlinks from ~/.claude/skills/
+# Removes ftm skill symlinks from ~/.claude/skills/
 # Only removes symlinks — never deletes real files.
 
 SKILLS_DIR="$HOME/.claude/skills"
 
-echo "Removing panda skill symlinks from: $SKILLS_DIR"
+echo "Removing ftm skill symlinks from: $SKILLS_DIR"
 echo ""
 
 count=0
-for link in "$SKILLS_DIR"/panda*; do
+for link in "$SKILLS_DIR"/ftm*; do
   if [ -L "$link" ]; then
     name=$(basename "$link")
     rm "$link"
@@ -21,5 +21,5 @@ done
 
 echo ""
 echo "Removed $count symlinks."
-echo "Blackboard state at ~/.claude/panda-state/ was NOT touched."
-echo "Config at ~/.claude/panda-config.yml was NOT touched."
+echo "Blackboard state at ~/.claude/ftm-state/ was NOT touched."
+echo "Config at ~/.claude/ftm-config.yml was NOT touched."

@@ -1,0 +1,2 @@
+name: ftm-resume
+description: Resume a previously paused ftm skill session from saved state. Use when user says "resume", "continue where we left off", "ftm resume", "pick up", or starts a new conversation wanting to continue previous ftm work.

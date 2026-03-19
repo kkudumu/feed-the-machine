@@ -1,0 +1,2 @@
+name: ftm-diagram
+description: Manages the hierarchical ARCHITECTURE.mmd mermaid diagram layer — root module-to-module relationship graph (subway map) and per-module DIAGRAM.mmd function-to-function graphs (street maps). Use when creating or updating architecture diagrams, bootstrapping a new project's diagram layer, or when user says "update diagram", "show architecture", "ftm-diagram", "visualize relationships". Auto-invoked by ftm-executor after every commit to keep diagrams in sync with code changes.

@@ -9,11 +9,11 @@ ERRORS=""
 
 MAX_SKILL_BYTES=20480  # 20 KiB
 
-for skill_dir in "$REPO_DIR"/panda*/; do
+for skill_dir in "$REPO_DIR"/ftm*/; do
   skill_md="$skill_dir/SKILL.md"
   name=$(basename "$skill_dir")
 
-  [ "$name" = "panda-state" ] && continue
+  [ "$name" = "ftm-state" ] && continue
 
   # --- missing SKILL.md ---
   if [ ! -f "$skill_md" ]; then
@@ -66,10 +66,10 @@ for skill_dir in "$REPO_DIR"/panda*/; do
 done
 
 # --- yml -> directory check (already existed; preserved) ---
-for yml in "$REPO_DIR"/panda*.yml; do
+for yml in "$REPO_DIR"/ftm*.yml; do
   yml_name=$(basename "$yml" .yml)
-  [ "$yml_name" = "panda-config" ] && continue
-  [ "$yml_name" = "panda-config.default" ] && continue
+  [ "$yml_name" = "ftm-config" ] && continue
+  [ "$yml_name" = "ftm-config.default" ] && continue
   if [ ! -d "$REPO_DIR/$yml_name" ]; then
     ERRORS="${ERRORS}\n  FAIL  ${yml_name}.yml — no matching skill directory"
     FAIL=$((FAIL + 1))
@@ -77,9 +77,9 @@ for yml in "$REPO_DIR"/panda*.yml; do
 done
 
 # --- directory -> yml check (new: bidirectional) ---
-for skill_dir in "$REPO_DIR"/panda*/; do
+for skill_dir in "$REPO_DIR"/ftm*/; do
   dir_name=$(basename "$skill_dir")
-  [ "$dir_name" = "panda-state" ] && continue
+  [ "$dir_name" = "ftm-state" ] && continue
 
   # Only flag directories that actually contain a SKILL.md
   if [ ! -f "$skill_dir/SKILL.md" ]; then

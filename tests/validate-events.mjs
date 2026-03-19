@@ -106,7 +106,7 @@ function parseSkillEvents(filePath) {
 
 /**
  * Find all SKILL.md files to scan.
- * Includes panda-[*]/SKILL.md and panda/SKILL.md. Skips panda-state/.
+ * Includes ftm-[*]/SKILL.md and ftm/SKILL.md. Skips ftm-state/.
  *
  * @returns {Array<{ skillName: string, filePath: string }>}
  */
@@ -117,10 +117,10 @@ function findSkillFiles() {
   for (const entry of entries) {
     const fullPath = join(REPO, entry);
     if (!statSync(fullPath).isDirectory()) continue;
-    if (entry === 'panda-state') continue;
+    if (entry === 'ftm-state') continue;
 
     const isPandaDir =
-      entry === 'panda' || (entry.startsWith('panda-') && entry !== 'panda-state');
+      entry === 'ftm' || (entry.startsWith('ftm-') && entry !== 'ftm-state');
     if (!isPandaDir) continue;
 
     const skillMd = join(fullPath, 'SKILL.md');
@@ -136,7 +136,7 @@ function findSkillFiles() {
 // Main
 // ---------------------------------------------------------------------------
 
-const REGISTRY_PATH = join(REPO, 'panda-mind', 'references', 'event-registry.md');
+const REGISTRY_PATH = join(REPO, 'ftm-mind', 'references', 'event-registry.md');
 
 if (!existsSync(REGISTRY_PATH)) {
   console.error(`ERROR: Event registry not found at ${REGISTRY_PATH}`);

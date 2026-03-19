@@ -2,7 +2,7 @@
 /**
  * generate-manifest.mjs
  *
- * Scans all panda skill SKILL.md files and produces panda-manifest.json
+ * Scans all ftm skill SKILL.md files and produces ftm-manifest.json
  * at the project root with structured metadata for each skill.
  *
  * Usage: node bin/generate-manifest.mjs
@@ -22,7 +22,7 @@ const ROOT = path.resolve(__dirname, '..');
 
 /**
  * Returns an array of { skillFile, skillDir, triggerFile } objects.
- * Handles both panda-X/SKILL.md pattern and the special panda/SKILL.md root skill.
+ * Handles both ftm-X/SKILL.md pattern and the special ftm/SKILL.md root skill.
  */
 function discoverSkillFiles() {
   const entries = fs.readdirSync(ROOT, { withFileTypes: true });
@@ -33,21 +33,21 @@ function discoverSkillFiles() {
 
     const dirName = entry.name;
 
-    // Root panda skill
-    if (dirName === 'panda') {
-      const skillFile = path.join(ROOT, 'panda', 'SKILL.md');
+    // Root ftm skill
+    if (dirName === 'ftm') {
+      const skillFile = path.join(ROOT, 'ftm', 'SKILL.md');
       if (fs.existsSync(skillFile)) {
         skills.push({
           skillFile,
-          skillDir: 'panda/',
-          triggerFile: 'panda.yml',
+          skillDir: 'ftm/',
+          triggerFile: 'ftm.yml',
         });
       }
       continue;
     }
 
-    // panda-* skill directories
-    if (dirName.startsWith('panda-')) {
+    // ftm-* skill directories
+    if (dirName.startsWith('ftm-')) {
       const skillFile = path.join(ROOT, dirName, 'SKILL.md');
       if (fs.existsSync(skillFile)) {
         skills.push({
@@ -112,12 +112,12 @@ function extractEventNames(lines) {
 }
 
 /**
- * Extracts ~/.claude/panda-state/... paths from blackboard section lines.
+ * Extracts ~/.claude/ftm-state/... paths from blackboard section lines.
  */
 function extractBlackboardPaths(lines) {
   const paths = [];
-  // Match backtick-quoted paths containing panda-state
-  const pathRegex = /`(~\/.claude\/panda-state\/[^`]+)`/g;
+  // Match backtick-quoted paths containing ftm-state
+  const pathRegex = /`(~\/.claude\/ftm-state\/[^`]+)`/g;
 
   for (const line of lines) {
     let match;
@@ -201,7 +201,7 @@ function main() {
     skills,
   };
 
-  const outputPath = path.join(ROOT, 'panda-manifest.json');
+  const outputPath = path.join(ROOT, 'ftm-manifest.json');
   fs.writeFileSync(outputPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
 
   process.stderr.write(`Generated manifest for ${skills.length} skills\n`);

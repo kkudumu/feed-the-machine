@@ -1,2 +1,0 @@
-name: panda-resume
-description: Resume a previously paused panda skill session from saved state. Use when user says "resume", "continue where we left off", "panda resume", "pick up", or starts a new conversation wanting to continue previous panda work.

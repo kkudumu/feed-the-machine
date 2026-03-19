@@ -3,8 +3,8 @@
 ## Install
 
 ```bash
-git clone https://github.com/kkudumu/panda-brain.git ~/panda-brain
-cd ~/panda-brain
+git clone https://github.com/kkudumu/ftm-brain.git ~/ftm-brain
+cd ~/ftm-brain
 ./install.sh
 ```
 
@@ -15,7 +15,7 @@ Restart Claude Code (or start a new session) to pick up the skills.
 ### 1. Ask for help
 
 ```
-/panda help
+/ftm help
 ```
 
 Shows all 16 skills and what they do.
@@ -23,7 +23,7 @@ Shows all 16 skills and what they do.
 ### 2. Let the mind route your request
 
 ```
-/panda I need to add error handling to my API routes
+/ftm I need to add error handling to my API routes
 ```
 
 Panda-mind reads your codebase, sizes the task, and either handles it directly or routes to the right skill. You don't need to pick the skill — it picks for you.
@@ -31,7 +31,7 @@ Panda-mind reads your codebase, sizes the task, and either handles it directly o
 ### 3. Brainstorm a feature
 
 ```
-/panda brainstorm I want to add OAuth login with Google and GitHub
+/ftm brainstorm I want to add OAuth login with Google and GitHub
 ```
 
 Launches parallel research agents that search the web and GitHub for real implementations, then presents 5 evidence-backed suggestions with trade-offs.
@@ -39,7 +39,7 @@ Launches parallel research agents that search the web and GitHub for real implem
 ### 4. Debug a stubborn bug
 
 ```
-/panda debug the auth middleware returns 401 even with a valid token
+/ftm debug the auth middleware returns 401 even with a valid token
 ```
 
 Deploys a war room with parallel hypothesis testing — instrumentation, reproduction, research, and solution agents working simultaneously.
@@ -47,7 +47,7 @@ Deploys a war room with parallel hypothesis testing — instrumentation, reprodu
 ### 5. Execute a plan
 
 ```
-/panda execute ~/.claude/plans/my-feature-plan.md
+/ftm execute ~/.claude/plans/my-feature-plan.md
 ```
 
 Reads your plan, assembles a team of specialized agents, dispatches them in parallel worktrees, and runs each through a commit-review-fix loop.
@@ -65,7 +65,7 @@ The system starts smart and gets smarter — it records experiences after each t
 
 ## Configuration
 
-Edit `~/.claude/panda-config.yml` to control model selection:
+Edit `~/.claude/ftm-config.yml` to control model selection:
 
 ```yaml
 profile: balanced  # quality | balanced | budget
@@ -79,7 +79,7 @@ profiles:
 
 ## What's Next
 
-- `/panda audit` — verify your code is properly wired
-- `/panda council` — get Claude + Codex + Gemini to debate a decision
-- `/panda config` — adjust settings
-- Just describe what you need — panda-mind handles the rest
+- `/ftm audit` — verify your code is properly wired
+- `/ftm council` — get Claude + Codex + Gemini to debate a decision
+- `/ftm config` — adjust settings
+- Just describe what you need — ftm-mind handles the rest

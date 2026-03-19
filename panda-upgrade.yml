@@ -1,2 +1,0 @@
-name: panda-upgrade
-description: Self-upgrade mechanism for panda skills ecosystem. Checks GitHub Releases for new versions, caches results for 60min, shows changelog, and copies updated files. Use when user says "upgrade", "update skills", "new version", "check for updates", "panda upgrade".

@@ -1,0 +1,2 @@
+name: ftm-audit
+description: Dual-purpose wiring audit that verifies all code is actually connected to the running application. Combines static analysis (knip) with adversarial LLM audit and auto-fixes anything it finds. Use when user says "audit", "wiring check", "verify wiring", "dead code", "check imports", "unused code", "find dead code", or "audit wiring". Also auto-invoked by ftm-executor after each task.

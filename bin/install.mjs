@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * npx panda-skills — installs panda skills into ~/.claude/skills/
+ * npx ftm-skills — installs ftm skills into ~/.claude/skills/
  *
  * Works by finding the npm package root (where the skill files live)
  * and symlinking them into the Claude Code skills directory.
@@ -17,7 +17,7 @@ const __dirname = dirname(__filename);
 const REPO_DIR = dirname(__dirname); // package root (one level up from bin/)
 const HOME = homedir();
 const SKILLS_DIR = join(HOME, ".claude", "skills");
-const STATE_DIR = join(HOME, ".claude", "panda-state");
+const STATE_DIR = join(HOME, ".claude", "ftm-state");
 const CONFIG_DIR = join(HOME, ".claude");
 
 function log(msg) {
@@ -47,24 +47,24 @@ function safeSymlink(src, dest) {
 }
 
 function main() {
-  console.log(`Installing panda skills from: ${REPO_DIR}`);
+  console.log(`Installing ftm skills from: ${REPO_DIR}`);
   console.log(`Linking into: ${SKILLS_DIR}`);
   console.log("");
 
   ensureDir(SKILLS_DIR);
 
-  // Link all panda*.yml files
+  // Link all ftm*.yml files
   const ymlFiles = readdirSync(REPO_DIR).filter(
-    (f) => f.startsWith("panda") && f.endsWith(".yml") && !f.includes("config.default")
+    (f) => f.startsWith("ftm") && f.endsWith(".yml") && !f.includes("config.default")
   );
   for (const yml of ymlFiles) {
     safeSymlink(join(REPO_DIR, yml), join(SKILLS_DIR, yml));
   }
 
-  // Link all panda* directories (skills with SKILL.md)
+  // Link all ftm* directories (skills with SKILL.md)
   const dirs = readdirSync(REPO_DIR).filter((f) => {
-    if (!f.startsWith("panda")) return false;
-    if (f === "panda-state") return false;
+    if (!f.startsWith("ftm")) return false;
+    if (f === "ftm-state") return false;
     const fullPath = join(REPO_DIR, f);
     try {
       return lstatSync(fullPath).isDirectory();
@@ -77,7 +77,7 @@ function main() {
   }
 
   // Set up blackboard state (copy templates, don't overwrite existing data)
-  const bbDir = join(REPO_DIR, "panda-state", "blackboard");
+  const bbDir = join(REPO_DIR, "ftm-state", "blackboard");
   if (existsSync(bbDir)) {
     ensureDir(join(STATE_DIR, "blackboard", "experiences"));
 
@@ -99,16 +99,16 @@ function main() {
   }
 
   // Copy default config if none exists
-  const configSrc = join(REPO_DIR, "panda-config.default.yml");
-  const configDest = join(CONFIG_DIR, "panda-config.yml");
+  const configSrc = join(REPO_DIR, "ftm-config.default.yml");
+  const configDest = join(CONFIG_DIR, "ftm-config.yml");
   if (existsSync(configSrc) && !existsSync(configDest)) {
     copyFileSync(configSrc, configDest);
-    log("INIT panda-config.yml (from default template)");
+    log("INIT ftm-config.yml (from default template)");
   }
 
   console.log("");
   console.log(`Done. ${ymlFiles.length} skills linked.`);
-  console.log("Try: /panda help");
+  console.log("Try: /ftm help");
 }
 
 main();

@@ -1,0 +1,62 @@
+# FTM Skills Configuration
+# Edit this file or use /ftm-config to modify settings
+
+# Model profiles control which model is used at each stage
+# Options: opus, sonnet, haiku, inherit (use session default)
+profile: balanced  # quality | balanced | budget | custom | inherit
+
+profiles:
+  quality:
+    planning: opus      # brainstorm, research, plan generation
+    execution: opus     # agent task implementation
+    review: sonnet      # audit, debug review, council synthesis
+
+  balanced:
+    planning: opus
+    execution: sonnet
+    review: sonnet
+
+  budget:
+    planning: sonnet
+    execution: sonnet
+    review: haiku
+
+  inherit:
+    planning: inherit
+    execution: inherit
+    review: inherit
+
+  custom:
+    planning: opus
+    execution: sonnet
+    review: haiku
+
+# Execution preferences
+execution:
+  max_parallel_agents: 5          # max agents dispatched simultaneously
+  auto_audit: true                # run ftm-audit after each executor task
+  progress_tracking: true         # write PROGRESS.md during execution
+
+# Skill enable/disable — set enabled: false to prevent ftm-mind from routing to a skill
+skills:
+  ftm-brainstorm: { enabled: true }
+  ftm-executor: { enabled: true }
+  ftm-debug: { enabled: true }
+  ftm-audit: { enabled: true }
+  ftm-council: { enabled: true }
+  ftm-codex-gate: { enabled: true }
+  ftm-intent: { enabled: true }
+  ftm-diagram: { enabled: true }
+  ftm-browse: { enabled: true }
+  ftm-pause: { enabled: true }
+  ftm-resume: { enabled: true }
+  ftm-upgrade: { enabled: true }
+  ftm-retro: { enabled: true }
+  ftm-config: { enabled: true }
+  ftm-git: { enabled: true }
+  ftm-mind: { enabled: true }
+
+# Session management
+session:
+  auto_pause_on_exit: false       # automatically save state when conversation ends
+  state_retention_days: 7         # archive states older than this
