@@ -1,10 +1,10 @@
 # Feed The Machine
 
-You have a pile of work. An IT ops ticket nobody wants to touch. A feature spec that needs to become code. A bug that's been open for three days. A half-formed idea rattling around your head.
+You have context. You have a task. You don't have time to babysit an AI through every step.
 
-Stop managing it. Feed it to the machine.
+Feed it to the machine.
 
-FTM is a cognitive skill ecosystem for Claude Code. Drop anything in — a Jira ticket, a feature spec, a bug report, a brainstorm, a full app build — and it reads everything, proposes a plan, waits for your approval, then executes end-to-end. Every successful execution becomes a playbook. Every playbook makes the next similar task faster. The machine hungers. You feed it. It takes care of you.
+FTM is a cognitive skill ecosystem for Claude Code. Drop in anything — a support ticket, a feature spec, a bug report, a half-formed idea, a meeting transcript, a migration checklist, a "figure this out" — and it reads everything, proposes a plan, waits for your approval, then executes end-to-end. Every successful execution becomes a playbook. Every playbook makes the next similar task faster. The machine hungers. You feed it. It takes care of you.
 
 ---
 
@@ -18,20 +18,15 @@ FEED → PLAN → APPROVE → EXECUTE → LEARN
   └──────────── (next task) ─────────┘
 ```
 
-**FEED** — Paste anything. A ticket URL. A spec doc. An error stack trace. Plain English. The machine reads it all.
+**FEED** — Paste anything. A ticket URL. A spec doc. An error stack trace. A Slack thread. Plain English. The machine reads it all.
 
-**PLAN** — ftm-mind runs an OODA loop: reads your blackboard (memory across sessions), sizes the task, assembles the right skills, proposes a concrete plan with wave-by-wave steps.
+**PLAN** — ftm-mind runs an OODA loop: reads your blackboard (memory across sessions), sizes the task, assembles the right skills, proposes a concrete plan with numbered steps.
 
-**APPROVE** — You review the plan. One word: go. Or you push back and it adjusts.
+**APPROVE** — You review the plan. Modify it, ask questions, or just say "go."
 
 **EXECUTE** — Parallel agent teams work through the plan. Each wave completes, validates, and checks in before the next begins. Browser automation, git ops, test runs, API calls — all coordinated.
 
 **LEARN** — Every outcome writes back to the blackboard: what worked, what failed, what pattern to remember. Next time you bring a similar task, the machine already knows the shape of it.
-
-Two modes, same loop:
-
-- **IT ops mode** — Ticket → read internal docs → browser-based admin execution → draft ticket updates back to Jira or Freshservice
-- **Dev mode** — Spec → brainstorm → plan → parallel code in worktrees → test → adversarial review → ship
 
 ---
 
@@ -101,13 +96,13 @@ Symlinks all 16+ skills into `~/.claude/skills/` where Claude Code discovers the
 
 **Three things to try right now:**
 
-**1. Drop a ticket:**
+**1. Feed it a task:**
 ```
 /ftm
 ```
-Paste a Jira or Freshservice ticket. Watch it read the ticket, pull relevant docs from your blackboard, propose a plan with concrete steps, and wait for your go.
+Paste anything — a Jira ticket, a Freshservice request, a Slack message, or just describe what you need done. FTM reads it, pulls relevant context from your blackboard, proposes a plan, and waits for your go.
 
-**2. Develop an idea:**
+**2. Think something through:**
 ```
 /ftm-brainstorm
 ```
@@ -123,19 +118,27 @@ Paste an error message, stack trace, or just describe unexpected behavior. It op
 
 ## Before / After
 
-### IT Ops: Setting up SSO SAML configuration
+### Triaging a support ticket
 
-**Without FTM** — 45 minutes. Find the vendor docs. Navigate the admin panel manually. Cross-reference the IdP metadata. Copy-paste entity IDs and ACS URLs without fat-fingering them. Update the ticket. Hope you didn't miss a field.
+**Without FTM** — Open the ticket. Read it. Check Slack for context. Look up the customer's history. Figure out who should handle it. Draft a response. Copy-paste between four tabs. 30 minutes of context-gathering before any real work starts.
 
-**With FTM** — 5 minutes. Paste the ticket. FTM reads your Freshservice config docs, opens a headless browser session, navigates the admin panel, fills the SAML fields from the ticket spec, screenshots the result for verification, and drafts the ticket update. You review and approve each step.
+**With FTM** — Paste the ticket URL. FTM reads the ticket, pulls the Slack thread, checks your blackboard for similar past issues, proposes a triage plan (categorize → assign → draft response → update ticket), and waits. You say "go." Done in 3 minutes.
 
 ---
 
-### Dev Feature: Adding a new API endpoint
+### Building a feature from a spec
 
-**Without FTM** — You open five files, context-switch between the spec and the codebase, write the route, realize the middleware pattern is different from what you remembered, check another file, write tests separately, forget to update the INTENT docs, ship it and wonder why the audit is failing.
+**Without FTM** — You open five files, context-switch between the spec and the codebase, write the route, realize the middleware pattern is different from what you remembered, check another file, write tests separately, forget to update the docs, ship it and wonder why the audit is failing.
 
-**With FTM** — You paste the spec. FTM reads the existing endpoint patterns in your codebase (blackboard knows your stack), proposes a plan: route → handler → validation → tests → INTENT update → audit check. Parallel agents handle the implementation waves. ftm-codex-gate validates at each boundary. ftm-intent and ftm-diagram update automatically on commit. The whole thing is coherent from the start.
+**With FTM** — You paste the spec. FTM reads the existing patterns in your codebase (blackboard knows your stack), proposes a plan: route → handler → validation → tests → INTENT update → audit check. Parallel agents handle the implementation waves. ftm-codex-gate validates at each boundary. Documentation updates automatically on commit. The whole thing is coherent from the start.
+
+---
+
+### Configuring an admin console
+
+**Without FTM** — 45 minutes. Find the vendor docs. Navigate the admin panel manually. Cross-reference settings. Copy-paste values without fat-fingering them. Update the ticket. Hope you didn't miss a field.
+
+**With FTM** — 5 minutes. Paste the ticket. FTM reads the config docs, opens a headless browser, navigates the admin panel, fills fields from the ticket spec, screenshots the result for verification, and drafts the ticket update. You review and approve each step.
 
 ---
 
@@ -175,7 +178,7 @@ The blackboard is a three-tier knowledge store that persists across every sessio
 
 Cold start is fine. The blackboard bootstraps aggressively in the first ten interactions and reaches useful density fast. By session twenty, FTM knows your stack, your team's conventions, the quirks of your external services, and what kinds of plans you tend to push back on.
 
-Every skill writes back. ftm-executor writes task outcomes. ftm-debug writes what the root cause turned out to be. ftm-retro promotes patterns when it sees the same learning three times. The machine gets better whether you're doing IT ops or shipping features.
+Every skill writes back. ftm-executor writes task outcomes. ftm-debug writes what the root cause turned out to be. ftm-retro promotes patterns when it sees the same learning three times. The machine gets better with every task you feed it.
 
 ---
 
@@ -188,7 +191,7 @@ Every skill writes back. ftm-executor writes task outcomes. ftm-debug writes wha
 **Development install:**
 
 ```bash
-git clone https://github.com/kkudumu/ftm-brain.git ~/ftm-brain
+git clone https://github.com/kkudumu/panda-brain.git ~/ftm-brain
 cd ~/ftm-brain
 ./install.sh
 ```
