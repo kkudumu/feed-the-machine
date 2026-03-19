@@ -1,0 +1,109 @@
+description: "panda-brainstorm behavior across multi-turn brainstorming sessions"
+
+prompts:
+  - "{{input}}"
+
+providers:
+  - id: "exec:claude --print"
+    label: "claude-code"
+
+defaultTest:
+  options:
+    transformVars: "vars"
+
+tests:
+  # Eval 0: fresh-idea-intake
+  - description: "fresh idea intake — asks 1-2 questions, no research sprint, hard stop"
+    vars:
+      input: "I'm thinking about building an app that helps people find study buddies at their university. Like Tinder but for studying."
+    assert:
+      - type: regex
+        value: "\\?"
+        description: "Response must contain at least one question"
+      - type: not-contains
+        value: "sprint"
+        description: "Does not dispatch research sprint on first turn"
+      - type: not-contains
+        value: "dispatch"
+        description: "Does not dispatch agents on first turn"
+
+  # Eval 1: fresh-idea-turn2-research
+  - description: "turn 2 — dispatches research agents, citations, labeled recommendation, challenge, ends with question"
+    vars:
+      input: "It's for college students who want to find people in the same classes to study with. Matching based on courses, study style, and schedule availability."
+    assert:
+      - type: regex
+        value: "https?://"
+        description: "Response includes at least one URL citation"
+      - type: regex
+        value: "RECOMMENDED|recommended|#1"
+        description: "At least one suggestion is labeled as recommended"
+      - type: regex
+        value: "\\?"
+        description: "Ends with a question"
+
+  # Eval 2: turn3-deeper-research
+  - description: "turn 3 — deeper research on specific concerns, builds on prior, fresh citations, challenge"
+    vars:
+      input: "I like option 2 — the React Native approach with Firebase. But I'm worried about the matching algorithm complexity. Also we need to handle the cold-start problem when a new university joins."
+    assert:
+      - type: regex
+        value: "matching|algorithm|cold.start"
+        description: "Response addresses the specific concerns raised"
+      - type: regex
+        value: "https?://"
+        description: "Response includes at least one URL citation"
+      - type: regex
+        value: "\\?"
+        description: "Ends with a question"
+
+  # Eval 3: brain-dump-intake
+  - description: "brain dump intake — extracts structure, confirmation gate, no research yet"
+    vars:
+      input: "help me build all the suggestions in this chat: [brain dump about eng-buddy]"
+    assert:
+      - type: regex
+        value: "Decided|decided|Decision|decision"
+        description: "Contains a 'Decided' section"
+      - type: regex
+        value: "open question|Open question|gap|Gap"
+        description: "Contains an open questions or gaps section"
+      - type: regex
+        value: "\\?"
+        description: "Ends with a confirmation question"
+      - type: not-contains
+        value: "dispatch"
+        description: "Does not dispatch research agents on intake turn"
+
+  # Eval 4: brain-dump-turn2-research
+  - description: "brain dump turn 2 — novelty map, research citations, challenge, question"
+    vars:
+      input: "Yeah that looks right, go ahead and research it"
+    assert:
+      - type: regex
+        value: "Novelty|novelty|novel|Novel"
+        description: "Contains a Novelty Map"
+      - type: regex
+        value: "https?://"
+        description: "Response includes at least one URL citation"
+      - type: regex
+        value: "\\?"
+        description: "Ends with a question"
+
+  # Eval 5: phase3-gate
+  - description: "phase 3 gate — vision summary and approval before generating full plan"
+    vars:
+      input: "Ok I think I know what I want. Let's turn this into a plan."
+    assert:
+      - type: regex
+        value: "summary|Summary|we've landed|landed on|here's what"
+        description: "Presents a vision summary before generating the full plan"
+      - type: regex
+        value: "confirm|Confirm|proceed|Proceed|ready|Ready|go ahead|approve"
+        description: "Asks for confirmation before proceeding to full plan"
+      - type: not-contains
+        value: "Wave 1"
+        description: "Does not dump the full plan structure prematurely"
+      - type: not-contains
+        value: "Wave 2"
+        description: "Does not dump the full plan structure prematurely"

@@ -83,8 +83,10 @@ Parse the user's input to determine what they want:
 - **`set profile <name>`**: Change the active profile.
 - **`set profile custom`**: Activate the custom profile, then interactively ask which model to use for each stage (planning, execution, review).
 - **`set <dotted.path> <value>`**: Update a specific setting (e.g., `set execution.max_parallel_agents 3`).
+- **`enable <skill-name>`** / **`disable <skill-name>`**: Enable or disable a skill in panda-mind routing.
 - **`reset`**: Restore all settings to defaults.
 - **`show profiles`**: Display all available profiles side by side.
+- **`show skills`**: Display all skills and their enabled/disabled status.
 
 ### Step 3: Display Current Configuration (No Args)
 
@@ -267,6 +269,18 @@ User: /panda-config set execution.max_parallel_agents 3
 ```
 User: /panda-config set execution.auto_audit false
 → Disables automatic audit after executor tasks
+```
+
+### Disable a skill
+```
+User: /panda-config disable panda-council
+→ Sets skills.panda-council.enabled: false — panda-mind will no longer route to it
+```
+
+### Show skill status
+```
+User: /panda-config show skills
+→ Displays all skills with enabled/disabled status
 ```
 
 ### Reset to defaults

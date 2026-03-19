@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "experience-index.schema.json",
+  "title": "Blackboard Experience Index",
+  "description": "Schema for the experience index file that tracks all stored experience entries",
+  "type": "object",
+  "required": ["entries", "metadata"],
+  "additionalProperties": false,
+  "properties": {
+    "entries": {
+      "type": "array",
+      "description": "Index records pointing to individual experience files",
+      "items": {
+        "type": "object",
+        "required": ["id", "file", "task_type", "tags", "timestamp", "confidence"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this experience entry"
+          },
+          "file": {
+            "type": "string",
+            "description": "Relative path to the experience JSON file (e.g. YYYY-MM-DD_task-slug.json)"
+          },
+          "task_type": {
+            "type": "string",
+            "description": "Category of task this experience was recorded from"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Labels for filtering and retrieval",
+            "items": {
+              "type": "string"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "ISO 8601 timestamp when the experience was recorded"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Confidence score for this experience (0.0 = low, 1.0 = high)"
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Administrative metadata about the experience index",
+      "required": ["total_count", "last_updated", "max_entries", "pruning_strategy"],
+      "additionalProperties": false,
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of experience entries in the index"
+        },
+        "last_updated": {
+          "type": ["string", "null"],
+          "description": "ISO 8601 timestamp of the most recent write to this index"
+        },
+        "max_entries": {
+          "type": "integer",
+          "default": 200,
+          "description": "Maximum number of entries to retain before pruning is triggered"
+        },
+        "pruning_strategy": {
+          "type": "string",
+          "description": "Strategy used to remove entries when max_entries is exceeded (e.g. remove_oldest_low_confidence)"
+        }
+      }
+    }
+  }
+}

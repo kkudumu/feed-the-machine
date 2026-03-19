@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "context.schema.json",
+  "title": "Blackboard Context",
+  "description": "Schema for the blackboard session context state file",
+  "type": "object",
+  "required": [
+    "current_task",
+    "recent_decisions",
+    "active_constraints",
+    "user_preferences",
+    "session_metadata"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "current_task": {
+      "type": "object",
+      "description": "The task currently being executed in this session",
+      "required": ["id", "description", "type", "started_at", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": ["string", "null"],
+          "description": "Unique identifier for the task"
+        },
+        "description": {
+          "type": ["string", "null"],
+          "description": "Human-readable description of the task"
+        },
+        "type": {
+          "type": ["string", "null"],
+          "description": "Category or type of task (e.g. feature, bugfix, refactor)"
+        },
+        "started_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the task was started"
+        },
+        "status": {
+          "type": ["string", "null"],
+          "enum": [null, "pending", "in_progress", "complete", "failed"],
+          "description": "Current execution status of the task"
+        }
+      }
+    },
+    "recent_decisions": {
+      "type": "array",
+      "description": "Log of decisions made during this session (capped at 10)",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["summary", "timestamp", "skill"],
+        "additionalProperties": false,
+        "properties": {
+          "summary": {
+            "type": "string",
+            "description": "Brief description of the decision made"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "When the decision was recorded"
+          },
+          "skill": {
+            "type": "string",
+            "description": "The skill that produced this decision"
+          }
+        }
+      }
+    },
+    "active_constraints": {
+      "type": "array",
+      "description": "List of constraints currently in effect for this session",
+      "items": {
+        "type": "string"
+      }
+    },
+    "user_preferences": {
+      "type": "object",
+      "description": "Preferences established or inferred during the session",
+      "required": ["communication_style", "approval_gates", "default_model_profile"],
+      "additionalProperties": false,
+      "properties": {
+        "communication_style": {
+          "type": ["string", "null"],
+          "description": "Preferred tone and verbosity level (e.g. concise, detailed)"
+        },
+        "approval_gates": {
+          "type": ["string", "null"],
+          "description": "Approval gate setting (e.g. always, on_destructive, never)"
+        },
+        "default_model_profile": {
+          "type": ["string", "null"],
+          "description": "Model profile to use by default when not overridden"
+        }
+      }
+    },
+    "session_metadata": {
+      "type": "object",
+      "description": "Metadata tracking the lifecycle and activity of this session",
+      "required": ["started_at", "last_updated", "conversation_id", "messages_count", "skills_invoked"],
+      "additionalProperties": false,
+      "properties": {
+        "started_at": {
+          "type": ["string", "null"],
+          "description": "ISO 8601 timestamp when the session began"
+        },
+        "last_updated": {
+          "type": ["string", "null"],
+          "description": "ISO 8601 timestamp of the most recent write to this file"
+        },
+        "conversation_id": {
+          "type": ["string", "null"],
+          "description": "Identifier for the conversation this session belongs to"
+        },
+        "messages_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of messages exchanged in the session so far"
+        },
+        "skills_invoked": {
+          "type": "array",
+          "description": "Ordered list of skill names invoked during this session",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

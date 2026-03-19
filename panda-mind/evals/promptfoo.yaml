@@ -1,0 +1,142 @@
+description: "panda-mind routing accuracy"
+
+prompts:
+  - "You are panda-mind. Given this user request, which panda skill should handle it? Reply with just the skill name.\n\nUser: {{input}}"
+
+providers:
+  - id: "exec:claude --print"
+    label: "claude-code"
+
+tests:
+  - description: "debug request routes to panda-debug"
+    vars:
+      input: "debug this flaky test"
+    assert:
+      - type: contains
+        value: "panda-debug"
+
+  - description: "design thinking routes to panda-brainstorm"
+    vars:
+      input: "help me think through auth design"
+    assert:
+      - type: contains
+        value: "panda-brainstorm"
+
+  - description: "plan execution routes to panda-executor"
+    vars:
+      input: "execute ~/.claude/plans/foo.md"
+    assert:
+      - type: contains
+        value: "panda-executor"
+
+  - description: "trivial rename routes to micro or direct handling"
+    vars:
+      input: "rename this variable"
+    assert:
+      - type: regex
+        value: "micro|direct"
+
+  - description: "multi-model deliberation routes to panda-council"
+    vars:
+      input: "what would other AIs think about this approach"
+    assert:
+      - type: contains
+        value: "panda-council"
+
+  - description: "wiring audit routes to panda-audit"
+    vars:
+      input: "audit the wiring"
+    assert:
+      - type: contains
+        value: "panda-audit"
+
+  - description: "pause request routes to panda-pause"
+    vars:
+      input: "pause"
+    assert:
+      - type: contains
+        value: "panda-pause"
+
+  - description: "save state request routes to panda-pause"
+    vars:
+      input: "save state"
+    assert:
+      - type: contains
+        value: "panda-pause"
+
+  - description: "resume request routes to panda-resume"
+    vars:
+      input: "resume"
+    assert:
+      - type: contains
+        value: "panda-resume"
+
+  - description: "continue request routes to panda-resume"
+    vars:
+      input: "continue where we left off"
+    assert:
+      - type: contains
+        value: "panda-resume"
+
+  - description: "upgrade request routes to panda-upgrade"
+    vars:
+      input: "upgrade panda"
+    assert:
+      - type: contains
+        value: "panda-upgrade"
+
+  - description: "config check routes to panda-config"
+    vars:
+      input: "check my config"
+    assert:
+      - type: contains
+        value: "panda-config"
+
+  - description: "panda settings routes to panda-config"
+    vars:
+      input: "panda settings"
+    assert:
+      - type: contains
+        value: "panda-config"
+
+  - description: "intent doc update routes to panda-intent"
+    vars:
+      input: "update the intent docs"
+    assert:
+      - type: contains
+        value: "panda-intent"
+
+  - description: "architecture diagram update routes to panda-diagram"
+    vars:
+      input: "update architecture diagram"
+    assert:
+      - type: contains
+        value: "panda-diagram"
+
+  - description: "browser task routes to panda-browse"
+    vars:
+      input: "open browser and check the page"
+    assert:
+      - type: contains
+        value: "panda-browse"
+
+  - description: "codex validation routes to panda-codex-gate"
+    vars:
+      input: "run codex validation"
+    assert:
+      - type: contains
+        value: "panda-codex-gate"
+
+  - description: "retrospective routes to panda-retro"
+    vars:
+      input: "how did that go"
+    assert:
+      - type: contains
+        value: "panda-retro"
+
+  - description: "retro keyword routes to panda-retro"
+    vars:
+      input: "retro"
+    assert:
+      - type: contains
+        value: "panda-retro"

@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "patterns.schema.json",
+  "title": "Blackboard Patterns",
+  "description": "Schema for the blackboard patterns file that accumulates learned behavioral and structural patterns",
+  "type": "object",
+  "required": [
+    "codebase_insights",
+    "execution_patterns",
+    "user_behavior",
+    "recurring_issues"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "codebase_insights": {
+      "type": "array",
+      "description": "Observations about the structure, conventions, and characteristics of the codebase",
+      "items": {
+        "type": "object"
+      }
+    },
+    "execution_patterns": {
+      "type": "array",
+      "description": "Recurring patterns observed in how tasks are executed (e.g. common wave shapes, frequent agent combos)",
+      "items": {
+        "type": "object"
+      }
+    },
+    "user_behavior": {
+      "type": "array",
+      "description": "Inferred patterns about user preferences and interaction style",
+      "items": {
+        "type": "object"
+      }
+    },
+    "recurring_issues": {
+      "type": "array",
+      "description": "Issues or failure modes that have appeared more than once across sessions",
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}

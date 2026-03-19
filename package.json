@@ -4,6 +4,7 @@
   "description": "A unified intelligence layer for Claude Code — 16 skills with OODA-based reasoning, persistent memory, and multi-model deliberation",
   "license": "MIT",
   "author": "kkudumu",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/kkudumu/panda-brain.git"
@@ -48,5 +49,26 @@
     "panda-config.default.yml",
     "README.md",
     "LICENSE"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.1",
+    "ajv-cli": "^5.0.0",
+    "husky": "^9.1.7",
+    "promptfoo": "^0.100.0",
+    "semantic-release": "^24.2.3"
+  }
 }

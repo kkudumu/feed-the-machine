@@ -32,480 +32,105 @@ If index.json is empty or no matches found, proceed normally without experience-
 
 # Plan Executor
 
-Autonomous agent-team orchestrator for plan documents. You read the plan, assemble the right team, give each agent its own worktree, and let them rip through tasks in a commit-review-fix loop until everything is done.
+Read the plan, assemble a team, give each agent an isolated worktree, execute tasks in a commit-review-fix loop.
 
-## Why This Exists
+## Phase Sequence
 
-Executing a multi-task plan manually means: read plan, pick a task, do it, commit, review, fix, repeat — while also tracking dependencies and parallelism yourself. That's slow and error-prone. This skill automates the entire thing by treating the plan as a job spec and dynamically building the team to fulfill it.
+```
+Phase 0.5 → Plan Verification Gate
+Phase 0.7 → Load Model Profile
+Phase 1   → Analyze the Plan
+Phase 1.5 → Documentation Layer Bootstrap
+Phase 2   → Assemble the Agent Team
+Phase 3   → Set Up Worktrees
+Phase 3.5 → Initialize Progress Tracking
+Phase 4   → Dispatch Agents (parallel, per wave)
+Phase 4.5 → Post-Task Audit (automatic, per task)
+Phase 5   → Collect and Integrate
+Phase 5.5 → Codex Gate (wave boundary validation)
+[repeat 3–5.5 for each wave]
+Phase 6   → Final Verification and Completion
+Phase 6.5 → Retrospective
+```
 
-## The Process
+---
 
 ### Phase 0.5: Plan Verification Gate
 
-**Before executing anything, validate the plan.** A bad plan wastes every agent's time. This gate catches structural problems, missing dependencies, and unrealistic scope before any code is written.
+Spawn a **Plan Checker** agent to validate the plan before any execution. Read `references/phases/PHASE-0-VERIFICATION.md` for the full agent prompt and checks.
 
-Spawn a **Plan Checker** agent to verify the plan:
-
-```
-You are a plan quality checker. Analyze this implementation plan and report issues.
-Do NOT implement anything — just verify the plan is sound.
-
-Plan path: [path]
-
-Check these dimensions:
-
-1. STRUCTURAL INTEGRITY
-   - Every task has: description, files list, dependencies, acceptance criteria
-   - Task numbering is consistent (no gaps, no duplicates)
-   - Dependencies reference valid task numbers
-   - No circular dependencies (Task A depends on B, B depends on A)
-
-2. DEPENDENCY GRAPH VALIDITY
-   - Build the full dependency graph
-   - Verify all referenced tasks exist
-   - Check for implicit dependencies (two tasks modifying the same file
-     but not declared as dependent)
-   - Flag tasks with too many dependencies (>3 usually means bad decomposition)
-
-3. FILE CONFLICT DETECTION
-   - Map every task to its file list
-   - Flag any files touched by multiple tasks in the same wave
-   - These MUST be sequential, not parallel — if the plan puts them
-     in the same wave, that's a bug
-
-4. SCOPE REASONABLENESS
-   - Flag tasks that touch >10 files (probably too big for one agent)
-   - Flag tasks with vague acceptance criteria ("make it work", "looks good")
-   - Flag tasks with no verification steps
-
-5. PROJECT COMPATIBILITY
-   - Check that file paths reference real directories in the project
-   - Verify the tech stack matches what the plan assumes
-   - Check that dependencies/libraries the plan references are installed
-     or listed in package.json/requirements.txt
-
-Return a structured report:
-
-PASS — plan is sound, proceed to execution
-WARN — issues found but execution can proceed (list warnings)
-FAIL — critical issues that must be fixed before execution (list blockers)
-
-For FAIL findings, suggest specific fixes.
-```
-
-**Interpret the result:**
-- **PASS**: Proceed to Phase 1
-- **WARN**: Show warnings to user, proceed unless they object
-- **FAIL**: Present blockers and suggested fixes. Ask user: fix the plan and re-run, or override and execute anyway?
-
-If the plan checker finds file conflicts between tasks in the same wave, automatically restructure the wave ordering to make conflicting tasks sequential. Report the change.
+**Decision gate:** PASS → proceed | WARN → show warnings, proceed unless user objects | FAIL → present blockers and fixes, ask user to fix or override
 
 ---
 
 ### Phase 0.7: Load Model Profile
 
-Read `~/.claude/panda-config.yml` to determine which models to use for agent dispatch. If the file doesn't exist, use balanced defaults:
-- Planning agents: opus
-- Execution agents: sonnet
-- Review/audit agents: sonnet
-
-When spawning agents in subsequent phases, pass the `model` parameter based on the agent's role:
-- Phase 2 (team assembly / plan checking): use `planning` model
-- Phase 4 (task execution): use `execution` model
-- Phase 4.5 (audit): use `review` model
-
-If the profile specifies `inherit`, omit the `model` parameter (uses session default).
+Read `references/protocols/MODEL-PROFILE.md` for config loading rules and model-to-phase assignment. Use loaded models when spawning all subsequent agents.
 
 ---
 
 ### Phase 1: Analyze the Plan
 
-Read the plan document and extract:
+Read the plan document and extract: all tasks (number, description, files, dependencies), the dependency graph, domain clusters (frontend/backend/infra/testing/etc.), and parallelism opportunities.
 
-1. **All tasks** — number, description, files touched, dependencies
-2. **Dependency graph** — which tasks block which (the plan usually states this)
-3. **Domain clusters** — group tasks by what kind of work they are (frontend, backend, infra, testing, styling, etc.)
-4. **Parallelism opportunities** — independent tasks or independent clusters that can run simultaneously
+Output a brief execution summary before proceeding — plan title, task count, agents needed with reasoning, and the wave breakdown showing which tasks run in each wave and their dependencies.
 
-Output a brief execution summary before proceeding:
-```
-Plan: [title]
-Tasks: [N] total
-Agents needed: [list with reasoning]
-Parallel waves:
-  Wave 1 (independent): Tasks 1, 2, 3, 4
-  Wave 2 (depends on wave 1): Tasks 5, 6, 7
-  Wave 3: Tasks 8-14
-  ...
-  Final: Task [N] (integration/cleanup)
-```
+---
 
 ### Phase 1.5: Documentation Layer Bootstrap
 
-Before dispatching any agents, check if the project has the required documentation layer. If any of these files are missing, create them.
-
-**Check for and create if missing:**
-1. **INTENT.md** (project root) — If missing, bootstrap from the plan's Vision and Architecture Decisions sections. Use the panda-intent skill's root template format.
-2. **ARCHITECTURE.mmd** (project root) — If missing, bootstrap by scanning the codebase for modules and their import relationships. Use the panda-diagram skill's root template format.
-3. **STYLE.md** (project root) — If missing, copy from `~/.claude/skills/panda-executor/references/STYLE-TEMPLATE.md` into the project root.
-4. **DEBUG.md** (project root) — If missing, create with a header:
-   ```markdown
-   # Debug Log
-
-   Failed approaches and their outcomes. Codex and Claude append here — never retry what's already logged.
-   ```
-
-This bootstrap runs once at the start of execution. If the files already exist, skip this phase entirely.
+Check for INTENT.md, ARCHITECTURE.mmd, STYLE.md, and DEBUG.md in the project root. Create any missing ones. Read `references/protocols/DOCUMENTATION-BOOTSTRAP.md` for creation rules. If all exist, skip entirely.
 
 ---
 
 ### Phase 2: Assemble the Agent Team
 
-For each domain cluster, you need an agent. Here's how to pick or create them:
+Map each domain cluster to an existing agent type. When none fits, create a purpose-built prompt. Read `references/phases/PHASE-2-AGENT-ASSEMBLY.md` for the matching table and custom agent creation rules.
 
-#### Check existing agents first
-
-Look at the available agent types (the ones in the Agent tool). Map each task cluster to the best fit:
-
-| Domain | Likely Agent |
-|--------|-------------|
-| React/UI/CSS/components | frontend-developer |
-| API/server/database | backend-architect |
-| CI/CD/deploy/infra | devops-automator |
-| Tests/coverage | test-writer-fixer |
-| Mobile/native | mobile-app-builder |
-| AI/ML features | ai-engineer |
-| General coding | general-purpose |
-
-#### When no existing agent fits
-
-If a task cluster requires specialized knowledge that none of the standard agents cover well — for example, "theme system with CSS custom properties and dark mode" or "WebSocket terminal integration" — create a purpose-built agent prompt.
-
-Write a focused agent definition that includes:
-- **Domain expertise**: What this agent knows deeply
-- **Task context**: The specific tasks from the plan it will handle
-- **Standards**: Coding conventions from the project (infer from existing code)
-- **Constraints**: Don't touch files outside your scope
-
-Store these as reference prompts in the skill workspace so they can be reused. The prompt becomes the `prompt` parameter when spawning the agent.
-
-The goal is that over time, your agent library grows with battle-tested specialists. A "theme-engineer" agent created for one project's CSS system can be reused next time themes come up.
+---
 
 ### Phase 3: Set Up Worktrees
 
-Each agent gets its own isolated worktree so they don't step on each other's changes.
+Each agent gets its own isolated worktree. Ensure `.worktrees/` is in `.gitignore` first. Read `references/phases/PHASE-3-WORKTREES.md` for setup commands, naming convention, and clean-start verification.
 
-For each agent in the current wave:
-
-1. Create a worktree branch: `plan-exec/<agent-name>` (e.g., `plan-exec/frontend-tasks-1-4`)
-2. Use git worktree to create isolation:
-   ```bash
-   git worktree add .worktrees/plan-exec-<agent-name> -b plan-exec/<agent-name>
-   ```
-3. Run any project setup (npm install, etc.) in the worktree
-4. Verify the worktree starts clean (tests pass or at least build succeeds)
-
-Make sure `.worktrees/` is in `.gitignore` first. If it's not, add it.
+---
 
 ### Phase 3.5: Initialize Progress Tracking
 
-If `progress_tracking` is enabled in `~/.claude/panda-config.yml` (default: true), create a `PROGRESS.md` file in the project root that gets updated after every significant event. This gives visibility into long-running executions without interrupting them.
-
-**Create the initial file:**
-
-```markdown
-# Panda Executor — Progress
-
-**Plan:** [plan title]
-**Started:** [timestamp]
-**Status:** IN PROGRESS
-
-## Execution Summary
-| Wave | Tasks | Status | Started | Completed |
-|------|-------|--------|---------|-----------|
-| 1 | [task list] | PENDING | — | — |
-| 2 | [task list] | PENDING | — | — |
-| ... | | | | |
-
-## Task Status
-| # | Title | Agent | Status | Audit | Notes |
-|---|-------|-------|--------|-------|-------|
-| 1 | [title] | [agent] | PENDING | — | |
-| 2 | [title] | [agent] | PENDING | — | |
-| ... | | | | | |
-
-## Activity Log
-[reverse chronological — newest first]
-```
-
-**Update PROGRESS.md at these events:**
-- Wave starts → update wave status to `IN PROGRESS`, add timestamp
-- Task agent returns → update task status to `COMPLETE` or `FAILED`, add audit result
-- Wave completes → update wave status to `COMPLETE`, add timestamp
-- Merge completes → add to activity log
-- Errors/blockers → add to activity log with details
-
-**Activity log entries** use this format:
-```
-### [HH:MM] [event type]
-[brief description]
-```
-
-Example:
-```
-### 14:32 Wave 1 complete
-Tasks 1-4 merged to main. All audits passed. 2 auto-fixes applied.
-
-### 14:15 Task 3 audit — auto-fix
-Added missing import for UserPreferences in SettingsView.tsx
-
-### 13:45 Wave 1 started
-Dispatching 4 agents in parallel: frontend (tasks 1,2), backend (task 3), testing (task 4)
-```
-
-This file is for human consumption — the user can check it anytime without interrupting execution. Keep entries concise and informative.
+If `progress_tracking` is enabled in `~/.claude/panda-config.yml` (default: true), create `PROGRESS.md` in the project root. Read `references/protocols/PROGRESS-TRACKING.md` for the template, update events, and activity log format.
 
 ---
 
 ### Phase 4: Dispatch Agents
 
-Launch agents for all tasks in the current wave **in parallel**. Each agent gets a prompt structured like this:
+Launch agents for all tasks in the current wave **in parallel**. Read `references/phases/PHASE-4-DISPATCH.md` for the complete dispatch prompt template.
 
-```
-You are working in an isolated git worktree at: [worktree path]
-Your working directory is: [worktree path]
-
-## Your Assignment
-
-Execute the following tasks from the plan:
-
-[paste the relevant task sections verbatim from the plan doc]
-
-## Plan Context
-
-Full plan: [plan path]
-Your tasks: [task numbers]
-Dependencies satisfied: [list what was already completed in prior waves]
-
-## Execution Loop
-
-For EACH task, follow this cycle:
-
-1. **Implement** — Follow the plan's steps exactly. Read files before modifying them. Use the project's existing patterns.
-
-2. **Commit** — Stage and commit your changes with a clear message describing what was done. Never reference AI/Claude in commit messages.
-
-2.5. **Document** — Every commit must include documentation updates:
-   - Update the module's INTENT.md: add entries for new functions, update entries for changed functions (Does/Why/Relationships/Decisions format)
-   - Update the module's DIAGRAM.mmd: add nodes for new functions, update edges for changed dependencies
-   - If you created a new module directory, also create its INTENT.md and DIAGRAM.mmd, and add rows to root INTENT.md module map and root ARCHITECTURE.mmd
-   - Reference STYLE.md for code standards — your code must comply with all Hard Limits and Structure Rules
-
-3. **Review** — After committing, review your own changes:
-   - Run `git diff HEAD~1` to see what changed
-   - Check for: bugs, missing error handling, type errors, style inconsistencies
-   - Run any verification commands the plan specifies
-   - Run the project's linter/typecheck if available
-
-4. **Fix** — If the review surfaces issues:
-   - Fix them immediately
-   - Commit the fixes
-   - Review again
-   - Repeat until clean
-
-5. **Continue** — Move to the next task. Do not stop to ask questions. If something is ambiguous, make the best technical decision and document it in your commit message.
-
-## Rules
-
-- NEVER stop to ask for input. Make decisions and keep going.
-- ALWAYS commit after each task (not one big commit at the end).
-- ALWAYS review after each commit. The review-fix loop is not optional.
-- Follow the plan's steps exactly — don't improvise unless the plan is clearly wrong.
-- Stay in your worktree. Don't touch files outside your assigned scope.
-- If a verification step fails and you can't fix it in 3 attempts, note it in a commit message and move on.
-- Run tests/build after each task if the project supports it.
-- Read STYLE.md at the project root before writing code. Follow all Hard Limits and Structure Rules.
-- Every commit must include: code changes + tests + INTENT.md update + DIAGRAM.mmd update. A commit without documentation updates is incomplete.
-```
+---
 
 ### Phase 4.5: Post-Task Audit (automatic)
 
-After each task agent returns and before marking the task complete, run the panda-audit verification automatically.
+After every task agent returns, run panda-audit before marking complete. Skip for documentation-only tasks or tasks marked `audit: skip`. Read `references/phases/PHASE-4-5-AUDIT.md` for pre-audit checks, smoke test steps, invocation, result interpretation, and skip conditions.
 
-**Per-Task Verification Gate (runs before audit):**
-
-Before running panda-audit, verify these four checks pass for every task:
-
-1. **Claude's tests pass** — any tests written or affected by the task must be green
-2. **INTENT.md updated** — check that new/changed functions have entries in their module's INTENT.md
-3. **Diagram updated** — check that new/changed functions have nodes in their module's DIAGRAM.mmd
-4. **Full suite still green** — run the project's test suite (if one exists) and verify no regressions
-
-5. **Visual smoke test (optional)** — If the project has a running dev server (detected via `lsof -i :3000` or `lsof -i :5173` or configured in plan metadata as `dev_server_url`), run:
-   - `$PB goto <dev_server_url>`
-   - `$PB screenshot`
-   - Verify the screenshot shows a rendered page (not a blank screen or error page)
-   - If the task modified UI components, `$PB snapshot -i` to verify new elements appear in the ARIA tree
-
-   Where `$PB` is `$HOME/.claude/skills/panda-browse/bin/panda-browse`.
-
-   **Graceful degradation**: If panda-browse binary is not installed at `$HOME/.claude/skills/panda-browse/bin/panda-browse`, skip visual checks with a note: "Visual smoke test skipped — panda-browse not installed." Do not fail the task.
-
-A task is NOT marked complete until all four checks pass (check 5 is optional). If a check fails:
-- For test failures: the agent must fix them before the task can complete
-- For missing INTENT.md entries: add them (use panda-intent format)
-- For missing diagram nodes: add them (use panda-diagram format)
-- For regression failures: investigate and fix before continuing
-
-**When to run:**
-- After EVERY task agent returns with completed work
-- SKIP for documentation-only tasks (tasks that only create/modify .md files with no code)
-- SKIP if the plan explicitly marks a task with `audit: skip`
-
-**How to run:**
-
-1. **Invoke panda-audit** against the agent's changes:
-   - Scope the audit to the files the task modified (check the agent's commits)
-   - If the task has a `Wiring:` contract in the plan, pass it to panda-audit for contract checking
-   - Run all three layers: knip static analysis → adversarial audit → auto-fix
-
-2. **Interpret results:**
-   - **PASS (no findings):** Mark task complete, proceed to next task
-   - **PASS after auto-fix:** Panda-audit found issues and fixed them automatically. Commit the fixes in the agent's worktree with message "Auto-fix: wire [description]". Mark task complete.
-   - **FAIL (manual intervention needed):** Task stays in-progress. Report the findings to the user:
-     ```
-     ⚠ Task [N] audit failed — manual intervention needed:
-     - [finding 1 with file:line]
-     - [finding 2 with file:line]
-     Suggested fixes: [panda-audit's suggestions]
-     ```
-     Wait for user input before continuing to next task.
-
-3. **Include audit results in task completion report:**
-   ```
-   Task [N]: [title] — COMPLETE
-   Audit: PASS (0 findings) | PASS after auto-fix (2 fixed) | FAIL (1 manual)
-   [if auto-fixed: list what was fixed]
-   [if failed: list outstanding issues]
-   ```
-
-**Skipping the audit:**
-
-To skip the audit for a specific task, the plan can include:
-```yaml
-audit: skip
-reason: "Documentation-only task" | "Config change" | "Test-only change"
-```
-
-The audit is also automatically skipped when:
-- The task only modified `.md`, `.txt`, `.json` (config), or `.yml` files
-- The task is explicitly marked as a "setup" or "scaffold" task
-- The project has no `package.json` AND no identifiable entry point (nothing to trace wiring against)
+---
 
 ### Phase 5: Collect and Integrate
 
-As each agent completes:
+As each agent completes: read its summary, review commits via `git log`, then merge into the main branch one worktree at a time using `--no-ff`. Run full verification (tests, build, lint) after each merge. Fix any merge issues before proceeding.
 
-1. **Read the agent's summary** — what was done, any issues encountered
-2. **Review the worktree's commits** — `git log` in each worktree to see what changed
-3. **Merge into the main branch** — one worktree at a time, resolving conflicts if any:
-   ```bash
-   git checkout main  # or whatever the working branch is
-   git merge plan-exec/<agent-name> --no-ff -m "Merge <agent-name> tasks [N-M]"
-   ```
-4. **Run full verification** — tests, build, lint after each merge
-5. **Fix merge issues** — if merging breaks something, fix it before proceeding
+For multi-wave plans: after merging wave N, verify everything works, then create fresh worktrees from the updated branch for wave N+1 before dispatch.
 
-If there are multiple waves, after merging wave N:
-- Verify everything still works
-- Update each wave N+1 worktree with the merged changes (or create fresh worktrees from the updated branch)
-- Dispatch wave N+1
+---
 
 ### Phase 5.5: Codex Gate (Wave Boundary Validation)
 
-After merging all agents' work for a wave (Phase 5) and before proceeding to the next wave, invoke the panda-codex-gate skill for adversarial validation.
+After merging all agents' work for a wave and before proceeding to the next wave, invoke the panda-codex-gate skill.
 
-**When to invoke:**
-- After EVERY wave completes and is merged — this is the heavy validation gate
-- For single-task executor runs (plans with only 1 task), invoke on task completion instead of wave completion
+Read `references/phases/PHASE-5-5-CODEX-GATE.md` for inputs, result interpretation, and INTENT.md conflict resolution steps.
 
-**How to invoke:**
-
-1. **Gather inputs for panda-codex-gate:**
-   - `file_list`: All files changed across the wave (collect from all agents' commits via `git diff --name-only` against the pre-wave state)
-   - `acceptance_criteria`: Combined acceptance criteria from all tasks in the wave
-   - `wave_context`: Summary of what the wave accomplished (task titles + brief descriptions)
-   - `project_root`: The project working directory
-   - `mode`: `"wave"` for multi-task waves, `"single-task"` for single-task runs
-
-2. **Invoke the Codex gate** by using the panda-codex-gate skill with these inputs. The gate will:
-   - Construct a Codex CLI command with the adversarial review prompt
-   - Run `codex exec --yolo --ephemeral -m "gpt-5.4"` against the changed files
-   - Return structured results
-
-3. **Interpret the results:**
-
-   **PASS (no issues found):**
-   - Log in PROGRESS.md: "Codex gate PASSED — 0 issues"
-   - Proceed to next wave (or Phase 6 if this was the last wave)
-
-   **PASS_WITH_FIXES (issues found and auto-fixed by Codex):**
-   - Codex committed fixes directly — review the fix commits
-   - Read each fix commit and diff it against INTENT.md entries for the affected functions
-   - **No INTENT.md conflict?** Accept the fixes. Log in PROGRESS.md and DEBUG.md. Proceed.
-   - **INTENT.md conflict detected?** See "INTENT.md Conflict Resolution" below.
-
-   **FAIL (issues Codex could not fix):**
-   - Read the remaining issues from the gate results
-   - Attempt to fix them yourself (you have full context from the wave)
-   - If you can fix them, commit and re-run the Codex gate
-   - If you cannot fix them after 2 attempts, report to the user:
-     ```
-     ⚠ Codex gate FAILED for Wave [N] — manual intervention needed:
-     - [remaining issue 1]
-     - [remaining issue 2]
-     Codex attempted [N] fixes but these remain unresolved.
-     ```
-     Wait for user input before continuing.
-
-**INTENT.md Conflict Resolution:**
-
-When Codex fixes code in a way that contradicts what INTENT.md says a function should do:
-
-1. **Detect the conflict**: Compare Codex's fix diff against the INTENT.md entry for the affected function. A conflict exists when:
-   - Codex changed a function's behavior but INTENT.md's "Does" field describes different behavior
-   - Codex reverted a deliberate choice documented in INTENT.md's "Decisions" field
-   - Codex changed the function signature documented in the INTENT.md header
-
-2. **Auto-invoke panda-council** with a structured conflict payload:
-   ```
-   CONFLICT TYPE: Codex fix contradicts INTENT.md
-
-   ORIGINAL INTENT (from INTENT.md):
-   [paste the full INTENT.md entry for the affected function]
-
-   CODEX'S CHANGE:
-   [paste the diff of what Codex changed]
-
-   CODEX'S REASONING:
-   [paste Codex's explanation from the gate results]
-
-   THE CODE IN QUESTION:
-   [file path and relevant code section]
-
-   DEBUG.md HISTORY:
-   [paste relevant entries from DEBUG.md so the council doesn't suggest already-failed approaches]
-
-   QUESTION FOR THE COUNCIL:
-   Should we (A) update INTENT.md to match Codex's fix, or (B) revert Codex's fix and keep the original intent?
-   ```
-
-3. **Execute the council's verdict:**
-   - If verdict is "update intent": Update the INTENT.md entry to reflect the new behavior. Commit with message "Update intent: [function] — council verdict [round N]"
-   - If verdict is "revert fix": Revert Codex's fix commit. Commit with message "Revert codex fix: [function] — council verdict preserves original intent"
-   - Log the full decision + reasoning in DEBUG.md
-
-4. **Continue to next wave** after all conflicts are resolved.
+**Decision gate:**
+- **PASS** → log in PROGRESS.md, proceed to next wave
+- **PASS_WITH_FIXES** → review fix commits against INTENT.md; if conflict detected, invoke panda-council per reference file
+- **FAIL** → attempt self-fix; if unresolved after 2 attempts, report to user and wait
 
 ---
 
@@ -513,100 +138,45 @@ When Codex fixes code in a way that contradicts what INTENT.md says a function s
 
 After all waves are merged:
 
-1. Run the full test suite
-2. Run the build
-3. Run linting/typechecking
-4. Fix any remaining issues (zero broken windows — fix everything, not just "your" stuff)
-4.5. **Final Codex gate** — Run one last Codex gate across ALL files changed in the entire plan execution. This catches cross-wave integration issues that per-wave gates might miss. Use `mode: "wave"` with the complete file list.
-5. **Branch finishing** — After all verification passes (including the final Codex gate), present exactly 4 options to the user:
+1. Run full test suite, build, and linting/typechecking
+2. Fix any remaining issues — zero broken windows, fix everything
+3. **Final Codex gate** — run one last gate across ALL files changed in the entire execution (`mode: "wave"`, complete file list)
+4. **Branch finishing** — present exactly 4 options and wait for user selection:
+   - **1. Merge locally** — verifies tests, `--no-ff` merge to main/develop, deletes branch
+   - **2. Push + Create PR** — auto-generates PR summary from INTENT.md vision, task list, Codex results, and file count
+   - **3. Keep branch as-is** — prints branch name, preserves worktrees, skips cleanup
+   - **4. Discard** — requires typed "discard" confirmation, full cleanup, cannot be undone
 
-   ```
-   All tasks complete. All tests pass. Codex gate passed. Choose how to finish:
-
-   1. **Merge locally** — Merge the work branch into main/develop right now
-      - Verifies all tests pass one final time before merging
-      - Uses --no-ff to preserve branch history
-      - Deletes the work branch after successful merge
-
-   2. **Push + Create PR** — Push the branch and create a pull request
-      - Pushes the branch to origin
-      - Creates a PR with auto-generated summary from:
-        - Root INTENT.md vision section
-        - Task list with acceptance criteria status
-        - Codex gate results summary
-        - Files changed count
-      - Returns the PR URL
-
-   3. **Keep branch as-is** — Leave everything on the current branch
-      - Prints the branch name so the user can return to it
-      - Preserves all worktrees (does NOT run cleanup)
-      - Good for: "I want to review this myself first"
-
-   4. **Discard** — Delete the branch and all changes
-      - Requires typed confirmation: user must type "discard" to proceed
-      - Runs full cleanup (worktrees + branches)
-      - Cannot be undone
-   ```
-
-   Wait for the user to choose. Execute their choice. Do not proceed without explicit selection.
+---
 
 ### Phase 6.5: Retrospective
 
-After all verification passes and before presenting branch finishing options, automatically invoke the panda-retro skill with execution context.
+Before branch finishing, automatically invoke panda-retro with: plan title/path, task count, wave count, total agents spawned, per-task audit results, per-wave Codex gate results, errors, and manual interventions. Do not ask. Report saves to `~/.claude/panda-retros/`. Show one-line score (X/50) before presenting branch options.
 
-**Invoke panda-retro** with this context:
-- Plan title and path
-- Task count, wave count
-- Total agents spawned (count of Agent tool invocations)
-- Per-task audit results: for each task, whether it passed audit on first attempt, needed auto-fix, or required manual intervention
-- Codex gate results: for each wave, whether it passed on first attempt or needed fixes
-- Any errors, blockers, or manual interventions that occurred during execution
+**Graceful degradation**: If panda-retro is not installed, skip with a note and proceed.
 
-The retro runs automatically — do not ask the user whether to run it. The report is saved to `~/.claude/panda-retros/` and a one-line summary of the overall score (X/50) is shown to the user before presenting the branch finishing options.
-
-**Graceful degradation**: If the panda-retro skill is not available (not installed), skip with a note and proceed to branch finishing.
+---
 
 ### Cleanup
 
-Cleanup runs automatically after options 1 (merge), 2 (PR), and 4 (discard). It does NOT run for option 3 (keep branch).
+Runs automatically after options 1, 2, and 4. Does NOT run for option 3. Remove each worktree with `git worktree remove .worktrees/plan-exec-<name>` then `git branch -d plan-exec/<name>` (use `-D` for option 4). For option 3, print branch name and worktree paths with manual cleanup instructions.
 
-```bash
-git worktree list  # verify what exists
-git worktree remove .worktrees/plan-exec-<name>  # for each worktree
-git branch -d plan-exec/<name>  # delete branches (use -D for discard option)
-```
+---
 
-For option 3, print a reminder:
-```
-Branch preserved: plan-exec/<name>
-Worktrees at: .worktrees/plan-exec-*
-Run cleanup manually when ready: git worktree remove .worktrees/plan-exec-<name>
-```
+## Edge Cases
 
-## Handling Edge Cases
+- **No dependency map**: Infer from file lists — same files = sequential, different domains = parallel
+- **Agent fails or gets stuck**: Read output, fix in worktree or respawn with more context
+- **Merge conflicts**: Resolve manually using context from both agents' work
+- **Large plans (20+ tasks)**: Show wave structure upfront, report progress between waves
+- **No tests**: Diff review becomes the primary quality gate
+- **Single-task plans**: Skip wave-boundary Codex gate; run it immediately after task completion with `mode: "single-task"`
 
-**Plan has no dependency map**: Analyze task descriptions and file lists yourself. Tasks touching the same files must be sequential. Tasks touching different files/domains can be parallel.
+---
 
-**Agent fails or gets stuck**: If an agent returns with unfinished tasks or errors it couldn't resolve, don't panic. Read its output, understand what went wrong, and either:
-- Fix it yourself in the worktree
-- Respawn the agent with more context about what failed
+## vs. executing-plans
 
-**Merge conflicts**: These happen when parallel agents touched overlapping files (shouldn't happen with good task partitioning, but sometimes it does). Resolve them manually — you have context from both agents' work.
-
-**Very large plans (20+ tasks)**: Don't try to explain every task upfront. Show the wave structure and agent assignments, then execute. Report progress between waves.
-
-**No tests in the project**: The review step becomes more important. Pay extra attention to the diff review and manual verification steps in the plan.
-
-**Single-task plans**: For plans with only 1 task, skip the wave-boundary Codex gate and instead run the gate immediately after the task completes (using `mode: "single-task"`). The flow is: task agent completes → per-task verification gate → panda-audit → Codex gate → Phase 6 completion.
-
-## What Makes This Different from executing-plans
-
-The `executing-plans` skill is a human-in-the-loop batch executor — it does 3 tasks, stops, waits for feedback, continues. That's valuable when the human wants to steer.
-
-This skill is fully autonomous. It analyzes the plan, builds a team, and executes everything without stopping. The human trusts the plan and wants it done. The review loop is agent-self-review, not human review.
-
-Use `executing-plans` when: human wants checkpoints and control.
-Use `panda-executor` when: human says "just go" and trusts the plan.
+`executing-plans` = human-in-the-loop checkpoints. `panda-executor` = fully autonomous. Use `executing-plans` when the human wants steering; use this when they say "just go."
 
 ## Blackboard Write
 

@@ -1,0 +1,75 @@
+description: "panda-git secret detection and remediation"
+
+prompts:
+  - "{{input}}"
+
+providers:
+  - id: "exec:claude --print"
+    label: "claude-code"
+
+tests:
+  # Eval 1: python-stripe-aws
+  - description: "detects Stripe live key and AWS credentials, extracts to .env, blocks commit"
+    vars:
+      input: "I just finished the payments module. commit this and push it up"
+    assert:
+      - type: regex
+        value: "sk_live_|stripe|Stripe"
+        description: "Detects the Stripe live key"
+      - type: regex
+        value: "AKIA|AWS|aws"
+        description: "Detects the AWS access key"
+      - type: regex
+        value: "\\.env"
+        description: "References .env file for secret extraction"
+      - type: regex
+        value: "\\.gitignore"
+        description: "References .gitignore to prevent committing secrets"
+      - type: regex
+        value: "block|blocked|cannot commit|will not commit|stop|halt|remediat"
+        description: "Blocks the commit until secrets are remediated"
+
+  # Eval 2: js-config-unignored-env
+  - description: "detects multiple secrets in config.js, flags missing .gitignore entry, extracts to .env"
+    vars:
+      input: "hey can you scan this repo for any secrets before I share it with the new contractor"
+    assert:
+      - type: regex
+        value: "Google|GOOGLE|AIza"
+        description: "Detects the Google API key"
+      - type: regex
+        value: "Slack|slack|xoxb"
+        description: "Detects the Slack token"
+      - type: regex
+        value: "SendGrid|sendgrid|SG\\."
+        description: "Detects the SendGrid key"
+      - type: regex
+        value: "\\.env"
+        description: "References .env file for secret extraction"
+      - type: regex
+        value: "\\.gitignore"
+        description: "Flags .gitignore coverage issue"
+      - type: regex
+        value: "process\\.env"
+        description: "Recommends using process.env in refactored code"
+
+  # Eval 3: yaml-google-key-in-ci
+  - description: "detects hardcoded secrets in CI yaml, recommends GitHub Actions secrets, blocks push"
+    vars:
+      input: "push to main"
+    assert:
+      - type: regex
+        value: "Google|GOOGLE|AIza|deploy\\.yml|CI|ci"
+        description: "Detects the Google API key in the CI file"
+      - type: regex
+        value: "RSA|private key|BEGIN RSA|-----BEGIN"
+        description: "Detects the RSA private key"
+      - type: regex
+        value: "Slack|slack|webhook"
+        description: "Detects the Slack webhook URL"
+      - type: regex
+        value: "secrets\\.|\\$\\{\\{|GitHub Actions|github actions|Actions secret"
+        description: "Recommends using GitHub Actions secrets instead of hardcoded values"
+      - type: regex
+        value: "block|blocked|cannot push|will not push|stop|halt|remediat"
+        description: "Blocks the push until secrets are remediated"

@@ -7,18 +7,22 @@ PASS=0
 FAIL=0
 ERRORS=""
 
+MAX_SKILL_BYTES=20480  # 20 KiB
+
 for skill_dir in "$REPO_DIR"/panda*/; do
   skill_md="$skill_dir/SKILL.md"
   name=$(basename "$skill_dir")
 
   [ "$name" = "panda-state" ] && continue
 
+  # --- missing SKILL.md ---
   if [ ! -f "$skill_md" ]; then
     ERRORS="${ERRORS}\n  FAIL  $name — missing SKILL.md"
     FAIL=$((FAIL + 1))
     continue
   fi
 
+  # --- frontmatter must open with --- ---
   FIRST_LINE=$(head -1 "$skill_md")
   if [ "$FIRST_LINE" != "---" ]; then
     ERRORS="${ERRORS}\n  FAIL  $name — SKILL.md missing frontmatter (no opening ---)"
@@ -26,29 +30,64 @@ for skill_dir in "$REPO_DIR"/panda*/; do
     continue
   fi
 
+  # --- name: field present ---
   if ! head -20 "$skill_md" | grep -q '^name:'; then
     ERRORS="${ERRORS}\n  FAIL  $name — SKILL.md frontmatter missing 'name:' field"
     FAIL=$((FAIL + 1))
   fi
 
+  # --- description: field present ---
   if ! head -20 "$skill_md" | grep -q '^description:'; then
     ERRORS="${ERRORS}\n  FAIL  $name — SKILL.md frontmatter missing 'description:' field"
     FAIL=$((FAIL + 1))
   fi
 
+  # --- no hardcoded user home paths ---
   if grep -q '/Users/[a-zA-Z]' "$skill_md"; then
     ERRORS="${ERRORS}\n  FAIL  $name — SKILL.md contains hardcoded user home path"
+    FAIL=$((FAIL + 1))
+  fi
+
+  # --- name: value must match directory name ---
+  FRONTMATTER_NAME=$(head -20 "$skill_md" | grep '^name:' | head -1 | sed 's/^name:[[:space:]]*//' | tr -d '[:space:]')
+  if [ -n "$FRONTMATTER_NAME" ] && [ "$FRONTMATTER_NAME" != "$name" ]; then
+    ERRORS="${ERRORS}\n  FAIL  $name — SKILL.md name: '${FRONTMATTER_NAME}' does not match directory name '${name}'"
+    FAIL=$((FAIL + 1))
+  fi
+
+  # --- size threshold: must not exceed 20 KiB ---
+  FILE_SIZE=$(wc -c < "$skill_md")
+  if [ "$FILE_SIZE" -gt "$MAX_SKILL_BYTES" ]; then
+    ERRORS="${ERRORS}\n  FAIL  $name — SKILL.md exceeds 20,480 bytes (actual: ${FILE_SIZE} bytes)"
     FAIL=$((FAIL + 1))
   fi
 
   PASS=$((PASS + 1))
 done
 
+# --- yml -> directory check (already existed; preserved) ---
 for yml in "$REPO_DIR"/panda*.yml; do
-  name=$(basename "$yml" .yml)
-  [ "$name" = "panda-config" ] && continue
-  if [ ! -d "$REPO_DIR/$name" ] && [ "$name" != "panda-config.default" ]; then
-    ERRORS="${ERRORS}\n  FAIL  $name.yml — no matching skill directory"
+  yml_name=$(basename "$yml" .yml)
+  [ "$yml_name" = "panda-config" ] && continue
+  [ "$yml_name" = "panda-config.default" ] && continue
+  if [ ! -d "$REPO_DIR/$yml_name" ]; then
+    ERRORS="${ERRORS}\n  FAIL  ${yml_name}.yml — no matching skill directory"
+    FAIL=$((FAIL + 1))
+  fi
+done
+
+# --- directory -> yml check (new: bidirectional) ---
+for skill_dir in "$REPO_DIR"/panda*/; do
+  dir_name=$(basename "$skill_dir")
+  [ "$dir_name" = "panda-state" ] && continue
+
+  # Only flag directories that actually contain a SKILL.md
+  if [ ! -f "$skill_dir/SKILL.md" ]; then
+    continue
+  fi
+
+  if [ ! -f "$REPO_DIR/${dir_name}.yml" ]; then
+    ERRORS="${ERRORS}\n  FAIL  ${dir_name}/ — has SKILL.md but no matching ${dir_name}.yml"
     FAIL=$((FAIL + 1))
   fi
 done

@@ -211,6 +211,33 @@ Guidelines for writing clear declarations:
 
 ---
 
+### secrets_found
+- **Description**: panda-git scan detected hardcoded credentials in staged files or the working tree — commit/push is blocked until remediation completes
+- **Emitted by**: panda-git
+- **Listened to by**: panda-executor (pause commit/push, await remediation), panda-mind (record security finding on blackboard)
+- **Fast-path**: no
+- **Payload**: `{ findings: [{ file_path, line_number, secret_type, severity }], scan_scope: "staged" | "working_tree" | "history", task_number }`
+
+---
+
+### secrets_clear
+- **Description**: panda-git scan completed with no findings — the commit or push is safe to proceed
+- **Emitted by**: panda-git
+- **Listened to by**: panda-executor (unblock pending commit/push operation), panda-mind (record clean scan on blackboard)
+- **Fast-path**: no
+- **Payload**: `{ files_scanned: number, scan_scope: "staged" | "working_tree" | "history", task_number }`
+
+---
+
+### secrets_remediated
+- **Description**: panda-git auto-fix successfully extracted secrets to .env and refactored source files — a re-scan confirmed no remaining findings
+- **Emitted by**: panda-git
+- **Listened to by**: panda-executor (unblock commit/push now that secrets are extracted), panda-mind (record remediation action on blackboard)
+- **Fast-path**: no
+- **Payload**: `{ secrets_extracted: number, files_refactored: [path], env_vars_added: [string], task_number }`
+
+---
+
 ## Fast-Path Summary
 
 | Event | Always triggers |
@@ -246,3 +273,6 @@ Use this table to quickly look up which skills are involved when an event fires:
 | session_resumed | resume | executor, mind |
 | experience_recorded | retro | mind |
 | pattern_discovered | retro | mind, executor |
+| secrets_found | git | executor, mind |
+| secrets_clear | git | executor, mind |
+| secrets_remediated | git | executor, mind |

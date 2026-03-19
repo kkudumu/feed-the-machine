@@ -11,6 +11,12 @@ panda-browse/bin/panda-browse
 # macOS
 .DS_Store
 
+# Worktrees (panda-executor isolation)
+.worktrees/
+
+# Eval results
+evals/results/
+
 # Editors
 .vscode/
 .idea/

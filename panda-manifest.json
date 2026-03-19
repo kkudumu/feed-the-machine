@@ -1,0 +1,390 @@
+{
+  "generated_at": "2026-03-19T00:39:36.256Z",
+  "skills": [
+    {
+      "name": "panda",
+      "description": "Universal entry point for all panda skills. Routes freeform text to the right panda skill. panda-mind is the default cognitive entry point for all unclassified input.",
+      "trigger_file": "panda.yml",
+      "skill_directory": "panda/",
+      "events_emits": [],
+      "events_listens": [],
+      "blackboard_reads": [],
+      "blackboard_writes": [],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 3822,
+      "enabled": true
+    },
+    {
+      "name": "panda-audit",
+      "description": "Dual-purpose wiring audit that verifies all code is actually connected to the running application. Combines static analysis (knip) with adversarial LLM audit and auto-fixes anything it finds. Use when user says \"audit\", \"wiring check\", \"verify wiring\", \"dead code\", \"check imports\", \"unused code\", \"find dead code\", or \"audit wiring\". Also auto-invoked by panda-executor after each task.",
+      "trigger_file": "panda-audit.yml",
+      "skill_directory": "panda-audit/",
+      "events_emits": [
+        "audit_complete",
+        "issue_found",
+        "task_completed"
+      ],
+      "events_listens": [
+        "code_committed",
+        "review_complete"
+      ],
+      "blackboard_reads": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/index.json",
+        "~/.claude/panda-state/blackboard/patterns.json"
+      ],
+      "blackboard_writes": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json"
+      ],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 7681,
+      "enabled": true
+    },
+    {
+      "name": "panda-brainstorm",
+      "description": "Research-powered Socratic brainstorming that dispatches parallel agents to search the web and GitHub for real-world patterns, then synthesizes findings into actionable suggestions with citations. Use this skill whenever the user wants to brainstorm, explore ideas, think through a feature, plan a project, or flesh out a concept before building. Also triggers when the user pastes a large block of text (notes, prior brainstorm, meeting transcript, spec draft, stream-of-consciousness dump) and wants to turn it into something buildable — phrases like \"help me build this\", \"turn this into a plan\", \"here's what I've been thinking\", or just a big paste followed by \"what do you think?\" or \"go\". Triggers on \"brainstorm\", \"help me think through\", \"I have an idea for\", \"how should I approach\", \"let's explore\", \"what if we built\", \"I'm thinking about\", \"help me figure out\", or any conversation where the user has a concept they want to develop before writing code. Even vague ideas like \"I want to build something that...\" or \"what's the best way to...\" should trigger this skill.",
+      "trigger_file": "panda-brainstorm.yml",
+      "skill_directory": "panda-brainstorm/",
+      "events_emits": [
+        "plan_generated",
+        "task_completed"
+      ],
+      "events_listens": [
+        "task_received"
+      ],
+      "blackboard_reads": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/index.json",
+        "~/.claude/panda-state/blackboard/patterns.json"
+      ],
+      "blackboard_writes": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json"
+      ],
+      "references": [
+        "agent-prompts.md",
+        "plan-template.md"
+      ],
+      "has_evals": true,
+      "size_bytes": 14099,
+      "enabled": true
+    },
+    {
+      "name": "panda-browse",
+      "description": "Headless browser daemon for visual verification and web interaction. Gives agents the ability to navigate, screenshot, click, fill forms, and inspect ARIA trees via CLI commands. Use when user says \"browse\", \"screenshot\", \"visual\", \"look at the app\", \"open browser\", \"check the page\", \"navigate to\", \"take a screenshot\", \"visual verification\".",
+      "trigger_file": "panda-browse.yml",
+      "skill_directory": "panda-browse/",
+      "events_emits": [
+        "task_completed"
+      ],
+      "events_listens": [],
+      "blackboard_reads": [],
+      "blackboard_writes": [],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 10996,
+      "enabled": true
+    },
+    {
+      "name": "panda-codex-gate",
+      "description": "Codex CLI integration gate for adversarial code validation. Invokes codex exec --yolo --ephemeral with gpt-5.4 to form test scenarios, review code quality, fix failures, and enforce STYLE.md patterns. Use when panda-executor needs Codex validation at wave boundaries or task completion, or when user says \"codex gate\", \"run codex\", \"validate with codex\". Not for direct user interaction — primarily auto-invoked by panda-executor.",
+      "trigger_file": "panda-codex-gate.yml",
+      "skill_directory": "panda-codex-gate/",
+      "events_emits": [
+        "review_complete",
+        "issue_found",
+        "task_completed"
+      ],
+      "events_listens": [
+        "code_committed"
+      ],
+      "blackboard_reads": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/index.json",
+        "~/.claude/panda-state/blackboard/patterns.json"
+      ],
+      "blackboard_writes": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json",
+        "~/.claude/panda-state/blackboard/experiences/index.json"
+      ],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 10760,
+      "enabled": true
+    },
+    {
+      "name": "panda-config",
+      "description": "Configure panda skill settings including model profiles, execution preferences, and defaults. Use when user says \"panda config\", \"panda settings\", \"set panda profile\", \"panda model\", or wants to change how panda skills behave.",
+      "trigger_file": "panda-config.yml",
+      "skill_directory": "panda-config/",
+      "events_emits": [
+        "task_completed"
+      ],
+      "events_listens": [],
+      "blackboard_reads": [],
+      "blackboard_writes": [],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 10784,
+      "enabled": true
+    },
+    {
+      "name": "panda-council",
+      "description": "Multi-AI deliberation council that sends problems to Claude, Codex, and Gemini as equal peers, then loops through rounds of debate until 2-of-3 agree on a decision. Use when the user wants a second (and third) opinion, says \"council this\", \"get other opinions\", \"what would other AIs think\", \"debate this\", \"multi-model\", \"panda-council\", or wants to cross-check a decision, architecture choice, debugging approach, or any problem where diverse AI perspectives would reduce blind spots. Especially valuable for debugging hard problems, architecture decisions, code review, and any situation where confirmation bias from a single model is a risk. Even if the user just says \"I'm not sure about this approach\" or \"sanity check this\", consider invoking the council.",
+      "trigger_file": "panda-council.yml",
+      "skill_directory": "panda-council/",
+      "events_emits": [
+        "review_complete",
+        "task_completed"
+      ],
+      "events_listens": [],
+      "blackboard_reads": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/index.json",
+        "~/.claude/panda-state/blackboard/patterns.json"
+      ],
+      "blackboard_writes": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json",
+        "~/.claude/panda-state/blackboard/experiences/index.json"
+      ],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 7808,
+      "enabled": true
+    },
+    {
+      "name": "panda-debug",
+      "description": "Deep multi-vector debugging war room that launches parallel agent teams to instrument, research, reproduce, hypothesize, solve, and verify tricky bugs. Use when a bug is stubborn, multi-turn debugging hasn't worked, the user says \"debug this deeply\", \"war room this\", \"I can't figure out why\", \"this is driving me crazy\", \"launch the debug team\", or any situation where standard debugging is insufficient. Also triggers on \"/panda-debug\". Covers any codebase — frontend, backend, CLI tools, native apps, build systems, anything. Do NOT use for simple one-step fixes — this is the heavy artillery for problems that resist normal debugging.",
+      "trigger_file": "panda-debug.yml",
+      "skill_directory": "panda-debug/",
+      "events_emits": [
+        "bug_fixed",
+        "issue_found",
+        "test_passed",
+        "test_failed",
+        "error_encountered",
+        "task_completed"
+      ],
+      "events_listens": [
+        "test_failed",
+        "error_encountered"
+      ],
+      "blackboard_reads": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/index.json",
+        "~/.claude/panda-state/blackboard/patterns.json"
+      ],
+      "blackboard_writes": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json"
+      ],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 8147,
+      "enabled": true
+    },
+    {
+      "name": "panda-diagram",
+      "description": "Manages the hierarchical ARCHITECTURE.mmd mermaid diagram layer — root module-to-module relationship graph (subway map) and per-module DIAGRAM.mmd function-to-function graphs (street maps). Use when creating or updating architecture diagrams, bootstrapping a new project's diagram layer, or when user says \"update diagram\", \"show architecture\", \"panda-diagram\", \"visualize relationships\". Auto-invoked by panda-executor after every commit to keep diagrams in sync with code changes.",
+      "trigger_file": "panda-diagram.yml",
+      "skill_directory": "panda-diagram/",
+      "events_emits": [
+        "documentation_updated",
+        "task_completed"
+      ],
+      "events_listens": [
+        "code_committed"
+      ],
+      "blackboard_reads": [],
+      "blackboard_writes": [],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 7195,
+      "enabled": true
+    },
+    {
+      "name": "panda-executor",
+      "description": "Autonomous plan execution engine. Takes any plan document and executes it end-to-end with a dynamically assembled agent team — analyzing tasks, creating purpose-built agents, dispatching them in parallel worktrees, and running each through a commit-review-fix loop until complete. Use this skill whenever the user wants to execute a plan, run a plan doc, launch an agent team on tasks, or says things like \"execute this plan\", \"run this\", \"launch agents on this doc\", \"take this plan and go\", or points to a plan file and wants it implemented autonomously. Even if they just paste a plan path and say \"go\" — this is the skill.",
+      "trigger_file": "panda-executor.yml",
+      "skill_directory": "panda-executor/",
+      "events_emits": [
+        "task_received",
+        "plan_generated",
+        "plan_approved",
+        "code_changed",
+        "code_committed",
+        "test_passed",
+        "test_failed",
+        "task_completed",
+        "error_encountered"
+      ],
+      "events_listens": [
+        "plan_approved"
+      ],
+      "blackboard_reads": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/index.json",
+        "~/.claude/panda-state/blackboard/patterns.json"
+      ],
+      "blackboard_writes": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json",
+        "~/.claude/panda-state/blackboard/experiences/index.json"
+      ],
+      "references": [
+        "STYLE-TEMPLATE.md"
+      ],
+      "has_evals": false,
+      "size_bytes": 9536,
+      "enabled": true
+    },
+    {
+      "name": "panda-git",
+      "description": "Secret scanning and credential safety gate for git operations. Prevents API keys, tokens, passwords, and other secrets from ever being committed or pushed to remote repositories. Scans staged files, working tree, and git history for hardcoded credentials using regex pattern matching, then auto-remediates by extracting secrets to gitignored .env files and replacing hardcoded values with env var references. Use when user says \"scan for secrets\", \"check for keys\", \"audit credentials\", \"panda-git\", \"secret scan\", \"remove api keys\", \"check before push\", or any time git commit/push operations are about to happen. Also auto-invoked by panda-executor and panda-mind before any commit or push operation. Even if the user just says \"commit this\" or \"push to remote\", this skill MUST run first. Do NOT use for general git workflow operations like branching or merging — that's git-workflow territory. This skill is specifically the security gate.",
+      "trigger_file": "panda-git.yml",
+      "skill_directory": "panda-git/",
+      "events_emits": [
+        "secrets_found",
+        "secrets_clear",
+        "secrets_remediated",
+        "task_completed"
+      ],
+      "events_listens": [
+        "code_changed",
+        "code_committed"
+      ],
+      "blackboard_reads": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/index.json",
+        "~/.claude/panda-state/blackboard/patterns.json"
+      ],
+      "blackboard_writes": [
+        "~/.claude/panda-state/blackboard/context.json"
+      ],
+      "references": [],
+      "has_evals": true,
+      "size_bytes": 9638,
+      "enabled": true
+    },
+    {
+      "name": "panda-intent",
+      "description": "Manages the hierarchical INTENT.md documentation layer — root index with architecture decisions and module map, plus per-module INTENT.md files with function-level entries (does/why/relationships/decisions). Use when creating or updating intent documentation, bootstrapping a new project's intent layer, or when user says \"update intent\", \"document intent\", \"panda-intent\", \"what does this function do\". Auto-invoked by panda-executor after every commit to keep intent documentation in sync with code changes.",
+      "trigger_file": "panda-intent.yml",
+      "skill_directory": "panda-intent/",
+      "events_emits": [
+        "documentation_updated",
+        "task_completed"
+      ],
+      "events_listens": [
+        "code_committed"
+      ],
+      "blackboard_reads": [],
+      "blackboard_writes": [],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 8327,
+      "enabled": true
+    },
+    {
+      "name": "panda-mind",
+      "description": "Unified OODA cognitive loop for the panda system. Use for freeform `/panda` or `/panda-mind` requests, vague asks, mixed-tool workflows, Jira/ticket-driven work, or any request that should be understood before routing. Also handles explicit panda skill invocations by honoring the requested skill while still doing a fast orientation pass for context, prerequisites, and approval gates. Triggers on open-ended requests like \"help me think through this\", bug reports, plan execution asks, Jira URLs, \"make this better\", mixed MCP asks like \"check my calendar and draft a Slack message\", and direct skill invocations like \"/panda-debug ...\" or \"/panda-brainstorm ...\". Do NOT use only when another panda skill is already actively handling the task and no re-orientation is needed.",
+      "trigger_file": "panda-mind.yml",
+      "skill_directory": "panda-mind/",
+      "events_emits": [],
+      "events_listens": [],
+      "blackboard_reads": [],
+      "blackboard_writes": [],
+      "references": [
+        "blackboard-schema.md",
+        "complexity-guide.md",
+        "event-registry.md",
+        "mcp-inventory.md",
+        "reflexion-protocol.md",
+        "routing-scenarios.md"
+      ],
+      "has_evals": true,
+      "size_bytes": 11714,
+      "enabled": true
+    },
+    {
+      "name": "panda-pause",
+      "description": "Save the current panda skill session state so work can be resumed in a new conversation. Use when user says \"pause\", \"save state\", \"I need to stop\", \"continue later\", \"panda pause\", \"save progress\", or is about to end a session mid-workflow. Works with any panda skill (brainstorm, executor, debug, council, audit).",
+      "trigger_file": "panda-pause.yml",
+      "skill_directory": "panda-pause/",
+      "events_emits": [
+        "session_paused",
+        "task_completed"
+      ],
+      "events_listens": [],
+      "blackboard_reads": [],
+      "blackboard_writes": [],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 6112,
+      "enabled": true
+    },
+    {
+      "name": "panda-resume",
+      "description": "Resume a previously paused panda skill session from saved state. Use when user says \"resume\", \"continue where we left off\", \"panda resume\", \"pick up\", or starts a new conversation wanting to continue previous panda work.",
+      "trigger_file": "panda-resume.yml",
+      "skill_directory": "panda-resume/",
+      "events_emits": [
+        "session_resumed",
+        "task_completed"
+      ],
+      "events_listens": [],
+      "blackboard_reads": [],
+      "blackboard_writes": [],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 6962,
+      "enabled": true
+    },
+    {
+      "name": "panda-retro",
+      "description": "Post-execution self-assessment skill. Automatically triggered after panda-executor completes a plan. Scores execution across 5 dimensions, identifies what went well and what was slow, writes structured report with improvement suggestions. Use when user says \"retro\", \"retrospective\", \"how did that go\", \"execution review\", \"self-assessment\", \"panda retro\".",
+      "trigger_file": "panda-retro.yml",
+      "skill_directory": "panda-retro/",
+      "events_emits": [
+        "experience_recorded",
+        "pattern_discovered",
+        "task_completed"
+      ],
+      "events_listens": [
+        "task_completed",
+        "error_encountered",
+        "bug_fixed"
+      ],
+      "blackboard_reads": [],
+      "blackboard_writes": [
+        "~/.claude/panda-state/blackboard/context.json",
+        "~/.claude/panda-state/blackboard/experiences/YYYY-MM-DD_task-slug.json"
+      ],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 8226,
+      "enabled": true
+    },
+    {
+      "name": "panda-upgrade",
+      "description": "Self-upgrade mechanism for panda skills ecosystem. Checks GitHub Releases for new versions, caches results for 60min, shows changelog, and copies updated files. Use when user says \"upgrade\", \"update skills\", \"new version\", \"check for updates\", \"panda upgrade\".",
+      "trigger_file": "panda-upgrade.yml",
+      "skill_directory": "panda-upgrade/",
+      "events_emits": [
+        "task_completed"
+      ],
+      "events_listens": [],
+      "blackboard_reads": [],
+      "blackboard_writes": [],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 5284,
+      "enabled": true
+    }
+  ]
+}

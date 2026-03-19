@@ -1,0 +1,51 @@
+name: Release
+
+# Runs only on direct pushes to main (not PRs).
+# IMPORTANT: The very first npm publish must be done manually:
+#   npm publish --access public
+# After that, semantic-release handles all subsequent releases.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write   # Required for npm provenance (OIDC trusted publishing).
+                    # Once npmjs.com trusted publisher is configured for this
+                    # package, NODE_AUTH_TOKEN / NPM_TOKEN can be removed.
+
+jobs:
+  release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Full history required for semantic-release to
+                           # determine the next version from commit history.
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # NPM_TOKEN is required until OIDC trusted publishing is fully
+          # configured on npmjs.com for this package. After that, remove
+          # this secret and rely solely on id-token: write + provenance.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'

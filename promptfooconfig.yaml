@@ -1,0 +1,13 @@
+# Root promptfoo configuration
+# Run: npx promptfoo eval
+
+description: "Panda Skills Eval Suite"
+
+# Include eval configs from individual skills
+evaluateOptions:
+  maxConcurrency: 2
+
+# Default provider for all evals
+providers:
+  - id: "exec:claude --print"
+    label: "claude-code"
