@@ -1,10 +1,28 @@
 # Feed The Machine
 
-You have context. You have a task. You don't have time to babysit an AI through every step.
+Models get smarter every quarter. Your workflow shouldn't have to start over every time.
 
-Feed it to the machine.
+FTM is a cognitive architecture for Claude Code — not a prompt library, not a wrapper, not scaffolding that dies on the next model drop. It's a persistent intelligence layer that learns how *you* work and gets better every time you use it. The OODA (Observe, Orient, Decide, Act) reasoning loop, the blackboard memory, the multi-model deliberation, the event mesh — these are design patterns that become *more* valuable as models improve, not less.
 
-FTM is a cognitive skill ecosystem for Claude Code. Drop in anything — a support ticket, a feature spec, a bug report, a half-formed idea, a meeting transcript, a migration checklist, a "figure this out" — and it reads everything, proposes a plan, waits for your approval, then executes end-to-end. Every successful execution becomes a playbook. Every playbook makes the next similar task faster. The machine hungers. You feed it. It takes care of you.
+Drop in anything. A support ticket, a feature spec, a bug report, a half-formed idea, a meeting transcript, a "figure this out." The machine reads everything, proposes a plan, waits for your approval, then executes end-to-end. Every successful execution becomes a playbook. Every playbook makes the next similar task faster.
+
+The machine hungers. You feed it. It takes care of you.
+
+---
+
+## Why This Exists
+
+Most AI tooling is disposable by design. You write prompts, the model gets better, your prompts become unnecessary. That's the scaffolding thesis — and it's true for most of what people are building.
+
+FTM is built on the opposite bet: **the orchestration layer survives model drops.** Three things in this system are structurally hard for any single model provider to absorb:
+
+**Persistent memory that compounds.** Claude's native memory is conversation-scoped. FTM's blackboard is a three-tier knowledge store — context, experiences, patterns — that persists across every session. By your twentieth task, it knows your stack, your team's conventions, the quirks of your external services, and what kinds of plans you tend to push back on. It's not remembering facts. It's building judgment.
+
+**Multi-model deliberation.** FTM's council sends hard decisions to Claude, Codex, and Gemini as equal peers, then loops through rounds of debate until 2-of-3 agree. No model provider will ever natively ship "ask our competitors for a second opinion." That's permanently outside their incentive structure.
+
+**Event-driven skill composition.** 18 typed events wire skills together automatically — a commit triggers documentation updates and architecture diagrams, a completed task triggers micro-reflection, a wave boundary triggers adversarial validation. This is workflow orchestration that sits above any single model's capability. It's closer to what Temporal does than what a model improvement would replace.
+
+The ideas are portable. The architecture is model-agnostic. The skills format is just the current packaging.
 
 ---
 
@@ -13,14 +31,14 @@ FTM is a cognitive skill ecosystem for Claude Code. Drop in anything — a suppo
 Every task, every time:
 
 ```
-FEED → PLAN → APPROVE → EXECUTE → LEARN
-  ↑                                  |
-  └──────────── (next task) ─────────┘
+FEED --> PLAN --> APPROVE --> EXECUTE --> LEARN
+  ^                                        |
+  +------------- (next task) --------------+
 ```
 
 **FEED** — Paste anything. A ticket URL. A spec doc. An error stack trace. A Slack thread. Plain English. The machine reads it all.
 
-**PLAN** — ftm-mind runs an OODA loop: reads your blackboard (memory across sessions), sizes the task, assembles the right skills, proposes a concrete plan with numbered steps.
+**PLAN** — ftm-mind runs the OODA loop (Observe what you gave it, Orient using blackboard memory, Decide on an approach, Act by assembling the right skills) and proposes a concrete plan with numbered steps.
 
 **APPROVE** — You review the plan. Modify it, ask questions, or just say "go."
 
@@ -50,7 +68,7 @@ graph TD
         Debug["ftm-debug\nMulti-vector\ndebugging war room"]
         Exec["ftm-executor\nAutonomous plan\nexecution"]
         Council["ftm-council\nClaude + Codex + Gemini\n2-of-3 consensus"]
-        Browse["ftm-browse\nHeadless browser\n+ ARIA inspection"]
+        Browse["ftm-browse\nHeadless browser\n+ accessibility inspection"]
         Git["ftm-git\nSecret scanning\n+ credential gate"]
         Audit["ftm-audit\nKnip + adversarial\nLLM wiring check"]
     end
@@ -63,11 +81,11 @@ graph TD
     Mesh --> Git
     Mesh --> Audit
 
-    subgraph Integrations["External Integrations"]
-        Jira["Jira MCP"]
-        FS["Freshservice MCP"]
-        Slack["Slack MCP"]
-        Gmail["Gmail MCP"]
+    subgraph Integrations["External Integrations (via MCP)"]
+        Jira["Jira"]
+        FS["Freshservice"]
+        Slack["Slack"]
+        Gmail["Gmail"]
     end
 
     Browse --> Jira
@@ -122,7 +140,7 @@ Paste an error message, stack trace, or just describe unexpected behavior. It op
 
 **Without FTM** — Open the ticket. Read it. Check Slack for context. Look up the customer's history. Figure out who should handle it. Draft a response. Copy-paste between four tabs. 30 minutes of context-gathering before any real work starts.
 
-**With FTM** — Paste the ticket URL. FTM reads the ticket, pulls the Slack thread, checks your blackboard for similar past issues, proposes a triage plan (categorize → assign → draft response → update ticket), and waits. You say "go." Done in 3 minutes.
+**With FTM** — Paste the ticket URL. FTM reads the ticket, pulls the Slack thread, checks your blackboard for similar past issues, proposes a triage plan (categorize, assign, draft response, update ticket), and waits. You say "go." Done in 3 minutes.
 
 ---
 
@@ -130,7 +148,7 @@ Paste an error message, stack trace, or just describe unexpected behavior. It op
 
 **Without FTM** — You open five files, context-switch between the spec and the codebase, write the route, realize the middleware pattern is different from what you remembered, check another file, write tests separately, forget to update the docs, ship it and wonder why the audit is failing.
 
-**With FTM** — You paste the spec. FTM reads the existing patterns in your codebase (blackboard knows your stack), proposes a plan: route → handler → validation → tests → INTENT update → audit check. Parallel agents handle the implementation waves. ftm-codex-gate validates at each boundary. Documentation updates automatically on commit. The whole thing is coherent from the start.
+**With FTM** — You paste the spec. FTM reads the existing patterns in your codebase (blackboard knows your stack), proposes a plan: route, handler, validation, tests, INTENT update, audit check. Parallel agents handle the implementation waves. ftm-codex-gate validates at each boundary. Documentation updates automatically on commit. The whole thing is coherent from the start.
 
 ---
 
@@ -146,7 +164,7 @@ Paste an error message, stack trace, or just describe unexpected behavior. It op
 
 | Skill | What It Does |
 |-------|-------------|
-| **ftm-mind** | OODA cognitive loop — the universal entry point; reads context, sizes tasks, routes everything |
+| **ftm-mind** | Observe-Orient-Decide-Act cognitive loop — the universal entry point; reads context, sizes tasks, routes everything |
 | **ftm-executor** | Autonomous plan execution with dynamically assembled agent teams and wave-by-wave progress |
 | **ftm-debug** | Multi-vector debugging war room — parallel hypothesis testing, static + runtime + dependency analysis |
 | **ftm-brainstorm** | Socratic ideation with parallel web and GitHub research agents; challenges assumptions, surfaces options |
@@ -156,7 +174,7 @@ Paste an error message, stack trace, or just describe unexpected behavior. It op
 | **ftm-retro** | Post-execution retrospectives and continuous micro-reflections after every task |
 | **ftm-intent** | INTENT.md documentation layer — function-level contracts, auto-updated on every commit |
 | **ftm-diagram** | ARCHITECTURE.mmd mermaid diagrams — auto-regenerated after commits |
-| **ftm-browse** | Headless browser — screenshots, ARIA inspection, form automation, visual verification |
+| **ftm-browse** | Headless browser — screenshots, accessibility tree inspection, form automation, visual verification |
 | **ftm-git** | Secret scanning and credential safety gate for all git operations |
 | **ftm-pause** | Save current session state to the blackboard mid-task |
 | **ftm-resume** | Restore a paused session and continue exactly where you left off |
@@ -216,7 +234,8 @@ profiles:
 
 - [Codex CLI](https://github.com/openai/codex) — required for `ftm-council` and `ftm-codex-gate`
 - [Gemini CLI](https://github.com/google/gemini-cli) — required for `ftm-council`
-- Playwright MCP (`npx @playwright/mcp@latest`) — required for `ftm-browse`
+- Playwright MCP server (`npx @playwright/mcp@latest`) — required for `ftm-browse`
+  *(MCP = Model Context Protocol — the standard way AI tools connect to external services)*
 
 All other skills run on Claude Code alone.
 
