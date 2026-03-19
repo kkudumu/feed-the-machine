@@ -34,6 +34,11 @@ profiles:
 # Execution preferences
 execution:
   max_parallel_agents: 5          # max agents dispatched simultaneously
+  per_skill_overrides:              # skills read their own override, fall back to global
+    ftm-researcher: 10
+    ftm-executor: 8
+    ftm-debug: 6
+    ftm-brainstorm: 3              # fallback if researcher unavailable
   auto_audit: true                # run ftm-audit after each executor task
   progress_tracking: true         # write PROGRESS.md during execution
   approval_mode: plan_first       # plan_first | always_ask
@@ -66,6 +71,7 @@ skills:
   ftm-config: { enabled: true }
   ftm-git: { enabled: true }
   ftm-mind: { enabled: true }
+  ftm-researcher: { enabled: true }   # deep parallel research engine
 
 # Session management
 session:
