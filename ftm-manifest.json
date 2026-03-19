@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19T21:06:50.384Z",
+  "generated_at": "2026-03-19T21:57:27.654Z",
   "skills": [
     {
       "name": "ftm",
@@ -300,6 +300,24 @@
       "enabled": true
     },
     {
+      "name": "ftm-map",
+      "description": "Persistent code knowledge graph powered by tree-sitter and SQLite with FTS5 full-text search. Builds structural dependency graphs, enables blast radius analysis, dependency chain queries, and keyword-based code search. Use when the user asks \"what breaks if I change X\", \"what depends on Y\", \"blast radius of Z\", \"where do we handle auth\", \"map this codebase\", \"index this project\", \"what calls function X\", \"show dependencies for Y\". Also triggered by ftm-intent and ftm-diagram for graph-powered view generation. Triggers on \"blast radius\", \"what breaks\", \"what calls\", \"what depends on\", \"where do we\", \"map codebase\", \"index\", \"code graph\", \"dependency chain\", \"ftm-map\".",
+      "trigger_file": "ftm-map.yml",
+      "skill_directory": "ftm-map/",
+      "events_emits": [
+        "map_updated"
+      ],
+      "events_listens": [
+        "code_committed"
+      ],
+      "blackboard_reads": [],
+      "blackboard_writes": [],
+      "references": [],
+      "has_evals": false,
+      "size_bytes": 3884,
+      "enabled": true
+    },
+    {
       "name": "ftm-mind",
       "description": "Unified OODA cognitive loop for the ftm system. Use for freeform `/ftm` or `/ftm-mind` requests, vague asks, mixed-tool workflows, Jira/ticket-driven work, or any request that should be understood before routing. Also handles explicit ftm skill invocations by honoring the requested skill while still doing a fast orientation pass for context, prerequisites, and approval gates. Triggers on open-ended requests like \"help me think through this\", bug reports, plan execution asks, Jira URLs, \"make this better\", mixed MCP asks like \"check my calendar and draft a Slack message\", and direct skill invocations like \"/ftm-debug ...\" or \"/ftm-brainstorm ...\". Do NOT use only when another ftm skill is already actively handling the task and no re-orientation is needed.",
       "trigger_file": "ftm-mind.yml",
@@ -317,7 +335,7 @@
         "routing-scenarios.md"
       ],
       "has_evals": true,
-      "size_bytes": 39905,
+      "size_bytes": 40959,
       "enabled": true
     },
     {
@@ -358,7 +376,7 @@
         "output-format.md",
         "synthesis-pipeline.md"
       ],
-      "has_evals": false,
+      "has_evals": true,
       "size_bytes": 10899,
       "enabled": true
     },
