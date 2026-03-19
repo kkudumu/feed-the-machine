@@ -39,6 +39,14 @@ execution:
   approval_mode: plan_first       # plan_first | always_ask
                                   #   plan_first: every task gets a plan, micro tasks get inline plans
                                   #   always_ask: always present full plan, even for micro tasks
+  tdd_mode: false               # when true, agents must write tests before implementation
+                                 # spec reviewer enforces RED-GREEN-REFACTOR compliance
+
+# Two-stage review — runs after each task agent completes, before ftm-audit
+review:
+  spec_reviewer_model: haiku    # fast, cheap — checks spec compliance only
+  quality_reviewer_model: opus  # thorough — checks code quality and bug risk
+  skip_quality_review: false    # set true to run spec review only (faster execution)
 
 # Skill enable/disable — set enabled: false to prevent ftm-mind from routing to a skill
 skills:

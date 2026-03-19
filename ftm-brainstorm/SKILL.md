@@ -103,6 +103,54 @@ Detect which path you're on:
 
 ---
 
+# DISCUSS MODE
+
+When the user provides a clear, specific spec or feature description (not a vague idea), skip broad research and go straight to targeted analysis.
+
+## Detection
+
+Discuss mode activates when:
+- The user's input is 200+ words with specific technical details
+- The user says "I know what I want to build" or "here's my spec" or "discuss this"
+- The input contains file paths, function names, or architecture details
+- The user explicitly requests "discuss" rather than "brainstorm"
+
+## Flow
+
+Instead of the standard brainstorm research → synthesis → suggestions flow:
+
+1. **Parse the spec** — Extract: what's being built, key components, tech stack, constraints
+2. **Identify gray areas** — Find the parts that aren't specified:
+   - Edge cases not mentioned
+   - Error handling not specified
+   - Performance implications not considered
+   - Security concerns not addressed
+   - Integration points not defined
+3. **Ask targeted questions** — Present 3-5 specific questions about the gray areas:
+   ```
+   Your spec is clear on [X, Y, Z]. A few gray areas to nail down:
+
+   1. [Edge case question] — e.g., "What happens when the user submits while offline?"
+   2. [Error handling question] — e.g., "Should failed API calls retry or show an error?"
+   3. [Performance question] — e.g., "Expected data volume? 100 items or 100K?"
+   4. [Security question] — e.g., "Who should have access to this endpoint?"
+   5. [Integration question] — e.g., "Does this need to sync with the existing auth system?"
+   ```
+4. **Refine based on answers** — Each answer narrows the spec. After 2-3 rounds of Q&A, the spec should be implementation-ready.
+5. **Output: implementation-ready spec** — Not a brainstorm document, but a tight spec that can feed directly into plan generation.
+
+## Gray Area Categories by Feature Type
+
+| Feature Type | Common Gray Areas |
+|---|---|
+| API endpoint | Auth, rate limiting, pagination, error codes, versioning |
+| UI component | Loading states, empty states, error states, accessibility, responsive |
+| Data pipeline | Failure modes, retry logic, idempotency, monitoring, backpressure |
+| Integration | Auth flow, webhook handling, rate limits, data mapping, error recovery |
+| Config change | Rollback plan, feature flags, gradual rollout, monitoring |
+
+---
+
 # PHASE 2: RESEARCH + CHALLENGE LOOP
 
 This is the heart of the skill. Unlimited turns. Each one follows the cycle.
@@ -231,6 +279,51 @@ Read `references/plan-template.md` for the full template and rules. Present the 
 - **superpowers:brainstorming**: Design/spec work. User knows what they're building, needs HOW.
 
 If user already completed superpowers:brainstorming, point to ftm-executor instead. If user explicitly invokes this skill, always run it.
+
+---
+
+## Context Compression
+
+After turn 5 in a brainstorm session, earlier turns start consuming significant context. Apply compression to maintain quality in later turns.
+
+### Trigger
+
+- Turns 1-5: No compression. Full fidelity.
+- Turn 6+: Compress turns 1 through (current - 3). Keep the 3 most recent turns at full fidelity.
+
+### Compression Strategy
+
+For each compressed turn, replace the full content with a summary:
+
+```
+[Turn N summary]
+- Topic: [what was discussed]
+- Key decisions: [bullet list of decisions made]
+- Open questions resolved: [what was answered]
+- Artifacts produced: [any specs, diagrams, code snippets referenced]
+```
+
+### What to Preserve in Summaries
+
+- Decisions and their rationale (WHY something was decided)
+- Constraints discovered
+- Requirements confirmed by the user
+- Technical choices made
+
+### What to Drop
+
+- Exploratory tangents that were abandoned
+- Research citations already synthesized
+- Verbose explanations of options not chosen
+- Repeated context that's already captured in later turns
+
+### Implementation
+
+This is implemented at the skill level, not via hooks. When presenting a response at turn 6+:
+1. Mentally compress old turns using the strategy above
+2. Reference compressed summaries when needed
+3. Keep recent turns verbatim for conversational continuity
+4. If the user references something from a compressed turn, expand it on demand
 
 ---
 

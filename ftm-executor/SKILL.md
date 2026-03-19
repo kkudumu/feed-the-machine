@@ -45,6 +45,7 @@ Phase 2   → Assemble the Agent Team
 Phase 3   → Set Up Worktrees
 Phase 3.5 → Initialize Progress Tracking
 Phase 4   → Dispatch Agents (parallel, per wave)
+Phase 4.3 → Two-Stage Review (spec + quality, per task)
 Phase 4.5 → Post-Task Audit (automatic, per task)
 Phase 5   → Collect and Integrate
 Phase 5.5 → Codex Gate (wave boundary validation)
@@ -135,11 +136,221 @@ After each task agent completes successfully, call:
 node ~/.claude/skills/ftm-executor/runtime/ftm-runtime.mjs mark-complete <task-id>
 ```
 
+### Pre-Step Checkpoints
+
+Before dispatching each task agent, create a git checkpoint in the agent's worktree:
+
+```bash
+# In the agent's worktree, before the agent starts work
+git tag ftm-checkpoint-task-[N] HEAD
+```
+
+This creates a lightweight tag that marks the exact state before the task began.
+
+**After successful task completion:**
+- Delete the checkpoint tag: `git tag -d ftm-checkpoint-task-[N]`
+- The successful commits stand on their own
+
+**On task failure (after review/audit fails and retries exhausted):**
+
+Present rollback option to the user:
+```
+⚠ Task [N] "[title]" failed after [X] attempts.
+
+Last error: [error description]
+
+Options:
+  1. rollback  — Restore worktree to pre-task state (discard all changes from this task)
+  2. keep      — Keep the partial changes and continue to next task
+  3. retry     — Try once more with additional context
+  4. abort     — Stop execution entirely
+```
+
+**On "rollback":**
+```bash
+# Reset the worktree to the checkpoint
+git reset --hard ftm-checkpoint-task-[N]
+git tag -d ftm-checkpoint-task-[N]
+```
+Log in PROGRESS.md: "Task [N] rolled back to checkpoint"
+
+**On "keep":**
+- Mark task as "partial" in runtime state
+- Continue to next task
+- Note partial state in PROGRESS.md
+
+**Checkpoint cleanup:**
+- Successful tasks: checkpoint deleted immediately
+- Failed + rolled back: checkpoint deleted after rollback
+- End of wave: verify no orphaned checkpoint tags remain
+
+---
+
+### Phase 4.3: Two-Stage Review
+
+After each task agent returns and before running panda-audit (Phase 4.5), execute a two-stage review.
+
+#### Stage 1: Spec Review (fast, cheap model)
+
+Spawn a review agent using the `spec_reviewer_model` from the `review` block in `ftm-config.yml` (default: haiku for budget, sonnet for balanced):
+
+```
+You are a spec reviewer. Check whether this task was implemented correctly.
+
+Task from plan:
+[paste task description, files list, acceptance criteria]
+
+Changes made:
+[git diff of the agent's commits]
+
+Check ONLY these things:
+1. Were the right files modified? (compare file list in plan vs actual changes)
+2. Does each acceptance criterion have a corresponding change?
+3. Were any files modified that AREN'T in the task's file list? (scope creep)
+4. Were verification steps completed?
+
+Return: PASS or FAIL with specific reasons.
+Do NOT check code quality, style, or architecture — that's stage 2.
+```
+
+**When TDD mode is active**, add this additional check to the Stage 1 prompt:
+
+```
+Additional check (TDD mode is ACTIVE):
+- Was a failing test committed BEFORE the implementation?
+- Does the test actually test the new behavior (not just import checks)?
+- If no test was written, is there a valid reason? (config-only change, documentation, etc.)
+```
+
+**On spec FAIL:** Send the task back to the agent with the specific failures. The agent must fix and recommit before proceeding to Stage 2. Max 2 retries.
+
+#### Stage 2: Quality Review (capable model)
+
+Only runs after Stage 1 passes. Spawn using the `quality_reviewer_model` from the `review` block in `ftm-config.yml` (default: opus):
+
+```
+You are a quality reviewer. The spec review passed — the right things were changed.
+Now check whether they were changed WELL.
+
+Changes:
+[git diff]
+
+Project conventions:
+[read STYLE.md if it exists]
+
+Check:
+1. Code quality — clean, readable, follows existing patterns
+2. Bug risk — obvious bugs, missing null checks, race conditions
+3. Error handling — are failure modes handled?
+4. Style consistency — matches the rest of the codebase
+5. Conflicts — do these changes conflict with other recent changes?
+
+Return: PASS, WARN (with suggestions), or FAIL (with required fixes).
+```
+
+**On quality FAIL:** Present issues to user with fix suggestions. User decides: fix now, fix later, or accept as-is.
+**On quality WARN:** Note warnings in task report, proceed.
+
+### TDD Mode (Optional)
+
+When `tdd_mode: true` is set in `~/.claude/ftm-config.yml`, agents must follow RED-GREEN-REFACTOR for every task that creates new code.
+
+**When TDD mode is active, add to each agent's prompt:**
+
+```
+## TDD Requirement (ACTIVE)
+
+For every task that creates or modifies functional code, follow RED-GREEN-REFACTOR:
+
+1. RED — Write a failing test FIRST that describes the expected behavior
+   - The test must fail for the RIGHT reason (not import error, but actual assertion failure)
+   - Commit the failing test: "test: add failing test for [feature]"
+
+2. GREEN — Write the minimum code to make the test pass
+   - Don't gold-plate. Just make it pass.
+   - Commit: "feat: implement [feature] — tests green"
+
+3. REFACTOR — Clean up while keeping tests green
+   - Only if needed. Don't refactor for the sake of it.
+   - Commit: "refactor: clean up [feature]"
+
+The spec reviewer (Phase 4.3) will CHECK for TDD compliance:
+- If code was committed before tests → FAIL
+- If tests were never written → FAIL
+- If tests don't actually test the new behavior → FAIL
+```
+
+**When TDD mode is OFF (default):** No impact on execution flow. Agents write code and tests in whatever order makes sense.
+
+**Exemptions from TDD:**
+- Documentation-only tasks
+- Configuration changes (YAML, JSON, env vars)
+- Style/formatting changes
+- Tasks explicitly marked `tdd: skip` in the plan
+
+---
+
+#### Skip Conditions
+
+Skip both stages for:
+- Documentation-only tasks (no code changes)
+- Tasks marked `review: skip` in the plan
+
+If `skip_quality_review: true` is set in `ftm-config.yml`, run Stage 1 only.
+
 ---
 
 ### Phase 4.5: Post-Task Audit (automatic)
 
 After every task agent returns, run ftm-audit before marking complete. Skip for documentation-only tasks or tasks marked `audit: skip`. Read `references/phases/PHASE-4-5-AUDIT.md` for pre-audit checks, smoke test steps, invocation, result interpretation, and skip conditions.
+
+---
+
+### Step Completion Reports
+
+After each task agent completes and passes review/audit, display a progress report:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Step [N]/[total] complete: [task title]
+
+Files changed:
+  M  [modified files]
+  A  [added files]
+  D  [deleted files]
+
+Tests: [pass count] passed, [fail count] failed
+Review: Spec ✓ | Quality ✓
+Audit: [PASS | PASS after auto-fix (N fixed) | SKIPPED]
+
+Next: Step [N+1] — [next task title]
+  Files: [next task's file list]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Wave completion report** — after all tasks in a wave complete:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Wave [W]/[total_waves] complete
+
+Tasks completed: [list]
+Total files changed: [count]
+Merge status: [success | conflicts resolved]
+
+Remaining: [X] tasks across [Y] waves
+Next wave: Tasks [list] — [brief descriptions]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Data sources:**
+- Files changed: `git diff --stat` from the agent's commits
+- Test results: from the agent's verification output
+- Review results: from Phase 4.3 two-stage review
+- Audit results: from Phase 4.5 audit
+- Next step: from `ftm-runtime next-wave` or the plan structure
+
+**Also update PROGRESS.md** with each report (if progress_tracking is enabled).
 
 ---
 
