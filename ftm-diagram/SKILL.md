@@ -203,3 +203,9 @@ Add `sendEmail` node with edges to `src/notifications/DIAGRAM.mmd`.
 **View current architecture:**
 > "show architecture"
 Read and display `ARCHITECTURE.mmd` + list available module diagrams.
+
+---
+
+### Auto-Invocation by ftm-executor
+
+This skill's format is used by ftm-executor's documentation pipeline. After every commit during plan execution, agents update INTENT.md (or DIAGRAM.mmd) entries following this skill's templates. The updates are automatic and don't require explicit skill invocation — agents reference the format directly.

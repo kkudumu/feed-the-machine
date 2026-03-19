@@ -1,0 +1,4 @@
+---
+name: ftm-routine
+description: Execute named, recurring multi-step workflows from YAML definitions. Use when user says "routine", "run routine", "ftm-routine", "morning triage", or names a known routine. Routines are reusable workflows stored in ~/.ftm/routines/ that execute through the normal plan-approve flow.
+---

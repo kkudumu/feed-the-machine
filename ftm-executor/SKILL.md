@@ -306,6 +306,70 @@ After every task agent returns, run ftm-audit before marking complete. Skip for 
 
 ---
 
+### Documentation Pipeline (Automatic)
+
+Every commit during plan execution must include documentation updates. This is enforced in the agent prompt and verified in Phase 4.5.
+
+#### Per-Commit Documentation
+
+After each commit, the executing agent must:
+
+1. **Update INTENT.md** — for every new or changed function:
+   - Add or update the entry in the module's INTENT.md
+   - Format: Does / Why / Relationships / Decisions
+   - If a new module directory was created, create its INTENT.md and add it to the root INTENT.md module map
+   - Use ftm-intent format (refer to `~/.claude/skills/ftm-intent/SKILL.md` for template)
+
+2. **Update ARCHITECTURE.mmd** — for every new or changed module/function:
+   - Add or update nodes in the module's DIAGRAM.mmd
+   - Update edges for changed dependencies
+   - If a new module was created, add it to root ARCHITECTURE.mmd
+   - Use ftm-diagram format (refer to `~/.claude/skills/ftm-diagram/SKILL.md` for template)
+
+3. **Verify STYLE.md compliance** — check the project root for STYLE.md
+   - If it exists, the agent's code must follow its Hard Limits and Structure Rules
+   - If any violation is found during review, fix before committing
+
+#### Post-Plan Summary
+
+After ALL plan tasks complete successfully (Phase 6), generate a SUMMARY.md in the project root:
+
+```markdown
+# Execution Summary
+
+**Plan:** [plan title]
+**Executed:** [date]
+**Tasks:** [N] completed across [W] waves
+
+## Changes Made
+[For each task: one-line summary of what was done]
+
+## Files Modified
+[Grouped by module/directory]
+
+## Verification Results
+- Tests: [pass/fail counts]
+- Build: [success/failure]
+- Codex Gate: [pass/warnings]
+
+## Decisions Made
+[Any non-trivial technical decisions made during execution, with rationale]
+
+## Next Steps
+[Any follow-up work identified during execution]
+```
+
+#### Notification Mode
+
+Documentation updates are shown to the user in a compact notification:
+```
+📄 Docs updated: INTENT.md (3 entries), ARCHITECTURE.mmd (2 nodes)
+```
+
+The user is NOT asked to approve documentation updates — they're automatic. But they're visible so the user knows what changed.
+
+---
+
 ### Step Completion Reports
 
 After each task agent completes and passes review/audit, display a progress report:

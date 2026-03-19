@@ -41,6 +41,8 @@ Preserve: the full user text, explicit skill names, file paths, URLs, ticket IDs
 
 Note but do not finalize: likely task type (`feature`, `bug`, `refactor`, `investigation`, `configuration`, `documentation`, `test`, `deploy`, `communication`, `research`, `multi`), likely scope (answer, edit, workflow, orchestration), and whether this continues the current session or branches.
 
+**Routine detection:** If the user's input matches a known routine name (check `~/.ftm/routines/*.yml` filenames), or the user says "run routine", "routine", or a phrase matching a routine's `name` field, route to ftm-routine instead of generating a fresh plan.
+
 ### 3. Load active session state
 
 Read `~/.claude/ftm-state/blackboard/context.json`. Extract: `current_task`, `recent_decisions`, `active_constraints`, `user_preferences`, `session_metadata.skills_invoked`. If missing or malformed, treat as empty state.
@@ -720,6 +722,69 @@ When a parameterized playbook is loaded in step 0 of Decide:
 - 50% cost reduction from plan reuse
 - 27% latency reduction from skipping plan generation
 - Parameterized playbooks become more valuable with each use
+
+### 8. Slack Message Drafting
+
+When a plan step involves communicating via Slack (notifying a team, updating a channel, escalating to someone), draft the message and present for approval.
+
+**Detection:**
+- Plan step mentions "notify", "message", "slack", "post to #channel", "tell [person]"
+- Task context indicates a Slack communication is needed (e.g., deployment notification, incident update)
+
+**Draft process:**
+1. Compose the message based on:
+   - What was accomplished (from execution results)
+   - Who needs to know (from plan context or ticket)
+   - Appropriate tone (from blackboard patterns — formal for incidents, casual for updates)
+2. Present the draft:
+   ```
+   Draft Slack message to #[channel] (or @[user]):
+
+   ---
+   [draft message content]
+   ---
+
+   Say "send" to post via slack_post_message, "edit" to modify, or "skip".
+   ```
+3. On "send": call `slack_post_message` with channel and message
+4. On edit: incorporate changes, re-present
+5. On "skip": continue without sending
+6. **NEVER send without explicit "send" / "post" approval**
+
+**Thread replies:** If responding to a Slack thread (detected from external_context), use `slack_reply_to_thread` instead.
+
+**Tone adaptation:** If blackboard patterns contain communication style preferences, adapt the draft tone. Default: concise, professional, emoji-light.
+
+### 9. Email Drafting
+
+Same pattern as Slack but for email via Gmail MCP.
+
+**Detection:**
+- Plan step mentions "email", "send mail", "notify via email"
+- Task involves external stakeholders who aren't on Slack
+
+**Draft process:**
+1. Compose email with:
+   - **Subject line**: concise, descriptive
+   - **Body**: what was done, what's needed, next steps
+   - **Recipients**: inferred from context or explicitly stated
+2. Present the draft:
+   ```
+   Draft email:
+
+   To: [recipients]
+   Subject: [subject]
+
+   ---
+   [body content]
+   ---
+
+   Say "send" to deliver via Gmail, "edit" to modify, or "skip".
+   ```
+3. On "send": call `send_email` with recipients, subject, body
+4. On edit: any part (to, subject, body) can be modified
+5. On "skip": continue without sending
+6. **NEVER send without explicit approval**
 
 ## Routing Scenarios
 
