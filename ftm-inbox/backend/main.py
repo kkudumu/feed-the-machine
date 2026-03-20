@@ -21,6 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.db.connection import get_connection
 from backend.db.schema import initialize_schema
 from backend.routes.health import router as health_router
+from backend.routes.inbox import router as inbox_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -84,6 +85,7 @@ async def shutdown() -> None:
 # ---------------------------------------------------------------------------
 
 app.include_router(health_router)
+app.include_router(inbox_router)
 
 
 # ---------------------------------------------------------------------------

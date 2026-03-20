@@ -4,47 +4,16 @@
 	import PillButton from '$lib/components/ui/PillButton.svelte';
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import StreamDrawer from '$lib/components/ui/StreamDrawer.svelte';
-	import type { Status } from '$lib/components/ui/StatusBadge.svelte';
-
-	// Sample task data for layout preview
-	const sampleTasks = [
-		{
-			id: 'TASK-001',
-			title: 'Review security alert from Jira',
-			source: 'jira',
-			status: 'pending' as Status,
-			age: '2m ago'
-		},
-		{
-			id: 'TASK-002',
-			title: 'Freshservice ticket: DB migration approval',
-			source: 'freshservice',
-			status: 'planning' as Status,
-			age: '15m ago'
-		},
-		{
-			id: 'TASK-003',
-			title: 'Slack: deploy to staging requested',
-			source: 'slack',
-			status: 'approved' as Status,
-			age: '1h ago'
-		},
-		{
-			id: 'TASK-004',
-			title: 'Gmail: onboarding email follow-up',
-			source: 'gmail',
-			status: 'executing' as Status,
-			age: '2h ago'
-		}
-	];
+	import InboxFeed from '$lib/components/InboxFeed.svelte';
+	import type { UnifiedTask } from '$lib/api';
 
 	const auditEntries = [
 		{ time: '13:08:01', level: 'info',    msg: 'Poller connected: jira' },
 		{ time: '13:08:02', level: 'info',    msg: 'Poller connected: freshservice' },
-		{ time: '13:10:44', level: 'info',    msg: 'Task TASK-001 ingested' },
-		{ time: '13:11:02', level: 'info',    msg: 'Plan generated for TASK-001' },
+		{ time: '13:10:44', level: 'info',    msg: 'Task ingested from Jira' },
+		{ time: '13:11:02', level: 'info',    msg: 'Plan generation started' },
 		{ time: '13:11:05', level: 'warn',    msg: 'Approval gate: awaiting human' },
-		{ time: '13:25:18', level: 'success', msg: 'Task TASK-003 approved, executing' }
+		{ time: '13:25:18', level: 'success', msg: 'Task approved, executing' }
 	];
 
 	const sourceAccent: Record<string, 'blue' | 'green' | 'yellow' | 'coral'> = {
@@ -54,25 +23,21 @@
 		gmail:         'coral'
 	};
 
-	let selectedTask = sampleTasks[0];
+	let selectedTask: UnifiedTask | null = null;
 	let drawerOpen = false;
 
-	const drawerLines = [
-		'[13:25:18] Agent started: task-executor',
-		'[13:25:19] Fetching Jira context for TASK-001...',
-		'[13:25:20] Context fetched: 3 linked issues found',
-		'[13:25:21] Analyzing security impact...',
-		'[13:25:23] OK Draft remediation plan generated',
-		'[13:25:24] Awaiting approval gate...'
-	];
+	const drawerLines: string[] = [];
 
-	const planSteps = [
-		{ step: 1, label: 'Fetch context from Jira',   done: true  },
-		{ step: 2, label: 'Analyze security impact',   done: true  },
-		{ step: 3, label: 'Draft remediation plan',    done: false },
-		{ step: 4, label: 'Await human approval',      done: false },
-		{ step: 5, label: 'Execute approved actions',  done: false }
-	];
+	function handleSelectTask(e: CustomEvent<UnifiedTask>) {
+		selectedTask = e.detail;
+	}
+
+	function handleGeneratePlan(e: CustomEvent<UnifiedTask>) {
+		selectedTask = e.detail;
+		// Plan generation will be wired in Task 7
+		drawerLines.push(`[${new Date().toLocaleTimeString()}] Generate plan requested for: ${e.detail.title}`);
+		drawerOpen = true;
+	}
 </script>
 
 <!-- Three-column layout + bottom drawer -->
@@ -81,35 +46,13 @@
 	<aside class="sidebar sidebar-left" aria-label="Task inbox">
 		<div class="sidebar-header">
 			<h2 class="sidebar-title">Inbox</h2>
-			<span class="sidebar-count">{sampleTasks.length}</span>
 		</div>
 		<div class="sidebar-body">
-			{#if sampleTasks.length === 0}
-				<EmptyState
-					emoji="📭"
-					title="Inbox is clear"
-					message="No pending tasks right now."
-				/>
-			{:else}
-				<div class="task-list">
-					{#each sampleTasks as task (task.id)}
-						<button
-							class="task-item"
-							class:selected={selectedTask?.id === task.id}
-							on:click={() => (selectedTask = task)}
-						>
-							<div class="task-item-top">
-								<span class="task-source badge-source-{task.source}">{task.source}</span>
-								<span class="task-age">{task.age}</span>
-							</div>
-							<p class="task-title">{task.title}</p>
-							<div class="task-item-bottom">
-								<StatusBadge status={task.status} />
-							</div>
-						</button>
-					{/each}
-				</div>
-			{/if}
+			<InboxFeed
+				selectedTaskId={selectedTask?.id ?? null}
+				on:selectTask={handleSelectTask}
+				on:generatePlan={handleGeneratePlan}
+			/>
 		</div>
 	</aside>
 
@@ -119,31 +62,29 @@
 			<div class="plan-viewer">
 				<div class="plan-header">
 					<div class="plan-header-top">
-						<span class="plan-id">{selectedTask.id}</span>
-						<StatusBadge status={selectedTask.status} />
+						<span class="plan-id">{selectedTask.source}:{selectedTask.source_id}</span>
+						<StatusBadge status="pending" />
 					</div>
 					<h1 class="plan-title">{selectedTask.title}</h1>
+					{#if selectedTask.body}
+						<p class="plan-body">{selectedTask.body}</p>
+					{/if}
 				</div>
 
 				<KawaiiCard accent={sourceAccent[selectedTask.source] ?? 'green'}>
-					<span slot="header" class="card-label">Execution Plan</span>
+					<span slot="header" class="card-label">Plan</span>
 
-					<ol class="plan-steps">
-						{#each planSteps as s (s.step)}
-							<li class="plan-step" class:done={s.done}>
-								<span class="step-num">{s.step}</span>
-								<span class="step-label">{s.label}</span>
-								{#if s.done}
-									<span class="step-check" aria-label="complete">✓</span>
-								{/if}
-							</li>
-						{/each}
-					</ol>
+					<EmptyState
+						emoji="📋"
+						title="No plan generated yet"
+						message="Click 'Generate Plan' on a task card to create an execution plan."
+					/>
 
 					<div slot="footer" class="plan-actions">
-						<PillButton variant="primary" size="sm">Approve</PillButton>
-						<PillButton variant="ghost" size="sm">Reject</PillButton>
-						<PillButton variant="ghost" size="sm">View Details</PillButton>
+						<PillButton variant="primary" size="sm" on:click={() => handleGeneratePlan(new CustomEvent('generatePlan', { detail: selectedTask }))}>Generate Plan</PillButton>
+						{#if selectedTask.source_url}
+							<PillButton variant="ghost" size="sm" on:click={() => window.open(selectedTask?.source_url ?? '', '_blank')}>Open Source</PillButton>
+						{/if}
 					</div>
 				</KawaiiCard>
 			</div>
@@ -253,79 +194,6 @@
 		min-width: 0;
 	}
 
-	/* ─── Task inbox list ─── */
-	.task-list {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.task-item {
-		display: block;
-		width: 100%;
-		text-align: left;
-		background: var(--bg-card);
-		border: 2px solid var(--border-card);
-		border-radius: 12px;
-		padding: 0.65rem 0.75rem;
-		cursor: pointer;
-		transition:
-			border-color 0.15s ease,
-			box-shadow 0.15s ease,
-			transform 0.15s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-		font-family: 'Nunito', sans-serif;
-	}
-
-	.task-item:hover {
-		border-color: var(--accent-primary);
-		transform: translateX(2px);
-	}
-
-	.task-item.selected {
-		border-color: var(--accent-primary);
-		box-shadow: var(--shadow-card-hover);
-		background: var(--bg-secondary);
-	}
-
-	.task-item-top {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 0.3rem;
-	}
-
-	.task-source {
-		font-size: 0.65rem;
-		font-weight: 800;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		padding: 2px 8px;
-		border-radius: 9999px;
-	}
-
-	.badge-source-jira         { background: #bbdefb; color: #0d47a1; }
-	.badge-source-freshservice { background: #c8e6c9; color: #1b5e20; }
-	.badge-source-slack        { background: #fff9c4; color: #5d4037; }
-	.badge-source-gmail        { background: #ffccbc; color: #bf360c; }
-
-	.task-age {
-		font-size: 0.68rem;
-		color: var(--text-muted);
-	}
-
-	.task-title {
-		font-size: 0.8rem;
-		font-weight: 700;
-		color: var(--text-primary);
-		margin: 0 0 0.4rem;
-		line-height: 1.35;
-	}
-
-	.task-item-bottom {
-		display: flex;
-		align-items: center;
-	}
-
 	/* ─── Plan viewer ─── */
 	.plan-viewer {
 		display: flex;
@@ -366,6 +234,15 @@
 		font-weight: 800;
 		color: var(--text-primary);
 		line-height: 1.3;
+	}
+
+	.plan-body {
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+		line-height: 1.5;
+		margin: 0;
+		max-height: 100px;
+		overflow-y: auto;
 	}
 
 	.card-label {
