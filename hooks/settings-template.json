@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "_comment": "FTM hooks configuration template. Merge these entries into your ~/.claude/settings.json under the 'hooks' key. install.sh can do this automatically with --setup-hooks.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ftm-plan-gate.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__slack__slack_post_message|mcp__slack__slack_reply_to_thread|mcp__gmail__send_email",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ftm-drafts-gate.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ftm-discovery-reminder.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ftm-pending-sync-check.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ftm-map-autodetect.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/ftm-event-logger.mjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|mcp__git__git_commit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ftm-post-commit-trigger.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ftm-blackboard-enforcer.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
