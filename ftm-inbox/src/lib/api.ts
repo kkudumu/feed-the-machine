@@ -116,3 +116,51 @@ export async function approveAllSteps(taskId: number): Promise<Plan> {
 	}
 	return res.json();
 }
+
+// ---------------------------------------------------------------------------
+// Execution types
+// ---------------------------------------------------------------------------
+
+export interface AuditEntry {
+	id: number;
+	step_id: string;
+	action_type: string;
+	target_system: string;
+	target_object: string;
+	mutation_performed: string;
+	result: Record<string, unknown>;
+	rollback_available: boolean;
+	created_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Execution API functions
+// ---------------------------------------------------------------------------
+
+export async function startExecution(taskId: number): Promise<Record<string, unknown>> {
+	const res = await fetch(`${API_BASE}/api/tasks/${taskId}/execute`, { method: 'POST' });
+	if (!res.ok) {
+		const err = await res.json().catch(() => ({ detail: res.statusText }));
+		throw new Error(err.detail ?? `API error: ${res.status}`);
+	}
+	return res.json();
+}
+
+export async function pauseExecution(taskId: number): Promise<void> {
+	await fetch(`${API_BASE}/api/tasks/${taskId}/pause`, { method: 'POST' });
+}
+
+export async function resumeExecution(taskId: number): Promise<void> {
+	await fetch(`${API_BASE}/api/tasks/${taskId}/resume`, { method: 'POST' });
+}
+
+export async function retryStep(taskId: number, stepId: number): Promise<void> {
+	await fetch(`${API_BASE}/api/tasks/${taskId}/steps/${stepId}/retry`, { method: 'POST' });
+}
+
+export async function getAuditLog(taskId: number): Promise<AuditEntry[]> {
+	const res = await fetch(`${API_BASE}/api/tasks/${taskId}/audit-log`);
+	if (!res.ok) return [];
+	const data = await res.json();
+	return data.entries ?? [];
+}
