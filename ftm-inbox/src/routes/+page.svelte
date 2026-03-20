@@ -5,16 +5,18 @@
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import StreamDrawer from '$lib/components/ui/StreamDrawer.svelte';
 	import InboxFeed from '$lib/components/InboxFeed.svelte';
-	import type { UnifiedTask } from '$lib/api';
+	import PlanView from '$lib/components/PlanView.svelte';
+	import type { UnifiedTask, Plan } from '$lib/api';
+	import { generatePlan, getPlan } from '$lib/api';
+	type StatusBadgeStatus = 'pending' | 'planning' | 'approved' | 'executing' | 'complete' | 'failed';
 
-	const auditEntries = [
-		{ time: '13:08:01', level: 'info',    msg: 'Poller connected: jira' },
-		{ time: '13:08:02', level: 'info',    msg: 'Poller connected: freshservice' },
-		{ time: '13:10:44', level: 'info',    msg: 'Task ingested from Jira' },
-		{ time: '13:11:02', level: 'info',    msg: 'Plan generation started' },
-		{ time: '13:11:05', level: 'warn',    msg: 'Approval gate: awaiting human' },
-		{ time: '13:25:18', level: 'success', msg: 'Task approved, executing' }
-	];
+	// Map arbitrary task status string to a valid StatusBadge value
+	function taskStatusBadge(s: string): StatusBadgeStatus {
+		const valid: StatusBadgeStatus[] = ['pending', 'planning', 'approved', 'executing', 'complete', 'failed'];
+		return (valid.includes(s as StatusBadgeStatus) ? s : 'pending') as StatusBadgeStatus;
+	}
+
+	const API_BASE = 'http://localhost:8042';
 
 	const sourceAccent: Record<string, 'blue' | 'green' | 'yellow' | 'coral'> = {
 		jira:          'blue',
@@ -24,19 +26,89 @@
 	};
 
 	let selectedTask: UnifiedTask | null = null;
+	let currentPlan: Plan | null = null;
+	let planLoading = false;
 	let drawerOpen = false;
+	let drawerLines: string[] = [];
+	let auditEntries: { time: string; level: string; msg: string }[] = [];
 
-	const drawerLines: string[] = [];
-
-	function handleSelectTask(e: CustomEvent<UnifiedTask>) {
-		selectedTask = e.detail;
+	function addAudit(level: 'info' | 'warn' | 'success' | 'error', msg: string) {
+		auditEntries = [
+			...auditEntries,
+			{ time: new Date().toLocaleTimeString('en-GB', { hour12: false }), level, msg }
+		];
 	}
 
-	function handleGeneratePlan(e: CustomEvent<UnifiedTask>) {
+	async function handleSelectTask(e: CustomEvent<UnifiedTask>) {
 		selectedTask = e.detail;
-		// Plan generation will be wired in Task 7
-		drawerLines.push(`[${new Date().toLocaleTimeString()}] Generate plan requested for: ${e.detail.title}`);
+		currentPlan = null;
+		// Load existing plan for this task if one exists
+		try {
+			currentPlan = await getPlan(e.detail.id);
+		} catch {
+			// No plan yet — that's fine
+		}
+	}
+
+	async function handleGeneratePlan(e: CustomEvent<UnifiedTask>) {
+		selectedTask = e.detail;
+		currentPlan = null;
+		planLoading = true;
+		drawerLines = [];
 		drawerOpen = true;
+
+		const task = e.detail;
+		addAudit('info', `Plan generation started for: ${task.title}`);
+		drawerLines = [...drawerLines, `[${new Date().toLocaleTimeString()}] Generate plan: ${task.title}`];
+
+		// Use SSE stream for live output in the drawer
+		try {
+			const evtSource = new EventSource(`${API_BASE}/api/tasks/${task.id}/plan-stream`);
+
+			evtSource.onmessage = (event) => {
+				try {
+					const msg = JSON.parse(event.data);
+					if (msg.type === 'chunk') {
+						drawerLines = [...drawerLines, msg.text.trimEnd()];
+					} else if (msg.type === 'done') {
+						currentPlan = msg.plan as Plan;
+						planLoading = false;
+						addAudit('success', `Plan ready: ${currentPlan.steps.length} steps`);
+						drawerLines = [...drawerLines, `Plan ready — ${currentPlan.steps.length} steps generated.`];
+						evtSource.close();
+					} else if (msg.type === 'error') {
+						addAudit('error', `Plan failed: ${msg.message}`);
+						drawerLines = [...drawerLines, `Error: ${msg.message}`];
+						planLoading = false;
+						evtSource.close();
+					}
+				} catch {
+					// Ignore malformed SSE frames
+				}
+			};
+
+			evtSource.onerror = () => {
+				planLoading = false;
+				addAudit('warn', 'SSE stream closed unexpectedly');
+				evtSource.close();
+			};
+		} catch (err) {
+			// Fallback: direct POST without streaming
+			try {
+				const plan = await generatePlan(task.id);
+				currentPlan = plan;
+				addAudit('success', `Plan ready: ${plan.steps.length} steps`);
+			} catch (genErr) {
+				addAudit('error', `Plan generation failed: ${genErr}`);
+			} finally {
+				planLoading = false;
+			}
+		}
+	}
+
+	function handlePlanUpdated(e: CustomEvent<Plan>) {
+		currentPlan = e.detail;
+		addAudit('info', `Plan updated — status: ${e.detail.status}`);
 	}
 </script>
 
@@ -63,7 +135,7 @@
 				<div class="plan-header">
 					<div class="plan-header-top">
 						<span class="plan-id">{selectedTask.source}:{selectedTask.source_id}</span>
-						<StatusBadge status="pending" />
+						<StatusBadge status={taskStatusBadge(selectedTask.status)} />
 					</div>
 					<h1 class="plan-title">{selectedTask.title}</h1>
 					{#if selectedTask.body}
@@ -72,18 +144,27 @@
 				</div>
 
 				<KawaiiCard accent={sourceAccent[selectedTask.source] ?? 'green'}>
-					<span slot="header" class="card-label">Plan</span>
+					<span slot="header" class="card-label">Execution Plan</span>
 
-					<EmptyState
-						emoji="📋"
-						title="No plan generated yet"
-						message="Click 'Generate Plan' on a task card to create an execution plan."
+					<PlanView
+						plan={currentPlan}
+						loading={planLoading}
+						on:planUpdated={handlePlanUpdated}
 					/>
 
 					<div slot="footer" class="plan-actions">
-						<PillButton variant="primary" size="sm" on:click={() => handleGeneratePlan(new CustomEvent('generatePlan', { detail: selectedTask }))}>Generate Plan</PillButton>
+						<PillButton
+							variant="primary"
+							size="sm"
+							disabled={planLoading}
+							on:click={() => { if (selectedTask) handleGeneratePlan(new CustomEvent('generatePlan', { detail: selectedTask })); }}
+						>
+							{planLoading ? 'Generating…' : currentPlan ? 'Regenerate Plan' : 'Generate Plan'}
+						</PillButton>
 						{#if selectedTask.source_url}
-							<PillButton variant="ghost" size="sm" on:click={() => window.open(selectedTask?.source_url ?? '', '_blank')}>Open Source</PillButton>
+							<PillButton variant="ghost" size="sm" on:click={() => window.open(selectedTask?.source_url ?? '', '_blank')}>
+								Open Source
+							</PillButton>
 						{/if}
 					</div>
 				</KawaiiCard>
@@ -101,6 +182,9 @@
 	<aside class="sidebar sidebar-right" aria-label="Audit log">
 		<div class="sidebar-header">
 			<h2 class="sidebar-title">Audit Log</h2>
+			{#if auditEntries.length > 0}
+				<span class="sidebar-count">{auditEntries.length}</span>
+			{/if}
 		</div>
 		<div class="sidebar-body">
 			{#if auditEntries.length === 0}
@@ -253,62 +337,6 @@
 		color: var(--text-muted);
 	}
 
-	.plan-steps {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.plan-step {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		padding: 0.5rem 0.75rem;
-		border-radius: 10px;
-		background: var(--bg-secondary);
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-		transition: background 0.15s;
-	}
-
-	.plan-step.done {
-		color: var(--text-muted);
-		text-decoration: line-through;
-		background: transparent;
-	}
-
-	.step-num {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 22px;
-		height: 22px;
-		border-radius: 9999px;
-		background: var(--border-card);
-		font-size: 0.7rem;
-		font-weight: 800;
-		color: var(--text-secondary);
-		flex-shrink: 0;
-	}
-
-	.plan-step.done .step-num {
-		background: #c8e6c9;
-		color: #1b5e20;
-	}
-
-	.step-label {
-		flex: 1;
-		font-weight: 600;
-	}
-
-	.step-check {
-		color: #4caf50;
-		font-weight: 800;
-		font-size: 0.85rem;
-	}
 
 	.plan-actions {
 		display: flex;

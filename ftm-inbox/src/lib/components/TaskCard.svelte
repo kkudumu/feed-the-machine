@@ -93,8 +93,9 @@
 		<PillButton
 			variant="primary"
 			size="sm"
-			on:click|stopPropagation={() => dispatch('generatePlan', task)}
+			on:click={(e) => { e.stopPropagation(); dispatch('generatePlan', task); }}
 		>
+
 			Generate Plan
 		</PillButton>
 	</div>

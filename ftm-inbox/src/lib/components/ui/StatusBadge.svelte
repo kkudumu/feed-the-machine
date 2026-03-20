@@ -1,4 +1,4 @@
-<script lang="ts">
+<script context="module" lang="ts">
 	export type Status =
 		| 'pending'
 		| 'planning'
@@ -6,7 +6,9 @@
 		| 'executing'
 		| 'complete'
 		| 'failed';
+</script>
 
+<script lang="ts">
 	export let status: Status = 'pending';
 	export let label: string | undefined = undefined;
 
