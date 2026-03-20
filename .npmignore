@@ -1,0 +1,23 @@
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Test/dev files
+tests/
+docs/plans/
+docs/playbooks/
+docs/recordings/
+promptfooconfig.yaml
+commitlint.config.js
+.husky/
+.worktrees/
+.ftm-map/
+PROGRESS.md
+CONTRIBUTING.md
+CHANGELOG.md
+
+# IDE/OS
+.DS_Store
+*.swp

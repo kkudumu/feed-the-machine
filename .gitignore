@@ -8,6 +8,11 @@ ftm-browse/bin/ftm-browse
 # ftm-state/ templates ARE committed — they're empty schemas
 # But if someone runs locally, don't track their actual data
 
+# Python artifacts
+**/__pycache__/
+*.pyc
+**/.venv/
+
 # macOS
 .DS_Store
 
