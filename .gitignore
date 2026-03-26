@@ -12,6 +12,7 @@ ftm-browse/bin/ftm-browse
 **/__pycache__/
 *.pyc
 **/.venv/
+**/.ftm-map/
 
 # macOS
 .DS_Store
