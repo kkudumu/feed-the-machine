@@ -174,22 +174,35 @@ Parallel waves:
   Final: Task [N] (integration/cleanup)
 ```
 
-### Phase 1.5: Documentation Layer Bootstrap
+### Phase 1.5: Documentation Layer Bootstrap (MANDATORY)
 
-Before dispatching any agents, check if the project has the required documentation layer. If any of these files are missing, create them.
+**This phase is non-skippable.** The documentation layer is required for ftm-verify to assess plan completion, for ftm-codex-gate to detect intent conflicts, and for agents to update docs as they work. Without it, every downstream verification step is degraded.
 
-**Check for and create if missing:**
-1. **INTENT.md** (project root) — If missing, bootstrap from the plan's Vision and Architecture Decisions sections. Use the ftm-intent skill's root template format.
-2. **ARCHITECTURE.mmd** (project root) — If missing, bootstrap by scanning the codebase for modules and their import relationships. Use the ftm-diagram skill's root template format.
-3. **STYLE.md** (project root) — If missing, copy from `~/.claude/skills/ftm-executor/references/STYLE-TEMPLATE.md` into the project root.
-4. **DEBUG.md** (project root) — If missing, create with a header:
+Before dispatching any agents, check if the project has the required documentation layer. If any of these files are missing, create them. If they already exist, verify they're non-empty and well-formed.
+
+**Required documentation files — create if missing:**
+1. **INTENT.md** (project root) — Bootstrap from the plan's Vision and Architecture Decisions sections. Use the ftm-intent skill's root template format. Must include: Vision, Architecture Decisions table, Module Map.
+2. **ARCHITECTURE.mmd** (project root) — Bootstrap by scanning the codebase for modules and their import relationships. Use the ftm-diagram skill's root template format. Must have at least one node and one edge.
+3. **STYLE.md** (project root) — Copy from `~/.claude/skills/ftm-executor/references/STYLE-TEMPLATE.md` into the project root.
+4. **DEBUG.md** (project root) — Create with a header:
    ```markdown
    # Debug Log
 
    Failed approaches and their outcomes. Codex and Claude append here — never retry what's already logged.
    ```
 
-This bootstrap runs once at the start of execution. If the files already exist, skip this phase entirely.
+**Phase 1.5 Gate:** After creating any missing files, verify all 4 exist:
+```bash
+for f in INTENT.md ARCHITECTURE.mmd STYLE.md DEBUG.md; do
+  [ -f "$f" ] || echo "MISSING: $f"
+done
+```
+If any file is still missing after the bootstrap attempt, STOP and report:
+```
+Documentation bootstrap failed — missing: [list]
+Cannot proceed without documentation layer. Fix manually or re-run.
+```
+Do NOT proceed to Phase 2 with missing documentation files.
 
 ---
 
