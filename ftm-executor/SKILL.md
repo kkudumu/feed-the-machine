@@ -128,7 +128,7 @@ For FAIL findings, suggest specific fixes.
 ```
 
 **Interpret the result:**
-- **PASS**: Proceed to Phase 1
+- **PASS**: Proceed to Phase 0.7 → Phase 1 → Phase 1.5 (documentation bootstrap) → Phase 2
 - **WARN**: Show warnings to user, proceed unless they object
 - **FAIL**: Present blockers and suggested fixes. Ask user: fix the plan and re-run, or override and execute anyway?
 
@@ -174,6 +174,10 @@ Parallel waves:
   Final: Task [N] (integration/cleanup)
 ```
 
+**After outputting the summary, proceed IMMEDIATELY to Phase 1.5.** Do NOT skip to Phase 2. The documentation bootstrap must run before any agents are dispatched.
+
+---
+
 ### Phase 1.5: Documentation Layer Bootstrap (MANDATORY)
 
 **This phase is non-skippable.** The documentation layer is required for ftm-verify to assess plan completion, for ftm-codex-gate to detect intent conflicts, and for agents to update docs as they work. Without it, every downstream verification step is degraded.
@@ -203,6 +207,10 @@ Documentation bootstrap failed — missing: [list]
 Cannot proceed without documentation layer. Fix manually or re-run.
 ```
 Do NOT proceed to Phase 2 with missing documentation files.
+
+**Phase 1.5 complete.** All documentation files verified. Proceed to Phase 2.
+
+**CRITICAL FLOW REMINDER: The execution sequence is Phase 0 → 0.5 → 0.7 → 1 → 1.5 → 2 → 3 → 3.5 → 4. Phase 1.5 MUST execute between Phase 1 and Phase 2. If you are reading this and have not yet created/verified the documentation layer, STOP and do it now before dispatching any agents.**
 
 ---
 
