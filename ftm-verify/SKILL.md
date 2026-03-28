@@ -84,7 +84,7 @@ Before doing anything else, detect which external CLI tools are available and au
 CODEX_AVAILABLE=false
 if command -v codex &>/dev/null; then
   # Verify auth by running a trivial command
-  if codex exec --full-auto --ephemeral -m "o3" "echo CODEX_AUTH_OK" 2>/dev/null | grep -q "CODEX_AUTH_OK"; then
+  if codex exec --full-auto --ephemeral -m "gpt-5.4" "echo CODEX_AUTH_OK" 2>/dev/null | grep -q "CODEX_AUTH_OK"; then
     CODEX_AVAILABLE=true
   fi
 fi
@@ -173,7 +173,7 @@ Launch Codex with full read access to analyze the entire project against the pla
 
 ```bash
 codex exec --full-auto --ephemeral \
-  -m "o3" \
+  -m "gpt-5.4" \
   -C "[project_root]" \
   -o "[workspace]/codex-report.md" \
   "$(cat <<'PROMPT'
@@ -390,7 +390,7 @@ Both commands run simultaneously. Use background processes:
 
 ```bash
 # Launch both in parallel
-codex exec --full-auto --ephemeral -m "o3" -C "$PROJECT_ROOT" \
+codex exec --full-auto --ephemeral -m "gpt-5.4" -C "$PROJECT_ROOT" \
   -o "$WORKSPACE/codex-report.md" "$CODEX_PROMPT" &
 CODEX_PID=$!
 
