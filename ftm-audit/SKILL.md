@@ -1,6 +1,6 @@
 ---
 name: ftm-audit
-description: Dual-purpose wiring audit that verifies all code is actually connected to the running application. Combines static analysis (knip) with adversarial LLM audit and auto-fixes anything it finds. Use when user says "audit", "wiring check", "verify wiring", "dead code", "check imports", "unused code", "find dead code", or "audit wiring". Also auto-invoked by ftm-executor after each task.
+description: Triple-layer wiring audit that verifies all code is actually connected to the running application and documented in INTENT.md. Combines static analysis (knip), documentation coverage checking (INTENT.md entries for every changed function), and adversarial LLM audit — auto-fixes anything it finds. Use when user says "audit", "wiring check", "verify wiring", "dead code", "check imports", "unused code", "find dead code", "audit wiring", "check docs", or "documentation coverage". Also auto-invoked by ftm-executor after each task.
 ---
 
 ## Events
@@ -121,6 +121,79 @@ Layer 1 findings:
 
 **Helper script:** `scripts/run-knip.sh` handles execution and returns structured JSON output.
 
+## Layer 1.5: Documentation Coverage Check
+
+**Purpose:** Verify that every new or changed function has a corresponding INTENT.md entry. This catches the most common documentation skip — agents write code and tests but forget to update INTENT.md, leaving the documentation layer stale.
+
+**When to run:** After Layer 1, before Layer 2. Only runs if the project has an INTENT.md documentation layer (root INTENT.md exists). If no INTENT.md exists anywhere in the project, skip this layer silently — it's not a documentation-first project.
+
+**Scope:** Analyze the current git diff to find new or changed functions/classes/methods.
+
+**Check protocol:**
+
+1. **Find changed files:** `git diff HEAD~1 --name-only -- '*.py' '*.ts' '*.tsx' '*.js' '*.jsx'` (or equivalent for the project's language)
+2. **For each changed source file:**
+   - Identify the module directory (e.g., `src/risk/` for `src/risk/position_sizer.py`)
+   - Check if `[module_dir]/INTENT.md` exists
+   - If it exists, read it and extract all documented function signatures
+   - Parse the changed file for public function/class/method definitions
+   - Compare: flag any public function that exists in code but has NO entry in INTENT.md
+3. **For new module directories** (directories created in this diff):
+   - Check if `[new_module_dir]/INTENT.md` was created
+   - Check if root INTENT.md module map has a row for the new module
+   - Flag if either is missing
+
+**Finding types:**
+
+| Finding | Severity | Auto-fixable? |
+|---------|----------|---------------|
+| `MISSING_INTENT_ENTRY` — function exists in code but no INTENT.md entry | HARD FAIL | Yes — generate entry from code |
+| `STALE_INTENT_ENTRY` — INTENT.md entry for a function that no longer exists | WARN | Yes — remove entry |
+| `MISSING_MODULE_INTENT` — new module directory has no INTENT.md file | HARD FAIL | Yes — create from template |
+| `MISSING_MODULE_MAP_ROW` — new module not in root INTENT.md module map | HARD FAIL | Yes — add row |
+
+**Output format:**
+```
+Layer 1.5 findings:
+- [MISSING_INTENT_ENTRY] src/risk/position_sizer.py:45 — `calculate_dynamic_size()` has no entry in src/risk/INTENT.md
+- [STALE_INTENT_ENTRY] src/risk/INTENT.md — entry for `old_function()` but function no longer exists in code
+- [MISSING_MODULE_INTENT] src/newmodule/ — directory created but no INTENT.md file
+- [MISSING_MODULE_MAP_ROW] src/newmodule/ — not listed in root INTENT.md module map
+```
+
+**Auto-fix strategy for `MISSING_INTENT_ENTRY`:**
+
+Generate the entry from the function's code. Read the function body and produce:
+```markdown
+### function_name(param1: Type, param2: Type) -> ReturnType
+- **Does**: [infer from function body — one sentence]
+- **Why**: [infer from context and callers — one sentence, or "Why unknown — inferred from usage: [inference]"]
+- **Relationships**: [grep for callers/callees — one sentence]
+- **Decisions**: [note any non-obvious choices, or "None"]
+```
+
+Append the entry to the module's INTENT.md under the `## Functions` section.
+
+**Auto-fix strategy for `MISSING_MODULE_INTENT`:**
+
+Create `[module_dir]/INTENT.md` with:
+```markdown
+# [Module Name] — Intent
+
+## Functions
+
+[generate entries for all public functions in the module]
+```
+
+**Auto-fix strategy for `MISSING_MODULE_MAP_ROW`:**
+
+Append a row to the root INTENT.md module map table:
+```markdown
+| [module_path] | [infer purpose from code] | [infer relationships from imports] |
+```
+
+---
+
 ## Layer 2: LLM Adversarial Audit
 
 **Mindset:** You are an adversary trying to PROVE code is dead. Not "confirm it works" — PROVE it's dead. Every new/modified export is guilty until proven innocent. You must find a complete chain from app entry point to the code in question, or it's flagged.
@@ -192,6 +265,10 @@ Layer 2 findings:
 | `UNCALLED_API` | If a hook or component should call this (check wiring contract), add the invocation. If truly unused, remove the function. | Flag — API integration decision needed |
 | `UNUSED_DEP` | Remove from package.json `dependencies` or `devDependencies`. | Flag if it might be used in scripts, config files, or CLI |
 | `UNLISTED_DEP` | Run `npm install <package>` (or appropriate package manager command). | Flag if the import might be wrong |
+| `MISSING_INTENT_ENTRY` | Generate INTENT.md entry from function code (Does/Why/Relationships/Decisions). Append to module's INTENT.md. | Flag if function purpose is ambiguous |
+| `STALE_INTENT_ENTRY` | Remove the entry from INTENT.md. | Flag if unsure whether function was renamed vs deleted |
+| `MISSING_MODULE_INTENT` | Create module INTENT.md with entries for all public functions. | Flag if module has no clear public API |
+| `MISSING_MODULE_MAP_ROW` | Add row to root INTENT.md module map table. | Flag if module purpose is unclear |
 
 **Fix Protocol (for each finding):**
 
@@ -430,12 +507,13 @@ When invoked (manually via `/ftm-audit` or automatically post-task):
 
 1. Run Phase 0 (detect project patterns — framework, router, state, API layer)
 2. Run Layer 1 (knip static analysis)
-3. Run Layer 2 (LLM adversarial audit, calibrated to detected patterns)
-4. Combine findings, deduplicate
-5. Run Layer 3 (auto-fix) for each finding
-6. Re-verify (re-run Layers 1+2)
-7. Run Phase 3 (runtime wiring via ftm-browse, if prerequisites met)
-8. Produce final changelog report
+3. Run Layer 1.5 (documentation coverage check — INTENT.md entries for changed functions)
+4. Run Layer 2 (LLM adversarial audit, calibrated to detected patterns)
+5. Combine findings, deduplicate
+6. Run Layer 3 (auto-fix) for each finding (including missing INTENT.md entries)
+7. Re-verify (re-run Layers 1+1.5+2)
+8. Run Phase 3 (runtime wiring via ftm-browse, if prerequisites met)
+9. Produce final changelog report
 
 ## Blackboard Write
 
@@ -457,6 +535,10 @@ After completing, update the blackboard:
 ### Layer 1: Static Analysis (knip)
 - Findings: [N]
 - [list each finding with file:line]
+
+### Layer 1.5: Documentation Coverage
+- Findings: [N]
+- [list each finding — missing entries, stale entries, missing module docs]
 
 ### Layer 2: Adversarial Audit
 - Findings: [N]
