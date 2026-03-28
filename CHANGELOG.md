@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.1 — 2026-03-28
+
+### Fixed
+- **ftm-executor**: Phase 1.5 documentation bootstrap was silently skipped during execution — added explicit phase transition directives so INTENT.md and ARCHITECTURE.mmd are always created before agents dispatch
+- **ftm-verify**: Codex CLI invocations used `o3` model which is unsupported on ChatGPT accounts — changed to `gpt-5.4`
+
+### Added
+- **ftm-audit**: Layer 1.5 documentation coverage check — verifies every changed function has a corresponding INTENT.md entry, with auto-fix for missing entries. HARD FAIL severity ensures agents cannot pass audit without documenting their code
+
 ## 1.0.0 — 2026-03-18
 
 ### Added
