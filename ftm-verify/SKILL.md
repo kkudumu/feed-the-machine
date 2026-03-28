@@ -131,6 +131,8 @@ Verification plan:
 
 Then fall back to Claude broad-pass for that tier. Do not block on auth — proceed with what's available.
 
+**Note on 429/rate limits:** Auth success during Phase 0.5 does NOT guarantee capacity during the full verification run. Both Codex and Gemini can hit 429 rate limits or MODEL_CAPACITY_EXHAUSTED errors mid-execution when model capacity is temporarily exhausted. The launch wrapper in Phase 2 handles this with exponential backoff retries — see "Launching Both Passes" for the retry protocol. Only fall back to Claude subagents after all retries are exhausted.
+
 ---
 
 ## Phase 1: Context Assembly
@@ -386,16 +388,63 @@ PROMPT
 
 ### Launching Both Passes
 
-Both commands run simultaneously. Use background processes:
+Both commands run simultaneously. Use background processes with **retry-on-429 wrappers**:
 
 ```bash
-# Launch both in parallel
-codex exec --full-auto --ephemeral -m "gpt-5.4" -C "$PROJECT_ROOT" \
+# Retry wrapper: retries up to MAX_RETRIES on 429/rate-limit with exponential backoff
+# Usage: retry_on_429 <max_retries> <command...>
+retry_on_429() {
+  local max_retries=$1; shift
+  local attempt=0
+  local backoff=30  # Start at 30 seconds
+
+  while [ $attempt -lt $max_retries ]; do
+    attempt=$((attempt + 1))
+    echo "[Attempt $attempt/$max_retries] Running: $@"
+
+    # Run the command, capture output and exit code
+    eval "$@"
+    local exit_code=$?
+
+    # Check if output file contains 429/rate-limit indicators
+    local output_file="${@: -1}"  # Last arg is typically the output redirect
+    if [ $exit_code -eq 0 ]; then
+      # Success — check output for rate limit errors embedded in response
+      if ! grep -qi "429\|rate.limit\|RESOURCE_EXHAUSTED\|capacity.*exhausted\|MODEL_CAPACITY_EXHAUSTED" "$output_file" 2>/dev/null; then
+        echo "[Attempt $attempt] Succeeded."
+        return 0
+      fi
+      echo "[Attempt $attempt] Got 429/rate-limit in output. Retrying in ${backoff}s..."
+    elif [ $exit_code -eq 1 ]; then
+      # Exit code 1 — check if it's a rate limit vs a real error
+      if grep -qi "429\|rate.limit\|RESOURCE_EXHAUSTED\|capacity.*exhausted\|MODEL_CAPACITY_EXHAUSTED" "$output_file" 2>/dev/null; then
+        echo "[Attempt $attempt] Got 429/rate-limit (exit 1). Retrying in ${backoff}s..."
+      else
+        echo "[Attempt $attempt] Failed with non-429 error (exit $exit_code). Not retrying."
+        return $exit_code
+      fi
+    else
+      echo "[Attempt $attempt] Failed with exit code $exit_code. Not retrying."
+      return $exit_code
+    fi
+
+    sleep $backoff
+    backoff=$((backoff * 2))  # Exponential backoff: 30s, 60s, 120s, 240s
+    # Cap at 5 minutes
+    [ $backoff -gt 300 ] && backoff=300
+  done
+
+  echo "[FAILED] All $max_retries attempts exhausted."
+  return 1
+}
+
+# Launch both in parallel with retry wrappers (4 retries = up to ~7.5 min backoff)
+retry_on_429 4 codex exec --full-auto --ephemeral -m "gpt-5.4" -C "$PROJECT_ROOT" \
   -o "$WORKSPACE/codex-report.md" "$CODEX_PROMPT" &
 CODEX_PID=$!
 
-gemini --yolo -m "gemini-2.5-pro" "$GEMINI_PROMPT" \
-  > "$WORKSPACE/gemini-report.md" 2>&1 &
+retry_on_429 4 gemini --yolo -m "gemini-2.5-pro" "$GEMINI_PROMPT" \
+  '>' "$WORKSPACE/gemini-report.md" '2>&1' &
 GEMINI_PID=$!
 
 # Wait for both
@@ -403,9 +452,21 @@ wait $CODEX_PID
 CODEX_EXIT=$?
 wait $GEMINI_PID
 GEMINI_EXIT=$?
+
+# If either still failed after retries, fall back to Claude subagent
+if [ $CODEX_EXIT -ne 0 ]; then
+  echo "Codex failed after retries — falling back to Claude subagent for Tier 1"
+  # Launch Claude subagent with Codex prompt (see Fallback section)
+fi
+if [ $GEMINI_EXIT -ne 0 ]; then
+  echo "Gemini failed after retries — falling back to Claude subagent for Tier 2"
+  # Launch Claude subagent with Gemini prompt (see Fallback section)
+fi
 ```
 
-While Tier 1 & 2 run, immediately launch Tier 3 in parallel — don't wait for the broad passes to finish.
+**Important:** Both Codex and Gemini can hit 429 rate limits even when authenticated — model capacity is shared and can be temporarily exhausted. The retry wrapper uses exponential backoff (30s → 60s → 120s → 240s) with up to 4 attempts before falling back to Claude subagents. This ensures we get genuine multi-model adversarial verification whenever capacity is available, rather than immediately falling back on transient rate limits.
+
+While Tier 1 & 2 run (including any retry backoff), immediately launch Tier 3 in parallel — don't wait for the broad passes to finish.
 
 ---
 
@@ -848,14 +909,17 @@ After completing, update the blackboard:
 - condition: codex not installed or auth failed | action: use Claude subagent for Pass 1; suggest user run `codex login` for future runs
 - condition: gemini not installed or auth failed | action: use Claude subagent for Pass 2; suggest user run `gemini` for interactive auth
 - condition: both codex and gemini unavailable | action: run two independent Claude subagents with different system prompts for Tier 1 & 2 (one as "adversarial auditor", one as "skeptical reviewer"); Tier 3 still runs its 6 specialists regardless
+- condition: codex returns 429/rate-limit during execution | action: retry with exponential backoff (30s, 60s, 120s, 240s) up to 4 attempts; only fall back to Claude subagent after all retries exhausted; log each retry attempt with backoff duration
+- condition: gemini returns 429/rate-limit or MODEL_CAPACITY_EXHAUSTED during execution | action: retry with exponential backoff (30s, 60s, 120s, 240s) up to 4 attempts; only fall back to Claude subagent after all retries exhausted; log each retry attempt with backoff duration
+- condition: both codex and gemini hit 429 after all retries | action: fall back to dual Claude subagents as above; note in report that adversarial multi-model verification was degraded due to API capacity
 - condition: PROGRESS.md not found and manual mode | action: check ~/.claude/ftm-retros/ for recent reports; ask user which execution to verify
 - condition: plan document not found | action: ask user for plan path; if unavailable, skip plan fulfillment check and run other verifications only
 - condition: no test runner detected | action: skip test execution, still audit test file quality if test files exist
 - condition: knip not available | action: skip static analysis wiring, rely on grep-based tracing only
 - condition: experiences/index.json has fewer than 10 entries | action: cold-start mode — record every task, set all confidence to low
 - condition: no build system detected | action: skip build verification, note in report
-- condition: codex exec times out (>10 minutes) | action: kill process, use partial output if available, fall back to Claude subagent for remaining checks
-- condition: gemini process times out (>10 minutes) | action: kill process, use partial output if available, fall back to Claude subagent for remaining checks
+- condition: codex exec times out (>10 minutes per attempt, or >15 minutes total including retries) | action: kill process, use partial output if available, fall back to Claude subagent for remaining checks
+- condition: gemini process times out (>10 minutes per attempt, or >15 minutes total including retries) | action: kill process, use partial output if available, fall back to Claude subagent for remaining checks
 
 ## Capabilities
 
