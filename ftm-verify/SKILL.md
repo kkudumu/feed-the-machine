@@ -792,6 +792,136 @@ Do not print the full report to the terminal. The summary above is sufficient.
 
 ---
 
+## Phase 8: Codex Auto-Remediation
+
+After the report is generated, if there are any BLOCKER or REMEDIATE findings, automatically dispatch Codex to fix them. This phase runs without user intervention.
+
+### Step 1: Build Remediation Prompt
+
+Construct a single Codex prompt that includes ALL findings from the report that need fixing. Group by category:
+
+```bash
+codex exec --full-auto --ephemeral \
+  -m "gpt-5.4" \
+  -C "$PROJECT_ROOT" \
+  "$(cat <<'PROMPT'
+You are a remediation agent. Fix ALL of the following issues found during
+post-execution verification. The verification report is your source of truth.
+
+Project root: [project_root]
+
+## BLOCKERS (must fix all)
+[paste each BLOCKER finding with file paths and exact description]
+
+## REMEDIATE (must fix all)
+[paste each REMEDIATE finding with file paths and exact description]
+
+For each fix:
+1. Read the relevant files first
+2. Make the minimal surgical fix
+3. Verify the fix works (import check, run relevant tests if possible)
+4. Do NOT refactor surrounding code
+5. Do NOT add features beyond what's listed
+
+For documentation fixes (INTENT.md, ARCHITECTURE.mmd, STYLE.md):
+- Match existing file format exactly
+- Document ACTUAL code behavior, not planned behavior
+
+For test fixes:
+- Write tests that probe FAILURE MODES, not just happy paths
+- Every test should answer "what bug would this catch?"
+
+For schema/code mismatches:
+- Prefer fixing the schema to match the code (code is source of truth)
+- Unless the code is clearly wrong, in which case fix the code
+
+After ALL fixes, run: python3 -m pytest tests/ --tb=short -q
+Report the test results.
+
+List every file you modified and what you changed.
+PROMPT
+)"
+```
+
+### Step 2: Apply Codex Fixes
+
+Run Codex with the retry-on-429 wrapper from Phase 2. If Codex is unavailable, fall back to launching parallel Claude subagents (one per finding category: docs, tests, code, schema).
+
+### Step 3: Verify Codex Output
+
+After Codex completes:
+1. Run `python3 -m pytest tests/ --tb=short -q` to confirm all tests still pass
+2. Spot-check that the fixes are correct (read modified files)
+3. If tests fail, revert and flag for manual intervention
+
+### Step 4: Commit Remediation
+
+If all tests pass:
+```bash
+git add -A
+git commit -m "fix(verify): auto-remediate [N] findings from verification report
+
+- [summary of BLOCKER fixes]
+- [summary of REMEDIATE fixes]"
+```
+
+---
+
+## Phase 9: Recursive Verification Loop
+
+After remediation is committed, re-run verification to confirm all issues are resolved and no new issues were introduced.
+
+### Loop Protocol
+
+```
+MAX_ITERATIONS = 3
+iteration = 1
+
+while iteration <= MAX_ITERATIONS:
+    1. Run Phase 2-3 (Tier 1 + 2 + 3 verification) — but SKIP Tier 1 & 2 CLI
+       passes after iteration 1 (use only Tier 3 specialist agents for speed)
+    2. Run Phase 3 (Reconciliation)
+    3. Count remaining BLOCKER + REMEDIATE findings
+
+    if findings == 0:
+        BREAK — report is clean
+    elif iteration == MAX_ITERATIONS:
+        BREAK — max iterations reached, report remaining issues
+    else:
+        Run Phase 8 (Codex remediation) on remaining findings
+        iteration += 1
+
+Report final status:
+  - "Clean after {iteration} iteration(s)" OR
+  - "Stopped after {MAX_ITERATIONS} iterations with {N} remaining issues"
+```
+
+### Re-Verification Strategy
+
+On iteration 2+, only run Tier 3 specialists (not full Codex + Gemini broad passes) for speed:
+- Agent 3 (Build & Compile) — always re-run to confirm no regressions
+- Agent 4 (Test Quality) — re-run if tests were added or modified
+- Agents for categories that had findings — re-run to confirm fixes
+- Skip agents for categories that were clean
+
+### Loop Termination
+
+Stop the loop when:
+- All BLOCKER and REMEDIATE findings are resolved (success)
+- 3 iterations completed (safety limit — prevents infinite loops)
+- Remediation introduced more issues than it fixed (regression detected — revert last remediation commit)
+- A finding cannot be fixed after 2 attempts (flag for manual intervention, continue with remaining fixes)
+
+### Final Report Update
+
+After the loop completes, update the report file with:
+- Number of iterations run
+- What was fixed in each iteration
+- Final verification status (CLEAN / ISSUES_REMAINING)
+- Append to the report rather than overwriting
+
+---
+
 ## Key Behaviors
 
 ### Tests that find bugs, not tests that pass
