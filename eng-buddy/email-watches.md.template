@@ -1,0 +1,37 @@
+# Email Watches
+# Managed by eng-buddy. Add new watches by telling eng-buddy "watch for email from X about Y".
+
+## Watch: Metacompliance SSO vendor response
+- From: *@metacompliance.com
+- Subject contains: SSO, SCIM, metacompliance, sign in
+- Task: #4
+- Action: update
+- Added: 2026-02-24
+
+## Watch: Structure licensing quote (Patryk / Deviniti)
+- From: patryk.plewa@deviniti.com, *@deviniti.com, *@tempo.io
+- Subject contains: Structure, license, pricing, multi-instance, trial
+- Task: #7
+- Action: update
+- Added: 2026-02-24
+
+## Watch: HR Acuity SSO setup
+- From: *@hracuity.com, joanna.lamb@klaviyo.com, mike.mason@klaviyo.com, winifred.binda@klaviyo.com
+- Subject contains: HR Acuity, SSO, implementation
+- Task: #20
+- Action: update
+- Added: 2026-02-24
+
+## Watch: Lusha SSO (Derek Walbridge)
+- From: derek.walbridge@klaviyo.com, *@lusha.com
+- Subject contains: Lusha, SSO, SAML
+- Task: #11
+- Action: update
+- Added: 2026-02-24
+
+## Watch: Linear SSO (Rian Brarmann)
+- From: rian.brarmann@klaviyo.com, *@linear.app
+- Subject contains: Linear, SSO, SCIM, migration
+- Task: #17
+- Action: update
+- Added: 2026-02-24

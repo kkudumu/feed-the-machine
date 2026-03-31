@@ -1,0 +1,26 @@
+# Email Watches — Example Configuration
+#
+# Copy this file to email-watches.md and customize.
+# The gmail-poller checks these watches on each run.
+
+## Watch: Manager Updates
+- From: manager@yourcompany.com
+- Subject contains: review, feedback, 1:1
+- Action: create
+
+## Watch: Vendor Renewals
+- From: *@vendor.com
+- Subject contains: renewal, invoice, contract
+- Task: #pending-vendor
+- Action: create
+
+## Watch: Incident Alerts
+- From: alerts@pagerduty.com, noreply@opsgenie.com
+- Subject contains: incident, P1, critical
+- Action: create
+
+## Watch: Specific Thread
+- Thread ID: 18d1a2b3c4d5e6f7
+- Task: #42
+- Action: update
+- Added: 2026-01-15
