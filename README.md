@@ -6,7 +6,28 @@ FTM is a cognitive architecture for Claude Code — not a prompt library, not a 
 
 Drop in anything. A support ticket, a feature spec, a bug report, a half-formed idea, a meeting transcript, a "figure this out." The machine reads everything, proposes a plan, waits for your approval, then executes end-to-end. Every successful execution becomes a playbook. Every playbook makes the next similar task faster.
 
-The machine hungers. You feed it. It takes care of you.
+This repo also includes **domain-specific skills** — standalone assistants built on the same architecture for IT operations work: SSO configuration, systems engineering, and more.
+
+---
+
+## What's In This Repo
+
+### FTM Core — Cognitive Architecture
+
+The FTM skill ecosystem is a set of 20+ interconnected skills that give Claude Code persistent memory, planning, multi-model reasoning, and autonomous execution.
+
+### Domain Skills — IT Operations
+
+| Skill | What It Does |
+|-------|-------------|
+| **[eng-buddy](#eng-buddy)** | IT systems engineering assistant — playbooks, session hooks, memory, and templates for managing Jira, Freshservice, Okta, Slack, and cross-team coordination |
+| **[sso-buddy](#sso-buddy)** | Interactive SSO/SCIM configuration guide — walks you through each phase of onboarding a new app to SSO, from intake to post-rollout monitoring |
+
+### Shared State
+
+| Directory | What It Contains |
+|-----------|-----------------|
+| `ftm-state/blackboard/` | Persistent knowledge store — context, experiences, and promoted patterns that compound across sessions |
 
 ---
 
@@ -103,17 +124,30 @@ graph TD
     Mesh --> Git
     Mesh --> Audit
 
+    subgraph Domain["Domain Skills"]
+        EB["eng-buddy\nIT systems engineering"]
+        SSO["sso-buddy\nSSO/SCIM configuration"]
+    end
+
+    Mind --> EB
+    Mind --> SSO
+
     subgraph Integrations["External Integrations (via MCP)"]
         Jira["Jira"]
         FS["Freshservice"]
         Slack["Slack"]
         Gmail["Gmail"]
+        Okta["Okta"]
     end
 
     Browse --> Jira
     Browse --> FS
-    Mind --> Slack
-    Mind --> Gmail
+    EB --> Jira
+    EB --> FS
+    EB --> Slack
+    EB --> Gmail
+    SSO --> Okta
+    SSO --> FS
 
     Exec -->|code_committed| Intent["ftm-intent\nINTENT.md layer"]
     Exec -->|code_committed| Diagram["ftm-diagram\nARCHITECTURE.mmd"]
@@ -124,65 +158,7 @@ graph TD
 
 ---
 
-## First 5 Minutes
-
-Install:
-
-```bash
-npx feed-the-machine@latest
-```
-
-Symlinks all 16+ skills into `~/.claude/skills/` where Claude Code discovers them automatically. That's it.
-
-**Three things to try right now:**
-
-**1. Feed it a task:**
-```
-/ftm
-```
-Paste anything — a Jira ticket, a Freshservice request, a Slack message, or just describe what you need done. FTM reads it, pulls relevant context from your blackboard, proposes a plan, and waits for your go.
-
-**2. Think something through:**
-```
-/ftm-brainstorm
-```
-Describe something you're trying to figure out. It runs parallel web and GitHub research agents, challenges your assumptions Socratically, and surfaces options you hadn't considered.
-
-**3. Kill a bug:**
-```
-/ftm-debug
-```
-Paste an error message, stack trace, or just describe unexpected behavior. It opens a multi-vector war room — static analysis, runtime hypothesis testing, dependency auditing — running in parallel.
-
----
-
-## Before / After
-
-### Triaging a support ticket
-
-**Without FTM** — Open the ticket. Read it. Check Slack for context. Look up the customer's history. Figure out who should handle it. Draft a response. Copy-paste between four tabs. 30 minutes of context-gathering before any real work starts.
-
-**With FTM** — Paste the ticket URL. FTM reads the ticket, pulls the Slack thread, checks your blackboard for similar past issues, proposes a triage plan (categorize, assign, draft response, update ticket), and waits. You say "go." Done in 3 minutes.
-
----
-
-### Building a feature from a spec
-
-**Without FTM** — You open five files, context-switch between the spec and the codebase, write the route, realize the middleware pattern is different from what you remembered, check another file, write tests separately, forget to update the docs, ship it and wonder why the audit is failing.
-
-**With FTM** — You paste the spec. FTM reads the existing patterns in your codebase (blackboard knows your stack), proposes a plan: route, handler, validation, tests, INTENT update, audit check. Parallel agents handle the implementation waves. ftm-codex-gate validates at each boundary. Documentation updates automatically on commit. The whole thing is coherent from the start.
-
----
-
-### Configuring an admin console
-
-**Without FTM** — 45 minutes. Find the vendor docs. Navigate the admin panel manually. Cross-reference settings. Copy-paste values without fat-fingering them. Update the ticket. Hope you didn't miss a field.
-
-**With FTM** — 5 minutes. Paste the ticket. FTM reads the config docs, opens a headless browser, navigates the admin panel, fills fields from the ticket spec, screenshots the result for verification, and drafts the ticket update. You review and approve each step.
-
----
-
-## Skill Inventory
+## FTM Skill Inventory
 
 | Skill | What It Does |
 |-------|-------------|
@@ -190,19 +166,66 @@ Paste an error message, stack trace, or just describe unexpected behavior. It op
 | **ftm-executor** | Autonomous plan execution with dynamically assembled agent teams and wave-by-wave progress |
 | **ftm-debug** | Multi-vector debugging war room — parallel hypothesis testing, static + runtime + dependency analysis |
 | **ftm-brainstorm** | Socratic ideation with parallel web and GitHub research agents; challenges assumptions, surfaces options |
+| **ftm-researcher** | Deep parallel research engine with domain-specialized finders, adversarial review, and credibility scoring |
 | **ftm-audit** | Wiring verification — knip static analysis plus adversarial LLM audit of skill connections |
 | **ftm-council** | Multi-model deliberation — Claude, Codex, and Gemini debate to 2-of-3 consensus on hard decisions |
 | **ftm-codex-gate** | Adversarial Codex validation at executor wave boundaries before proceeding |
 | **ftm-retro** | Post-execution retrospectives and continuous micro-reflections after every task |
 | **ftm-intent** | INTENT.md documentation layer — function-level contracts, auto-updated on every commit |
 | **ftm-diagram** | ARCHITECTURE.mmd mermaid diagrams — auto-regenerated after commits |
+| **ftm-map** | Persistent code knowledge graph — tree-sitter + SQLite FTS5 for blast radius analysis and dependency chains |
 | **ftm-browse** | Headless browser — screenshots, accessibility tree inspection, form automation, visual verification |
 | **ftm-git** | Secret scanning and credential safety gate for all git operations |
+| **ftm-capture** | Extract reusable routines and playbooks from session work into knowledge layers |
+| **ftm-routine** | Execute named, recurring multi-step workflows from YAML definitions |
 | **ftm-pause** | Save current session state to the blackboard mid-task |
 | **ftm-resume** | Restore a paused session and continue exactly where you left off |
+| **ftm-dashboard** | Session and weekly analytics — skills invoked, approval rates, patterns promoted |
 | **ftm-upgrade** | Self-upgrade from GitHub releases |
 | **ftm-config** | Configure model profiles and execution preferences |
 | **ftm** | Bare invocation — equivalent to `/ftm-mind` with plain-language input |
+
+---
+
+## Domain Skills
+
+### eng-buddy
+
+Your personal IT systems engineering assistant. Built for managing the chaos of cross-team coordination, ticket triage, and context switching across Jira, Freshservice, Okta, Slack, and Gmail.
+
+**What's included:**
+
+| Component | Purpose |
+|-----------|---------|
+| `SKILL.md` | Core skill prompt — task organization, meeting analysis, request tracking, context switching |
+| `playbooks/` | Reusable operational runbooks — saml2aws troubleshooting, Freshservice catalog config, Google Admin DWD setup |
+| `playbooks/tool-registry/` | MCP tool defaults for Jira, Freshservice, Slack, Gmail, Confluence, Playwright |
+| `hooks/` | Claude Code hooks — draft enforcement, session management, compaction handling, session snapshots |
+| `memory/` | Persistent state — context, patterns, and stakeholder directory |
+| `templates/` | Reusable templates — SSO stakeholder communications, timestamp formatting |
+
+**Invoke:** `/eng-buddy`
+
+---
+
+### sso-buddy
+
+Interactive guide for SSO/SCIM configuration. Walks you through the full lifecycle of onboarding a new application to SSO — from gathering requirements to post-rollout monitoring.
+
+**The 8 phases:**
+
+1. **Intake & Documentation** — RBAC sheet, requirements gathering
+2. **Administrative Access Setup** — Get admin access to the target app
+3. **Identity Provider Configuration** — Okta groups, naming conventions, API setup
+4. **Self-Service Provisioning Setup** — SCIM provisioning, attribute mapping
+5. **License Management Integration** — Trelica license tracking
+6. **Testing & Validation** — Test plans, validation checklists
+7. **Communication & Rollout** — Draft emails, user guides, FAQs
+8. **Post-Rollout & Monitoring** — Monitor and document lessons learned
+
+Includes the full SSO configuration runbook at `sso-buddy/sso-plan.md`.
+
+**Invoke:** `/sso-buddy`
 
 ---
 
@@ -231,7 +254,7 @@ Every skill writes back. ftm-executor writes task outcomes. ftm-debug writes wha
 **Development install:**
 
 ```bash
-git clone https://github.com/kkudumu/feed-the-machine.git ~/feed-the-machine
+git clone https://github.com/Klaviyo-IT/feed-the-machine.git ~/feed-the-machine
 cd ~/feed-the-machine
 ./install.sh
 ```
