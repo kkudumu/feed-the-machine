@@ -12,6 +12,10 @@ ftm-browse/bin/ftm-browse
 **/__pycache__/
 *.pyc
 **/.venv/
+**/.ftm-map/
+
+# Environment secrets
+.env
 
 # macOS
 .DS_Store

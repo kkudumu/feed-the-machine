@@ -128,7 +128,7 @@ For FAIL findings, suggest specific fixes.
 ```
 
 **Interpret the result:**
-- **PASS**: Proceed to Phase 1
+- **PASS**: Proceed to Phase 0.7 → Phase 1 → Phase 1.5 (documentation bootstrap) → Phase 2
 - **WARN**: Show warnings to user, proceed unless they object
 - **FAIL**: Present blockers and suggested fixes. Ask user: fix the plan and re-run, or override and execute anyway?
 
@@ -136,9 +136,9 @@ If the plan checker finds file conflicts between tasks in the same wave, automat
 
 ---
 
-### Phase 0.7: Load Model Profile
+### Phase 0.7: Load Model Profile and Agent Mode
 
-Read `~/.claude/ftm-config.yml` to determine which models to use for agent dispatch. If the file doesn't exist, use balanced defaults:
+Read `~/.claude/ftm-config.yml` to determine which models and permission mode to use for agent dispatch. If the file doesn't exist, use balanced defaults:
 - Planning agents: opus
 - Execution agents: sonnet
 - Review/audit agents: sonnet
@@ -149,6 +149,8 @@ When spawning agents in subsequent phases, pass the `model` parameter based on t
 - Phase 4.5 (audit): use `review` model
 
 If the profile specifies `inherit`, omit the `model` parameter (uses session default).
+
+**Agent permission mode**: Read `execution.agent_mode` from ftm-config.yml. Pass this as the `mode` parameter on every Agent tool call. Default: `bypassPermissions`. This ensures spawned agents inherit the user's preferred permission level and do not downgrade to `acceptEdits` or `default`.
 
 ---
 
@@ -174,22 +176,43 @@ Parallel waves:
   Final: Task [N] (integration/cleanup)
 ```
 
-### Phase 1.5: Documentation Layer Bootstrap
+**After outputting the summary, proceed IMMEDIATELY to Phase 1.5.** Do NOT skip to Phase 2. The documentation bootstrap must run before any agents are dispatched.
 
-Before dispatching any agents, check if the project has the required documentation layer. If any of these files are missing, create them.
+---
 
-**Check for and create if missing:**
-1. **INTENT.md** (project root) — If missing, bootstrap from the plan's Vision and Architecture Decisions sections. Use the ftm-intent skill's root template format.
-2. **ARCHITECTURE.mmd** (project root) — If missing, bootstrap by scanning the codebase for modules and their import relationships. Use the ftm-diagram skill's root template format.
-3. **STYLE.md** (project root) — If missing, copy from `~/.claude/skills/ftm-executor/references/STYLE-TEMPLATE.md` into the project root.
-4. **DEBUG.md** (project root) — If missing, create with a header:
+### Phase 1.5: Documentation Layer Bootstrap (MANDATORY)
+
+**This phase is non-skippable.** The documentation layer is required for ftm-verify to assess plan completion, for ftm-codex-gate to detect intent conflicts, and for agents to update docs as they work. Without it, every downstream verification step is degraded.
+
+Before dispatching any agents, check if the project has the required documentation layer. If any of these files are missing, create them. If they already exist, verify they're non-empty and well-formed.
+
+**Required documentation files — create if missing:**
+1. **INTENT.md** (project root) — Bootstrap from the plan's Vision and Architecture Decisions sections. Use the ftm-intent skill's root template format. Must include: Vision, Architecture Decisions table, Module Map.
+2. **ARCHITECTURE.mmd** (project root) — Bootstrap by scanning the codebase for modules and their import relationships. Use the ftm-diagram skill's root template format. Must have at least one node and one edge.
+3. **STYLE.md** (project root) — Copy from `~/.claude/skills/ftm-executor/references/STYLE-TEMPLATE.md` into the project root.
+4. **DEBUG.md** (project root) — Create with a header:
    ```markdown
    # Debug Log
 
    Failed approaches and their outcomes. Codex and Claude append here — never retry what's already logged.
    ```
 
-This bootstrap runs once at the start of execution. If the files already exist, skip this phase entirely.
+**Phase 1.5 Gate:** After creating any missing files, verify all 4 exist:
+```bash
+for f in INTENT.md ARCHITECTURE.mmd STYLE.md DEBUG.md; do
+  [ -f "$f" ] || echo "MISSING: $f"
+done
+```
+If any file is still missing after the bootstrap attempt, STOP and report:
+```
+Documentation bootstrap failed — missing: [list]
+Cannot proceed without documentation layer. Fix manually or re-run.
+```
+Do NOT proceed to Phase 2 with missing documentation files.
+
+**Phase 1.5 complete.** All documentation files verified. Proceed to Phase 2.
+
+**CRITICAL FLOW REMINDER: The execution sequence is Phase 0 → 0.5 → 0.7 → 1 → 1.5 → 2 → 3 → 3.5 → 4. Phase 1.5 MUST execute between Phase 1 and Phase 2. If you are reading this and have not yet created/verified the documentation layer, STOP and do it now before dispatching any agents.**
 
 ---
 

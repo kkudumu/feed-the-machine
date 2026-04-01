@@ -11,25 +11,28 @@
         {"name": "one_or_two_questions", "description": "Asks 1-2 questions max, not a wall of questions"},
         {"name": "no_research_sprint_turn1", "description": "Does NOT dispatch research agents on the very first turn — intake only"},
         {"name": "hard_stop", "description": "Ends with a question and waits — does NOT proceed to synthesize or generate suggestions"},
-        {"name": "repo_scan_launched", "description": "Mentions or silently launches a repo/codebase scan agent in background"}
+        {"name": "repo_scan_launched", "description": "Mentions or silently launches a repo/codebase scan agent in background"},
+        {"name": "follows_energy", "description": "Asks about the most interesting/emphasized part of the idea, not a generic checklist question"},
+        {"name": "no_skill_questions", "description": "Does NOT ask about the user's technical experience or skill level"}
       ]
     },
     {
       "id": 1,
       "name": "fresh-idea-turn2-research",
       "prompt": "It's for college students who want to find people in the same classes to study with. Matching based on courses, study style, and schedule availability.",
-      "expected_output": "First research sprint dispatched (3 agents), synthesized suggestions with citations, challenge, 1-2 questions, STOP",
+      "expected_output": "First research sprint dispatched (7 agents + synthesizer), synthesized suggestions with citations, challenge, 1-2 questions, STOP",
       "files": [],
       "multi_turn_context": "Turn 2. Turn 1: user said 'building study buddy app like Tinder for studying', skill asked intake questions, user now responds with details.",
       "assertions": [
-        {"name": "three_agents_dispatched", "description": "Dispatches 3 parallel research agents (web, github, competitive) — not fewer"},
+        {"name": "seven_agents_dispatched", "description": "Dispatches 7 parallel research agents (web, github, competitive, stack, architecture, pitfall, UX) plus synthesizer — not fewer in standard mode"},
         {"name": "real_citations", "description": "At least 3 unique URLs to real repos/articles/products in the synthesis"},
         {"name": "suggestions_with_evidence", "description": "Presents numbered suggestions (3-5) with real-world evidence backing each one"},
         {"name": "recommendation_labeled", "description": "Suggestion #1 is labeled RECOMMENDED with rationale"},
-        {"name": "challenge_present", "description": "Includes at least one challenge/pushback after suggestions"},
-        {"name": "ends_with_question", "description": "Ends with 1-2 targeted questions to drive next research sprint"},
+        {"name": "challenge_present", "description": "Includes at least one challenge/pushback after suggestions — as a statement, NOT a question"},
+        {"name": "ends_with_question", "description": "Ends with 1-2 targeted questions via AskUserQuestion to drive next research sprint"},
         {"name": "hard_stop", "description": "Does NOT continue past the questions — waits for user response"},
-        {"name": "depth_is_broad", "description": "Research queries are landscape-level (major approaches, who's done this) not implementation-specific"}
+        {"name": "depth_is_broad", "description": "Research queries are landscape-level (major approaches, who's done this) not implementation-specific"},
+        {"name": "synthesizer_output", "description": "Shows consensus/contested/unique findings structure from synthesizer"}
       ]
     },
     {
@@ -40,14 +43,15 @@
       "files": [],
       "multi_turn_context": "Turn 3. Prior turns: user described study buddy app, first research sprint found 5 approaches, user now picks one and raises two specific concerns.",
       "assertions": [
-        {"name": "three_agents_dispatched", "description": "Dispatches 3 parallel research agents again — every turn gets a research sprint"},
+        {"name": "seven_agents_dispatched", "description": "Dispatches 7 parallel research agents again — every turn gets a research sprint"},
         {"name": "research_is_deeper", "description": "Search queries target matching algorithms and cold-start specifically, NOT broad 'study buddy app' landscape again"},
         {"name": "builds_on_prior", "description": "References prior turn's findings — does not re-present the same 5 approaches"},
         {"name": "new_citations", "description": "At least 2 URLs not seen in prior turns — fresh research, not recycled"},
         {"name": "addresses_user_concerns", "description": "Suggestions specifically address matching algorithm complexity AND cold-start problem"},
         {"name": "challenge_present", "description": "Challenges the user on at least one assumption or pushes back on scope"},
         {"name": "ends_with_question", "description": "Ends with 1-2 questions that unlock the NEXT research vector"},
-        {"name": "hard_stop", "description": "Does NOT continue past the questions"}
+        {"name": "hard_stop", "description": "Does NOT continue past the questions"},
+        {"name": "prior_decision_logged", "description": "Records 'React Native + Firebase chosen' in prior decisions log — does NOT re-ask about tech stack"}
       ]
     },
     {
@@ -73,12 +77,12 @@
       "files": ["brain-dump-input.md"],
       "multi_turn_context": "Turn 2 of brain dump. Turn 1: user pasted eng-buddy brain dump, skill extracted structured summary, user now confirms.",
       "assertions": [
-        {"name": "three_agents_dispatched", "description": "Dispatches 3 parallel research agents searching for specific brain dump claims"},
+        {"name": "seven_agents_dispatched", "description": "Dispatches 7 parallel research agents searching for specific brain dump claims"},
         {"name": "novelty_map_present", "description": "Contains a Novelty Map table with solved/partially solved/novel verdicts"},
         {"name": "real_citations", "description": "At least 5 unique URLs to real repos/articles/products"},
         {"name": "brain_dump_claims_researched", "description": "Agents searched for specific architectural claims from the dump, not just broad topic searches"},
-        {"name": "challenge_present", "description": "At least one challenge/pushback raised"},
-        {"name": "ends_with_question", "description": "Ends with 1-2 targeted questions"},
+        {"name": "challenge_present", "description": "At least one challenge/pushback raised as a statement"},
+        {"name": "ends_with_question", "description": "Ends with 1-2 targeted questions via AskUserQuestion"},
         {"name": "hard_stop", "description": "Does NOT proceed past questions"}
       ]
     },
@@ -86,14 +90,90 @@
       "id": 5,
       "name": "phase3-gate",
       "prompt": "Ok I think I know what I want. Let's turn this into a plan.",
-      "expected_output": "Vision summary for approval, NOT the full plan yet",
+      "expected_output": "Spec self-review + pre-mortem runs, vision summary with risk mitigations for approval, NOT the full plan yet",
       "files": [],
       "multi_turn_context": "Turn 6+ of brainstorming. Previous turns explored study-buddy app, settled on React Native + Firebase, matching algorithm, cold-start solution. User now wants to move to planning.",
       "assertions": [
-        {"name": "vision_summary", "description": "Presents a brief 'here's what we've landed on' summary before generating the full plan"},
+        {"name": "spec_self_review", "description": "Runs spec self-review checking for placeholders, contradictions, scope gaps, ambiguity"},
+        {"name": "pre_mortem_runs", "description": "Runs pre-mortem stress test generating failure scenarios with mitigations"},
+        {"name": "vision_summary", "description": "Presents a brief 'here's what we've landed on' summary including key decisions AND top risks"},
+        {"name": "canonical_references", "description": "Includes canonical references section with links to key sources from research"},
         {"name": "approval_gate", "description": "Asks for explicit confirmation before proceeding to full plan generation"},
         {"name": "does_not_dump_full_plan", "description": "Does NOT generate the entire task breakdown, agent assignments, and wave structure in this message"},
         {"name": "references_plan_template", "description": "Reads or references references/plan-template.md for plan generation"}
+      ]
+    },
+    {
+      "id": 6,
+      "name": "assumption-audit-activation",
+      "prompt": "I want to build a real-time collaborative whiteboard where multiple users can draw simultaneously. It needs to sync instantly across devices.",
+      "expected_output": "Intake question, and on turn 2-3 the assumption audit module should activate to challenge 'instantly' and 'real-time' assumptions",
+      "files": [],
+      "multi_turn_context": "Turn 2-3. User has described a collaborative whiteboard with real-time sync. The assumption audit should catch assumptions about 'instantly' (network latency exists), 'real-time' (what tolerance?), and synchronization approach.",
+      "assertions": [
+        {"name": "assumption_audit_activates", "description": "Runs the First Principles Assumption Audit module"},
+        {"name": "crackable_assumptions_found", "description": "Identifies at least one crackable assumption (e.g., 'instantly' is a design choice, not a requirement)"},
+        {"name": "five_levels_analyzed", "description": "Examines assumptions at surface, process, structural, cultural, and fundamental levels"},
+        {"name": "user_can_respond", "description": "Presents assumptions as keep/challenge/ignore choices via AskUserQuestion"}
+      ]
+    },
+    {
+      "id": 7,
+      "name": "discuss-mode-activation",
+      "prompt": "I know exactly what I want. Here's my spec: Build a REST API endpoint POST /api/v1/recordings that accepts multipart form data with an audio file (max 500MB), stores it in S3 with a UUID filename, creates a database record with metadata (duration, format, size, created_at), and returns the record ID with a signed URL for playback. Use Express.js with multer for uploads, pg for Postgres, and aws-sdk for S3.",
+      "expected_output": "Discuss mode activates: parses spec, identifies gray areas using SEE/CALL/RUN/READ/ORGANIZE heuristics, asks targeted questions",
+      "files": [],
+      "assertions": [
+        {"name": "discuss_mode_detected", "description": "Recognizes this is a detailed spec and activates Discuss Mode instead of standard brainstorm"},
+        {"name": "spec_parsed", "description": "Extracts key components: endpoint, storage, database, response format"},
+        {"name": "gray_areas_found", "description": "Identifies gray areas: auth, rate limiting, error handling for S3 failures, max concurrent uploads, file validation"},
+        {"name": "uses_heuristics", "description": "Applies SEE/CALL/RUN/READ/ORGANIZE categorization to find unknowns"},
+        {"name": "targeted_questions", "description": "Asks 3-5 specific questions about gray areas, NOT basic 'what are you building' questions"},
+        {"name": "no_broad_research", "description": "Does NOT launch a broad 7-agent landscape research sprint — goes straight to targeted analysis"}
+      ]
+    },
+    {
+      "id": 8,
+      "name": "scope-guardrail",
+      "prompt": "Oh actually, while we're at it, we should also add a social feed where users can post their study notes and other students can comment on them.",
+      "expected_output": "Acknowledges the idea, adds to Deferred Ideas, redirects to current scope",
+      "files": [],
+      "multi_turn_context": "Turn 4 of study buddy app brainstorm. Core scope is matching + scheduling. User now wants to add a social feed — this is scope creep.",
+      "assertions": [
+        {"name": "acknowledges_idea", "description": "Does NOT dismiss the idea — acknowledges it's worth building"},
+        {"name": "defers_to_future", "description": "Adds the social feed to a Deferred Ideas list"},
+        {"name": "redirects_to_scope", "description": "Steers back to the current core scope (matching + scheduling)"},
+        {"name": "does_not_incorporate", "description": "Does NOT start researching social feeds or adding it to the current plan"}
+      ]
+    },
+    {
+      "id": 9,
+      "name": "anti-rationalization-check",
+      "prompt": "This is pretty straightforward, just generate the plan already. We don't need more research.",
+      "expected_output": "Does NOT skip to plan generation. Checks anti-rationalization table, explains why process matters, continues the brainstorm loop.",
+      "files": [],
+      "multi_turn_context": "Turn 3 of a complex brainstorm. Only 2 research sprints completed. User is impatient but the skill has a hard gate requiring explicit readiness AND research saturation.",
+      "assertions": [
+        {"name": "does_not_skip", "description": "Does NOT immediately generate a plan — honors the hard gate"},
+        {"name": "explains_value", "description": "Briefly explains what remaining research could surface, without being preachy"},
+        {"name": "offers_quick_mode", "description": "Offers Quick Mode as a compromise if the user truly wants speed"},
+        {"name": "continues_loop", "description": "Runs at least one more research sprint to check for saturation"}
+      ]
+    },
+    {
+      "id": 10,
+      "name": "plan-quality-verification",
+      "prompt": "Looks good, save it.",
+      "expected_output": "Runs plan checker agent before saving. Fixes any issues found. Then saves.",
+      "files": [],
+      "multi_turn_context": "Phase 3, final section approved. Plan has been presented incrementally and user approved all 3 sections. Now saving.",
+      "assertions": [
+        {"name": "plan_checker_runs", "description": "Dispatches a plan checker agent to validate the plan before saving"},
+        {"name": "nyquist_validated", "description": "Every task in the plan has an automated verify command"},
+        {"name": "discovery_levels_tagged", "description": "Every task has a discovery level (L0-L3)"},
+        {"name": "canonical_references_present", "description": "Plan includes a canonical references section"},
+        {"name": "deferred_ideas_present", "description": "Plan includes deferred ideas from scope guardrail"},
+        {"name": "handoff_prompt", "description": "Provides /ftm-executor handoff command after saving"}
       ]
     }
   ]

@@ -1,2 +1,37 @@
 name: ftm-config
-description: Configure ftm skill settings including model profiles, execution preferences, and defaults. Use when user says "ftm config", "ftm settings", "set ftm profile", "ftm model", or wants to change how ftm skills behave.
+description: Configure ftm skill settings including model profiles, execution preferences, ops intelligence settings, and defaults. Use when user says "ftm config", "ftm settings", "set ftm profile", "ftm model", "ftm ops", "ops settings", or wants to change how ftm skills behave.
+
+# Operations intelligence settings (merged from eng-buddy)
+ops:
+  personality_style: supportive-direct  # supportive-direct | formal | casual
+
+  mcp_account_rules:
+    personal: mcp-atlassian-personal    # for user actions (comments, ticket updates)
+    admin: mcp-atlassian                # for admin/global operations only
+    default: personal                    # always use personal unless explicitly admin
+
+  approval_gates:
+    communication_drafts: always        # always | auto | never — require approval before sending comms
+    task_status_changes: auto           # always | auto | never — Jira/ticket status changes
+    capacity_alerts: auto               # always | auto | never — when to surface capacity warnings
+
+  context_loading:
+    strategy: smart                     # smart | full | minimal
+    max_daily_files: 3                  # max daily files to load at once
+    grep_first: true                    # always grep index before loading full files
+    session_snapshot_on_cold_start: true # load last session snapshot if today's daily is sparse
+
+  alert_thresholds:
+    capacity_warning: 90               # percentage
+    capacity_alert: 100                # percentage
+    context_switches_warning: 20       # per week
+    oncall_incidents_warning: 3        # per week
+    weekend_work: true                 # alert on any weekend work
+    weekly_hours_warning: 45           # hours per week, alert if exceeded 2 weeks running
+    recurring_issue_threshold: 2       # times in 30 days before alerting
+    recurring_question_threshold: 3    # times before suggesting documentation
+
+  drafts:
+    directory: ~/.claude/eng-buddy/drafts/  # where communication drafts are stored
+    naming: "[recipient]-[topic]-[YYYY-MM-DD].md"
+    write_before_display: true         # always write file before showing draft in chat

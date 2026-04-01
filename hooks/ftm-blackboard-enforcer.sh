@@ -84,10 +84,7 @@ fi
 # Work was done but no blackboard write — nudge (don't block)
 cat <<'JSON'
 {
-  "hookSpecificOutput": {
-    "hookEventName": "Stop",
-    "additionalContext": "[ftm-blackboard-enforcer] You did meaningful work this session but did not record an experience to the blackboard. Before finishing, please: (1) Update ~/.claude/ftm-state/blackboard/context.json with current_task status and recent_decisions. (2) Write an experience file to ~/.claude/ftm-state/blackboard/experiences/ with task_type, tags, outcome, and lessons. (3) Update ~/.claude/ftm-state/blackboard/experiences/index.json with the new entry. This is how ftm learns — skipping it means the next session starts from zero."
-  }
+  "stopReason": "[ftm-blackboard-enforcer] You did meaningful work this session but did not record an experience to the blackboard. Before finishing, please: (1) Update ~/.claude/ftm-state/blackboard/context.json with current_task status and recent_decisions. (2) Write an experience file to ~/.claude/ftm-state/blackboard/experiences/ with task_type, tags, outcome, and lessons. (3) Update ~/.claude/ftm-state/blackboard/experiences/index.json with the new entry. This is how ftm learns — skipping it means the next session starts from zero."
 }
 JSON
 
