@@ -207,7 +207,7 @@ The interview should be 2-4 focused questions:
 During the Orient phase, enrich session context with the user's active operational state by loading tasks via brain.py:
 
 ```
-python3 ~/.claude/skills/eng-buddy/bin/brain.py --tasks --task-json
+python3 ~/.claude/skills/ftm/bin/brain.py --tasks --task-json
 ```
 
 Parse the JSON output for active tasks. Surface high-priority or blocking tasks via `TaskCreate` with the task details so they appear in the session task list. This gives ftm-mind awareness of what the user is carrying before deciding on the next move.
