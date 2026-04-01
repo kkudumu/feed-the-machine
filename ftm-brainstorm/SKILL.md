@@ -787,6 +787,11 @@ Check:
 5. NYQUIST VALIDATION — Does every task have testable acceptance criteria with an automated verify command?
 6. WIRING COMPLETENESS — Are all exports/imports/routes specified? Flag orphaned components.
 7. YAGNI — Are any tasks not traceable to a brainstorm decision? Flag for removal.
+8. EXECUTION FITNESS — Is this the right architectural pattern for how ftm-executor will run it? Check:
+   - Shared path conflicts: Do any tasks mutate files outside the repo (global paths like ~/.claude/)? If so, they MUST NOT run in parallel worktree isolation — flag missing shared path constraints.
+   - Context budget: Is the plan small enough for a single executor session, or should it be split into multiple runs with review checkpoints? Plans with 7+ tasks or 3+ waves should recommend a split.
+   - Wave sizing: Are parallel waves actually safe to parallelize? Two tasks in the same wave touching the same file or global path is a blocker.
+   - Agent isolation: Can each task's agent work independently, or do tasks have implicit shared state not captured in the dependency graph?
 
 Return: list of issues by category, severity (blocker/warning/nit), and suggested fix.
 ```
