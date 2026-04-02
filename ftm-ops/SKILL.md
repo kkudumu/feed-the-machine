@@ -54,13 +54,27 @@ When a request spans multiple domains (e.g., "wrap up today and check my capacit
 
 On every invocation:
 
-1. **Check tasks**: `python3 ~/.claude/skills/ftm/bin/brain.py --tasks --task-json`
-   - Parse the JSON output. For each task with status `pending` or `in_progress`:
-     - Call **TaskCreate** with subject: `[priority] task title`, description: task details from JSON
-     - This registers them in Claude Code's task tracking UI — the user sees them in the sidebar
-   - Report: "Loaded X active tasks from tasks.db"
+1. **Get current date**: `date +%Y-%m-%d` and week: `date +%Y-W%V`
+2. **Load tasks and register in Claude Code UI**:
+   - Run: `python3 ~/.claude/skills/ftm/bin/brain.py --tasks --task-json`
+   - Parse the JSON array. For EACH task with status `pending` or `in_progress`:
+
+   **⛔ MANDATORY: You MUST call the TaskCreate tool for each task. This is not optional. Do NOT just print a table — the tasks MUST appear in Claude Code's sidebar task list.**
+
+   ```
+   TaskCreate(
+     subject: "[#N] [task title]",
+     description: "[status] | [priority] | [jira key if present]"
+   )
+   ```
+
+   Example: if brain.py returns a task `{"id": 24, "title": "[SSO] Hindsight", "status": "in_progress", "priority": "medium", "jira_key": "ITWORK2-9702"}`, you call:
+   ```
+   TaskCreate(subject: "#24 [SSO] Hindsight", description: "in_progress | medium | ITWORK2-9702")
+   ```
+
+   After ALL TaskCreate calls are done, report: "Loaded X active tasks from tasks.db"
    - Fallback: read `~/.claude/ftm-ops/active-tasks.md` if brain.py fails
-2. **Get current date**: `date +%Y-%m-%d` and week: `date +%Y-W%V`
 3. **Load smart context**: See `references/smart-context-loading.md` for the 9-layer strategy
 4. **Route request**: Match to sub-routing table above, load the reference, then respond
 
