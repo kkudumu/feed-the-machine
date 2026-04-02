@@ -19,7 +19,16 @@ Before running ftm-audit, verify these four checks for every task:
 
    **Graceful degradation**: If ftm-browse binary is not installed, skip visual checks with a note: "Visual smoke test skipped — ftm-browse not installed." Do not fail the task.
 
-A task is NOT marked complete until checks 1–4 pass (check 5 is optional).
+6. **Path resolution check** — If the task changed any file/CLI path references in SKILL.md or reference files:
+   - Extract all paths matching patterns: `~/.claude/`, `bin/`, `python3 `, `bash `
+   - Resolve each path from the installed skill location (`~/.claude/skills/<skill-name>/`)
+   - Verify the target exists: `test -e <resolved-path>`
+   - For CLI commands (`python3 <path>`), verify execution: `python3 <path> --help` exits 0
+   - Flag any path that doesn't resolve as a BLOCKER — the skill will fail at runtime
+
+   **Why this exists**: In the v1.7.0 eng-buddy merge, all brain.py references were updated from `~/.claude/skills/eng-buddy/bin/brain.py` to `~/.claude/skills/ftm/bin/brain.py`. The path existed in the repo but `~/.claude/skills/ftm/` pointed to the `ftm/` subdirectory (the router skill), not the repo root — so the path didn't resolve at runtime. This was caught by a user, not by the audit. A 2-second `test -e` check would have caught it.
+
+A task is NOT marked complete until checks 1–4 pass (checks 5-6 are conditional).
 
 **Failure handling:**
 - Test failures → agent must fix before task completes

@@ -194,6 +194,51 @@ Append a row to the root INTENT.md module map table:
 
 ---
 
+## Layer 1.75: Filesystem Path Resolution Check
+
+**Purpose:** Verify that all file paths and CLI commands referenced in SKILL.md and reference files actually resolve from the installed skill location. This catches the most dangerous class of wiring bug — code that passes every static check but fails at runtime because a path doesn't exist where the skill expects it.
+
+**When to run:** After Layer 1.5, before Layer 2. Runs on ANY project that has `.md` files with path references (not just code projects). This is especially critical after tasks that change path references, move files, or update directory structures.
+
+**Scope:** Scan all `.md` files in the changed diff for path references.
+
+**Check protocol:**
+
+1. **Find changed markdown files:** `git diff HEAD~1 --name-only -- '*.md' '*.yml'`
+2. **For each changed file, extract path references** matching these patterns:
+   - Absolute paths: `~/.claude/`, `/Users/`, `/home/`
+   - CLI commands: `python3 <path>`, `bash <path>`, `node <path>`
+   - Skill-relative paths: `bin/`, `references/`, `scripts/`
+   - Config-referenced paths: any path that appears after a `paths.` config key
+3. **Resolve each path from the installed location:**
+   - For skill files (in `~/.claude/skills/<name>/`): resolve relative to the skill's install directory
+   - For absolute paths (`~/.claude/...`): resolve directly
+   - For CLI commands: extract the path argument, resolve it, then verify execution with `--help` or `--version`
+4. **Verify existence:** `test -e <resolved-path>` for each
+5. **For CLI commands:** additionally verify `python3 <path> --help 2>&1` exits without "No such file or directory"
+
+**Finding types:**
+
+| Finding | Severity | Auto-fixable? |
+|---------|----------|---------------|
+| `BROKEN_PATH` — path in .md file doesn't resolve from installed location | HARD FAIL | No — requires human decision on correct path |
+| `BROKEN_CLI` — CLI command path doesn't exist or errors on execution | HARD FAIL | No — requires fixing the path or creating a symlink |
+| `HARDCODED_USER_PATH` — absolute path contains a specific username (e.g., `/Users/kioja.kudumu/`) | WARN | Yes — replace with `~/` or `$HOME/` equivalent |
+| `STALE_PATH_REFERENCE` — path references a directory/file that was moved or renamed in this diff | HARD FAIL | Yes — update to new path |
+
+**Output format:**
+```
+Layer 1.75 findings:
+- [BROKEN_PATH] ftm-ops/SKILL.md:53 — `~/.claude/skills/ftm/bin/brain.py` does not exist (ftm/ points to router subdirectory, not repo root)
+- [BROKEN_CLI] ftm-mind/references/orient-protocol.md:210 — `python3 ~/.claude/skills/eng-buddy/bin/brain.py` → file not found
+- [HARDCODED_USER_PATH] ftm-mind/references/ops-routing.md:44 — `/Users/kioja.kudumu/.claude/eng-buddy/drafts/` contains hardcoded username
+- [STALE_PATH_REFERENCE] ftm-ops/references/task-management.md:15 — `~/.claude/eng-buddy/active-tasks.md` was moved to `~/.claude/ftm-ops/active-tasks.md`
+```
+
+**Why this layer exists:** In the v1.7.0 merge, 160+ path references were updated across 23 files. Every static check passed. The integration test verified brain.py worked from the repo path. But when a user invoked `/ftm-ops`, it called `python3 ~/.claude/skills/ftm/bin/brain.py` — which didn't exist because the `ftm` skill symlink pointed to the `ftm/` subdirectory (the router), not the repo root. A 2-second `test -e` would have caught this. This layer ensures it always does.
+
+---
+
 ## Layer 2: LLM Adversarial Audit
 
 **Mindset:** You are an adversary trying to PROVE code is dead. Not "confirm it works" — PROVE it's dead. Every new/modified export is guilty until proven innocent. You must find a complete chain from app entry point to the code in question, or it's flagged.
@@ -508,7 +553,8 @@ When invoked (manually via `/ftm-audit` or automatically post-task):
 1. Run Phase 0 (detect project patterns — framework, router, state, API layer)
 2. Run Layer 1 (knip static analysis)
 3. Run Layer 1.5 (documentation coverage check — INTENT.md entries for changed functions)
-4. Run Layer 2 (LLM adversarial audit, calibrated to detected patterns)
+4. Run Layer 1.75 (filesystem path resolution — verify all referenced paths exist from installed location)
+5. Run Layer 2 (LLM adversarial audit, calibrated to detected patterns)
 5. Combine findings, deduplicate
 6. Run Layer 3 (auto-fix) for each finding (including missing INTENT.md entries)
 7. Re-verify (re-run Layers 1+1.5+2)
@@ -539,6 +585,10 @@ After completing, update the blackboard:
 ### Layer 1.5: Documentation Coverage
 - Findings: [N]
 - [list each finding — missing entries, stale entries, missing module docs]
+
+### Layer 1.75: Path Resolution
+- Findings: [N]
+- [list each finding — broken paths, broken CLI commands, hardcoded user paths]
 
 ### Layer 2: Adversarial Audit
 - Findings: [N]
