@@ -177,18 +177,28 @@ FTM ships with 26 skills and 15 automation hooks. You don't need to memorize the
 | **ftm-pause / resume** | Save and restore. Pick up exactly where you left off in a new conversation |
 | **ftm-upgrade** | Self-update. Stay current with one command |
 
-### Hooks (15 automations)
+### Hooks (16 automations)
 
 These run automatically in the background — no slash commands needed:
 
-- **Auto-logging** — every tool call gets logged to events.log
-- **Learning capture** — extracts lessons from completed tasks
-- **Session snapshots** — saves state for crash recovery
-- **Secret scanning** — blocks commits containing credentials
-- **Task loading** — hydrates tasks from plans on session start
-- **Plan gates** — enforces plan approval before execution
-- **Compaction handlers** — preserves critical state when context compresses
-- And 8 more for blackboard enforcement, map auto-detection, drafts gating, etc.
+| Hook | What It Does |
+|------|-------------|
+| **event-logger** | Logs every tool use to a JSONL file with debouncing and 30-day rotation |
+| **auto-log** | Detects when you report completing work and reminds Claude to log progress |
+| **learning-capture** | Captures edits and task completions into a learning database for pattern recognition |
+| **session-snapshot** | Saves the last 15 exchanges as a markdown snapshot when a session ends — crash recovery |
+| **session-end** | Marks the current session as completed in the blackboard |
+| **blackboard-enforcer** | Nudges Claude to record meaningful work to the blackboard before a session ends undocumented |
+| **plan-gate** | Prevents code edits without a plan — soft-warns at first, blocks after 3+ edits |
+| **task-loader** | Loads active tasks from your task database when a session starts |
+| **pre-compaction** | Monitors token usage and flushes state to disk before context hits 75% capacity |
+| **post-compaction** | After context compresses, reloads critical state from disk before responding |
+| **map-autodetect** | Detects unmapped projects on first use and bootstraps the code knowledge graph |
+| **post-commit-trigger** | After git commits, triggers code map sync and documentation updates |
+| **pending-sync-check** | Surfaces out-of-session commits that need code map syncing |
+| **discovery-reminder** | Reminds Claude to run a discovery interview for tasks involving external systems or migrations |
+| **drafts-gate** | Blocks Slack and Gmail sends unless a draft file exists first — no accidental messages |
+| **install-hooks** | Self-installer that registers all hooks into Claude Code's settings.json |
 
 ---
 
