@@ -1,0 +1,7 @@
+interface:
+  display_name: "FTM Mind"
+  short_description: "Help with FTM Mind workflows"
+  default_prompt: "Use $ftm-mind when you need help with its workflows."
+
+policy:
+  allow_implicit_invocation: true

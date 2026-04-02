@@ -1,0 +1,7 @@
+interface:
+  display_name: "FTM Dashboard"
+  short_description: "Help with FTM Dashboard workflows"
+  default_prompt: "Use $ftm-dashboard when you need help with its workflows."
+
+policy:
+  allow_implicit_invocation: true

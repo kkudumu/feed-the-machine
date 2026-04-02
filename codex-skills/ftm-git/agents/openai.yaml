@@ -1,0 +1,7 @@
+interface:
+  display_name: "FTM Git"
+  short_description: "Help with FTM Git workflows"
+  default_prompt: "Use $ftm-git when you need help with its workflows."
+
+policy:
+  allow_implicit_invocation: true

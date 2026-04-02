@@ -1,0 +1,12 @@
+# ftm-researcher/evals/synthesis-quality.yaml
+description: Verify synthesis pipeline produces valid disagreement maps
+prompts:
+  - vars:
+      input: "Given these 10 findings from different agents, produce a disagreement map"
+    assert:
+      - type: contains
+        value: "consensus"
+      - type: contains
+        value: "contested"
+      - type: contains
+        value: "unique_insights"

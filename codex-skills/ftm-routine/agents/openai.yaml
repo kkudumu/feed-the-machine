@@ -1,0 +1,7 @@
+interface:
+  display_name: "FTM Routine"
+  short_description: "Help with FTM Routine workflows"
+  default_prompt: "Use $ftm-routine when you need help with its workflows."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "FTM Debug"
+  short_description: "Help with FTM Debug workflows"
+  default_prompt: "Use $ftm-debug when you need help with its workflows."
+
+policy:
+  allow_implicit_invocation: true

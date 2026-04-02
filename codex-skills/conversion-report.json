@@ -1,0 +1,305 @@
+{
+  "converted": [
+    {
+      "name": "eng-buddy",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/eng-buddy",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/eng-buddy",
+      "warnings": {
+        "claude_home_refs": 8,
+        "claude_cli_refs": 10,
+        "anthropic_refs": 1,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "finance-buddy",
+      "source": "/Users/kioja.kudumu/.claude/skills/finance-buddy",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/finance-buddy",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-audit",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-audit",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-audit",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-brainstorm",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-brainstorm",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-brainstorm",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 1,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-browse",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-browse",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-browse",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-capture",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-capture",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-capture",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-codex-gate",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-codex-gate",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-codex-gate",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-config",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-config",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-config",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-council",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-council",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-council",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 2,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-dashboard",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-dashboard",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-dashboard",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-debug",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-debug",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-debug",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 6,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-diagram",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-diagram",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-diagram",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-executor",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-executor",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-executor",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-git",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-git",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-git",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 1,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-intent",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-intent",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-intent",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-map",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-map",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-map",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-mind",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-mind",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-mind",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 1,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-pause",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-pause",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-pause",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-researcher",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-researcher",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-researcher",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 2,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-resume",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-resume",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-resume",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-retro",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-retro",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-retro",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-routine",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-routine",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-routine",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "ftm-upgrade",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-upgrade",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/ftm-upgrade",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "my-insights",
+      "source": "/Users/kioja.kudumu/.claude/skills/my-insights",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/my-insights",
+      "warnings": {
+        "claude_home_refs": 12,
+        "claude_cli_refs": 11,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "skill-creator",
+      "source": "/Users/kioja.kudumu/.claude/skills/skill-creator",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/skill-creator",
+      "warnings": {
+        "claude_home_refs": 4,
+        "claude_cli_refs": 19,
+        "anthropic_refs": 2,
+        "absolute_home_refs": 0
+      }
+    },
+    {
+      "name": "sso-buddy",
+      "source": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/sso-buddy",
+      "output": "/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills/sso-buddy",
+      "warnings": {
+        "claude_home_refs": 0,
+        "claude_cli_refs": 0,
+        "anthropic_refs": 0,
+        "absolute_home_refs": 0
+      }
+    }
+  ],
+  "skipped_manifests": [
+    "freelance-buddy",
+    "sso-buddy"
+  ]
+}

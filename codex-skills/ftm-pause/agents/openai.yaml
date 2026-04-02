@@ -1,0 +1,7 @@
+interface:
+  display_name: "FTM Pause"
+  short_description: "Help with FTM Pause workflows"
+  default_prompt: "Use $ftm-pause when you need help with its workflows."
+
+policy:
+  allow_implicit_invocation: true

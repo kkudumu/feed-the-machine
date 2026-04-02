@@ -1,0 +1,7 @@
+interface:
+  display_name: "My Insights"
+  short_description: "Help with My Insights workflows"
+  default_prompt: "Use $my-insights when you need help with its workflows."
+
+policy:
+  allow_implicit_invocation: true

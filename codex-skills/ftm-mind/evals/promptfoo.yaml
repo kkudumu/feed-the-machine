@@ -1,0 +1,142 @@
+description: "ftm-mind routing accuracy"
+
+prompts:
+  - "You are ftm-mind. Given this user request, which ftm skill should handle it? Reply with just the skill name.\n\nUser: {{input}}"
+
+providers:
+  - id: "exec:claude --print"
+    label: "claude-code"
+
+tests:
+  - description: "debug request routes to ftm-debug"
+    vars:
+      input: "debug this flaky test"
+    assert:
+      - type: contains
+        value: "ftm-debug"
+
+  - description: "design thinking routes to ftm-brainstorm"
+    vars:
+      input: "help me think through auth design"
+    assert:
+      - type: contains
+        value: "ftm-brainstorm"
+
+  - description: "plan execution routes to ftm-executor"
+    vars:
+      input: "execute ~/.codex/plans/foo.md"
+    assert:
+      - type: contains
+        value: "ftm-executor"
+
+  - description: "trivial rename routes to micro or direct handling"
+    vars:
+      input: "rename this variable"
+    assert:
+      - type: regex
+        value: "micro|direct"
+
+  - description: "multi-model deliberation routes to ftm-council"
+    vars:
+      input: "what would other AIs think about this approach"
+    assert:
+      - type: contains
+        value: "ftm-council"
+
+  - description: "wiring audit routes to ftm-audit"
+    vars:
+      input: "audit the wiring"
+    assert:
+      - type: contains
+        value: "ftm-audit"
+
+  - description: "pause request routes to ftm-pause"
+    vars:
+      input: "pause"
+    assert:
+      - type: contains
+        value: "ftm-pause"
+
+  - description: "save state request routes to ftm-pause"
+    vars:
+      input: "save state"
+    assert:
+      - type: contains
+        value: "ftm-pause"
+
+  - description: "resume request routes to ftm-resume"
+    vars:
+      input: "resume"
+    assert:
+      - type: contains
+        value: "ftm-resume"
+
+  - description: "continue request routes to ftm-resume"
+    vars:
+      input: "continue where we left off"
+    assert:
+      - type: contains
+        value: "ftm-resume"
+
+  - description: "upgrade request routes to ftm-upgrade"
+    vars:
+      input: "upgrade ftm"
+    assert:
+      - type: contains
+        value: "ftm-upgrade"
+
+  - description: "config check routes to ftm-config"
+    vars:
+      input: "check my config"
+    assert:
+      - type: contains
+        value: "ftm-config"
+
+  - description: "ftm settings routes to ftm-config"
+    vars:
+      input: "ftm settings"
+    assert:
+      - type: contains
+        value: "ftm-config"
+
+  - description: "intent doc update routes to ftm-intent"
+    vars:
+      input: "update the intent docs"
+    assert:
+      - type: contains
+        value: "ftm-intent"
+
+  - description: "architecture diagram update routes to ftm-diagram"
+    vars:
+      input: "update architecture diagram"
+    assert:
+      - type: contains
+        value: "ftm-diagram"
+
+  - description: "browser task routes to ftm-browse"
+    vars:
+      input: "open browser and check the page"
+    assert:
+      - type: contains
+        value: "ftm-browse"
+
+  - description: "codex validation routes to ftm-codex-gate"
+    vars:
+      input: "run codex validation"
+    assert:
+      - type: contains
+        value: "ftm-codex-gate"
+
+  - description: "retrospective routes to ftm-retro"
+    vars:
+      input: "how did that go"
+    assert:
+      - type: contains
+        value: "ftm-retro"
+
+  - description: "retro keyword routes to ftm-retro"
+    vars:
+      input: "retro"
+    assert:
+      - type: contains
+        value: "ftm-retro"

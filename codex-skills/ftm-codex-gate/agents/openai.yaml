@@ -1,0 +1,7 @@
+interface:
+  display_name: "FTM Codex Gate"
+  short_description: "Help with FTM Codex Gate workflows"
+  default_prompt: "Use $ftm-codex-gate when you need help with its workflows."
+
+policy:
+  allow_implicit_invocation: true

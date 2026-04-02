@@ -1,0 +1,7 @@
+interface:
+  display_name: "FTM Council"
+  short_description: "Help with FTM Council workflows"
+  default_prompt: "Use $ftm-council when you need help with its workflows."
+
+policy:
+  allow_implicit_invocation: true

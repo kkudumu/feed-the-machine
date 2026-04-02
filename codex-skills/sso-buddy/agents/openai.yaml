@@ -1,0 +1,7 @@
+interface:
+  display_name: "SSO Buddy"
+  short_description: "Help with SSO Buddy workflows"
+  default_prompt: "Use $sso-buddy when you need help with its workflows."
+
+policy:
+  allow_implicit_invocation: true
