@@ -76,6 +76,8 @@ Not sure about an architecture choice or debugging approach? This sends the prob
 ```
 An AIM-styled browser chatroom where you, Claude, Codex, and Gemini all talk in real time. You're a full participant, not just watching.
 
+<img src="docs/images/council-chat.png" alt="ftm-council-chat screenshot — AIM-styled chatroom with Claude, Codex, and Gemini debating Jira token types" width="800" />
+
 ---
 
 ## Before / After
