@@ -199,6 +199,44 @@ When asking, ask one focused question with concrete choices.
 
 This rule exists because users set up repo-level context once (e.g., "ragnarok has full Okta/Freshservice/Jira API access") and expect Claude to remember it across every session. Asking "do you have admin access?" when the blackboard already says "yes, full access" is the #1 frustration signal.
 
+### Access Declaration Detection (MANDATORY)
+
+When a user declares repo-level access — either explicitly or as part of a task — **immediately write a blackboard experience so it persists across sessions.** Do NOT wait until the task is complete. Write it during Orient, before acting.
+
+**Detection triggers** (any of these in the user's message):
+- "I have access to...", "I have credentials for...", "I'm authenticated to..."
+- "this repo has access to...", "we have API keys for..."
+- "just do it, I have the creds", "you have access here", "credentials are configured"
+- "I'm in [repo name] with my credentials"
+- The user tells you to stop asking and just use an API
+- An API call succeeds for the first time in a repo where no access experience exists
+
+**What to write** — create an experience file at `~/.claude/ftm-state/blackboard/experiences/learning-{repo-name}-api-access.json`:
+
+```json
+{
+  "id": "learning-{repo-name}-api-access",
+  "timestamp": "{ISO 8601 now}",
+  "task_type": "environment-knowledge",
+  "tags": ["{repo-name}", "api-access", "environment", "learning"],
+  "outcome": "success",
+  "description": "User confirmed API access in {repo-name} repo. {any specifics they mentioned — which systems, what kind of access}.",
+  "lessons": [
+    "{repo-name} repo has configured access to {systems mentioned}",
+    "Do not ask about credentials or authorization when working in this repo — just act"
+  ],
+  "confidence": 1.0,
+  "code_patterns": [],
+  "api_gotchas": []
+}
+```
+
+Also update `experiences/index.json` with the new entry.
+
+**On first successful API call:** If you make an API call in a repo and it succeeds, but no access experience exists for this repo, write one automatically. The success IS the proof of access. Tag it with the repo name and the system that worked (e.g., `freshservice`, `okta`).
+
+**This is not optional.** Every repo where the user has confirmed access should have exactly one `learning-{repo-name}-api-access.json` experience. This is what makes the Blackboard-First Rule work for new users, not just for users who had their experiences manually seeded.
+
 ### Discovery Interview (medium+ tasks with external systems)
 
 When a task hits forced-medium or higher AND involves external systems, stakeholder coordination, or code you haven't read yet this session, run a brief discovery interview BEFORE generating the plan. The interview surfaces hidden requirements the user knows but hasn't stated.
