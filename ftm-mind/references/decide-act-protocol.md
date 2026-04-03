@@ -37,11 +37,7 @@ Going ahead unless you say otherwise.
 
 **Step 0: Discovery Interview (if applicable).** Before generating the plan, check whether a Discovery Interview is needed (see Orient reference). If the task involves external systems, stakeholder coordination, or unfamiliar code, run the interview FIRST.
 
-**Step 1: Generate the plan.** Build a numbered list of concrete steps. Each step has:
-- A number
-- A one-line description
-- The files that will be touched
-- The verification method
+**Step 1: Generate the plan.** Build a numbered checkbox list. This format is **mandatory** — no narrative steps, no prose paragraphs. Every plan MUST use: `N. [ ] One-line action → target`. See `references/protocols/PLAN-APPROVAL.md` for the full format spec, examples for code/ops/comms/infra tasks, and the list of NEVER-produce anti-patterns.
 
 **Step 2: Parse the user's response.**
 

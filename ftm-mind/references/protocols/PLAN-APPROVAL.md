@@ -10,11 +10,30 @@ For **medium and large** tasks, present a numbered task list and wait for the us
 
 **Step 1: Generate the plan.**
 
-Build a numbered list of concrete steps based on Orient synthesis. Each step must have:
+Build a numbered checkbox list. This format is **mandatory** — no narrative steps, no prose paragraphs, no bullet-point summaries. Every plan, whether it's code, ops, comms, or infrastructure, MUST use this exact format:
+
+```
+  N. [ ] One-line action → target (file, channel, system, or person)
+```
+
+Each step must have:
 - A number
+- A `[ ]` checkbox (literal characters, not rendered)
 - A one-line description of what will be done
-- The files that will be touched
-- The verification method (test, lint, visual check, or "self-evident")
+- An arrow `→` pointing to the target: file path for code, channel/email for comms, system name for infra, or "self-evident" for simple actions
+- If applicable, a verification method after the target: `verify: test / lint / visual check / confirmation`
+
+**This applies to ALL task types, not just code:**
+- Code tasks: `3. [ ] Add OAuth validation → src/middleware/oauth.ts  verify: npm test`
+- Ops/comms tasks: `1. [ ] Reply to Everett requesting domain mapping → Braintrust support thread`
+- Infra tasks: `2. [ ] Create Freshservice webhook trigger → freshservice admin / workflows`
+- Admin tasks: `4. [ ] Close out ITWORK2-9772 → Jira`
+
+**NEVER produce:**
+- Narrative paragraphs describing steps
+- Numbered steps without `[ ]` checkboxes
+- Steps with sub-bullets explaining details (put that in execution, not the plan)
+- Headers like "Step 1:" or "### Step 1" — use the numbered checkbox format only
 
 Present it like this:
 
@@ -34,6 +53,21 @@ Approve all? Or tell me what to change.
   - "only 1,2" → execute only steps 1 and 2
   - "add: step between 2 and 3 to update the config" → insert a step
   - "deny" or "stop" → cancel entirely
+```
+
+**Ops example:**
+
+```
+Here's my plan for the Braintrust post-SSO setup:
+
+  1. [ ] Reply to Everett requesting domain mapping + group mappings → Braintrust support thread
+  2. [ ] Reply to Spencer with admin process answer → #proj-braintrust
+  3. [ ] Request API key from Everett or Spencer → Braintrust org settings
+  4. [ ] Build Freshservice webhook → Braintrust API integration → freshservice workflows + Lambda
+  5. [ ] Reconcile existing users vs Okta groups → Braintrust API + Okta
+  6. [ ] Close out ITWORK2-9772 → Jira
+
+Approve all? Or tell me what to change.
 ```
 
 **Step 2: Parse the user's response.**
