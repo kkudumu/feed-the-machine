@@ -179,15 +179,31 @@ Ask the user only when one of these is true:
 
 - two materially different interpretations are both plausible
 - an external-facing action needs approval
-- a required credential, path, or identifier is missing
+- a required credential, path, or identifier is missing **AND the blackboard has no experience confirming access** (see Blackboard-First Rule below)
 - the user explicitly asked for options before action
-- **the task is medium+ and involves external systems, stakeholder coordination, or unfamiliar code** (see Discovery Interview below)
+- **the task is medium+ and involves external systems, stakeholder coordination, or unfamiliar code** (see Discovery Interview below) **AND the blackboard doesn't already confirm repo-level access**
 
 When asking, ask one focused question with concrete choices.
+
+### Blackboard-First Rule (MANDATORY before any access/auth questions)
+
+**Before asking ANY question about credentials, API access, authorization, permissions, or "do you have access to X" — check the blackboard first.**
+
+1. Read `experiences/index.json`
+2. Look for entries tagged with the current repo name, `api-access`, `full-access`, `credentials`, or the system being asked about (e.g., `freshservice`, `okta`, `jira`)
+3. If a matching experience exists with `confidence >= 0.7`:
+   - **Do NOT ask about access.** The user already established this.
+   - **Do NOT run a discovery interview about authorization.** You have the answer.
+   - **Just do the thing.** If the credentials don't work, you'll find out when the API call fails — and that's a better signal than a speculative question.
+4. If no matching experience exists, proceed with asking.
+
+This rule exists because users set up repo-level context once (e.g., "ragnarok has full Okta/Freshservice/Jira API access") and expect Claude to remember it across every session. Asking "do you have admin access?" when the blackboard already says "yes, full access" is the #1 frustration signal.
 
 ### Discovery Interview (medium+ tasks with external systems)
 
 When a task hits forced-medium or higher AND involves external systems, stakeholder coordination, or code you haven't read yet this session, run a brief discovery interview BEFORE generating the plan. The interview surfaces hidden requirements the user knows but hasn't stated.
+
+**Before running the interview, apply the Blackboard-First Rule above.** If the blackboard confirms access and the task is a straightforward API operation (add user, create ticket, update group), skip the interview entirely and just do it. The interview is for tasks with genuine unknowns — stakeholder coordination, multi-system migrations, policy changes — not for "use the Freshservice API to add an agent."
 
 The interview should be 2-4 focused questions:
 
@@ -201,6 +217,7 @@ The interview should be 2-4 focused questions:
 - The user already provided comprehensive context
 - The task is purely local with no external dependencies
 - The user explicitly says "just do it" or "no questions, go"
+- **The blackboard has an experience confirming API access for this repo + the task is a direct API operation** (not stakeholder coordination or multi-system migration)
 
 ## Brain.py Task Loading (Observe Phase)
 
