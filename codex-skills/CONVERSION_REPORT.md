@@ -1,36 +1,36 @@
 # Codex Skill Conversion Report
 
-Converted 27 skills into `/Users/kioja.kudumu/Documents/Code/feed-the-machine/codex-skills`.
+Converted 27 skills into `~/feed-the-machine/codex-skills`.
 
 ## Converted Skills
 
-- `eng-buddy` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/eng-buddy`
-- `finance-buddy` from `/Users/kioja.kudumu/.claude/skills/finance-buddy`
-- `ftm` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm`
-- `ftm-audit` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-audit`
-- `ftm-brainstorm` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-brainstorm`
-- `ftm-browse` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-browse`
-- `ftm-capture` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-capture`
-- `ftm-codex-gate` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-codex-gate`
-- `ftm-config` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-config`
-- `ftm-council` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-council`
-- `ftm-dashboard` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-dashboard`
-- `ftm-debug` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-debug`
-- `ftm-diagram` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-diagram`
-- `ftm-executor` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-executor`
-- `ftm-git` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-git`
-- `ftm-intent` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-intent`
-- `ftm-map` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-map`
-- `ftm-mind` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-mind`
-- `ftm-pause` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-pause`
-- `ftm-researcher` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-researcher`
-- `ftm-resume` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-resume`
-- `ftm-retro` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-retro`
-- `ftm-routine` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-routine`
-- `ftm-upgrade` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/ftm-upgrade`
-- `my-insights` from `/Users/kioja.kudumu/.claude/skills/my-insights`
-- `skill-creator` from `/Users/kioja.kudumu/.claude/skills/skill-creator`
-- `sso-buddy` from `/Users/kioja.kudumu/Documents/Code/feed-the-machine/sso-buddy`
+- `eng-buddy` from `~/feed-the-machine/eng-buddy`
+- `finance-buddy` from `~/.claude/skills/finance-buddy`
+- `ftm` from `~/feed-the-machine/ftm`
+- `ftm-audit` from `~/feed-the-machine/ftm-audit`
+- `ftm-brainstorm` from `~/feed-the-machine/ftm-brainstorm`
+- `ftm-browse` from `~/feed-the-machine/ftm-browse`
+- `ftm-capture` from `~/feed-the-machine/ftm-capture`
+- `ftm-codex-gate` from `~/feed-the-machine/ftm-codex-gate`
+- `ftm-config` from `~/feed-the-machine/ftm-config`
+- `ftm-council` from `~/feed-the-machine/ftm-council`
+- `ftm-dashboard` from `~/feed-the-machine/ftm-dashboard`
+- `ftm-debug` from `~/feed-the-machine/ftm-debug`
+- `ftm-diagram` from `~/feed-the-machine/ftm-diagram`
+- `ftm-executor` from `~/feed-the-machine/ftm-executor`
+- `ftm-git` from `~/feed-the-machine/ftm-git`
+- `ftm-intent` from `~/feed-the-machine/ftm-intent`
+- `ftm-map` from `~/feed-the-machine/ftm-map`
+- `ftm-mind` from `~/feed-the-machine/ftm-mind`
+- `ftm-pause` from `~/feed-the-machine/ftm-pause`
+- `ftm-researcher` from `~/feed-the-machine/ftm-researcher`
+- `ftm-resume` from `~/feed-the-machine/ftm-resume`
+- `ftm-retro` from `~/feed-the-machine/ftm-retro`
+- `ftm-routine` from `~/feed-the-machine/ftm-routine`
+- `ftm-upgrade` from `~/feed-the-machine/ftm-upgrade`
+- `my-insights` from `~/.claude/skills/my-insights`
+- `skill-creator` from `~/.claude/skills/skill-creator`
+- `sso-buddy` from `~/feed-the-machine/sso-buddy`
 
 ## Skipped Manifests
 

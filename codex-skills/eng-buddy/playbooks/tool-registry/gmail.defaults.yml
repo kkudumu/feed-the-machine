@@ -1,6 +1,6 @@
 send_email:
-  from: "kioja.kudumu@klaviyo.com"
+  from: "user@example.com"
   signature: true
 
 draft_email:
-  from: "kioja.kudumu@klaviyo.com"
+  from: "user@example.com"

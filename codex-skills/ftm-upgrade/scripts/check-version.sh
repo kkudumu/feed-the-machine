@@ -7,7 +7,7 @@ set -uo pipefail
 CACHE_DIR="${HOME}/.cache/ftm-brain"
 CACHE_FILE="${CACHE_DIR}/version-check"
 VERSION_FILE="${HOME}/.codex/skills/ftm-version.txt"
-REPO="kkudumu/ftm-brain"
+REPO="yourorg/ftm-brain"
 
 # Ensure cache directory exists
 mkdir -p "${CACHE_DIR}"

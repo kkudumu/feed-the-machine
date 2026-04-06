@@ -4,7 +4,7 @@
 
 set -uo pipefail
 
-REPO="kkudumu/ftm-brain"
+REPO="kkudumu/feed-the-machine"
 SKILLS_DIR="${HOME}/.claude/skills"
 VERSION_FILE="${SKILLS_DIR}/ftm-version.txt"
 DOWNLOAD_DIR="/tmp/ftm-upgrade"

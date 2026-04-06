@@ -277,7 +277,7 @@ def rewrite_commands(text: str, skill_names: list[str]) -> str:
 
 def rewrite_paths(text: str) -> str:
     replacements = [
-        ("~/Documents/Code/kioja-scratch-paper/sso-plan.md", "$CODEX_HOME/skills/sso-buddy/sso-plan.md"),
+        ("~/scratch/sso-plan.md", "$CODEX_HOME/skills/sso-buddy/sso-plan.md"),
         (str(HOME / ".claude" / "skills") + "/", "$CODEX_HOME/skills/"),
         (str(HOME / ".claude") + "/", "$CODEX_HOME/"),
         ("$HOME/.claude/skills/", "$CODEX_HOME/skills/"),

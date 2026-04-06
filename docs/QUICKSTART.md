@@ -11,7 +11,7 @@ npx feed-the-machine@latest
 **Option B — git clone:**
 
 ```bash
-git clone https://github.com/kkudumu/feed-the-machine.git ~/feed-the-machine
+git clone https://github.com/yourorg/feed-the-machine.git ~/feed-the-machine
 cd ~/feed-the-machine
 ./install.sh
 ```

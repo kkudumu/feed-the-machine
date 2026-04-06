@@ -24,7 +24,7 @@ These copies target Codex, not Claude. If any later section uses legacy wording,
 
 # ftm-upgrade
 
-Self-upgrade mechanism for the ftm skills ecosystem. Fetches the latest release from `kkudumu/ftm-skills` on GitHub, compares it to the locally installed version, and copies updated skill files in place.
+Self-upgrade mechanism for the ftm skills ecosystem. Fetches the latest release from `yourorg/ftm-skills` on GitHub, compares it to the locally installed version, and copies updated skill files in place.
 
 ---
 
@@ -146,7 +146,7 @@ Map `CHECK_FAILED <reason>` codes to user-facing messages:
 |---|---|
 | `gh_not_installed` | GitHub CLI is not installed. Install it with: `brew install gh` (macOS) or see https://cli.github.com |
 | `no_internet` | Cannot reach GitHub. Check your internet connection and try again. |
-| `repo_not_found` | Repository `kkudumu/ftm-skills` not found. Verify you have access to the repository. |
+| `repo_not_found` | Repository `yourorg/ftm-skills` not found. Verify you have access to the repository. |
 | `no_releases_found` | No releases found in the repository yet. Check back later. |
 | any other reason | Version check failed: `<reason>`. Try running manually: `bash ~/.codex/skills/ftm-upgrade/scripts/check-version.sh` |
 
@@ -161,11 +161,11 @@ Map `CHECK_FAILED <reason>` codes to user-facing messages:
 
 **Cache location**: `~/.cache/ftm-skills/version-check`
 **Version file**: `~/.codex/skills/ftm-version.txt`
-**Repo**: `kkudumu/ftm-skills`
+**Repo**: `yourorg/ftm-skills`
 
 ## Requirements
 
-- tool: `gh` | required | GitHub CLI for querying releases from kkudumu/ftm-brain
+- tool: `gh` | required | GitHub CLI for querying releases from yourorg/ftm-brain
 - reference: `~/.codex/skills/ftm-upgrade/scripts/check-version.sh` | required | version check and cache script
 - reference: `~/.codex/skills/ftm-upgrade/scripts/upgrade.sh` | required | download and install latest release script
 - reference: `~/.codex/skills/ftm-version.txt` | optional | locally installed version number
@@ -186,7 +186,7 @@ Map `CHECK_FAILED <reason>` codes to user-facing messages:
 
 - condition: gh not installed | action: report "GitHub CLI not installed" with brew install gh instructions
 - condition: no internet connection | action: report "Cannot reach GitHub. Check internet connection."
-- condition: kkudumu/ftm-brain repo not found | action: report repo not found, suggest verifying access
+- condition: yourorg/ftm-brain repo not found | action: report repo not found, suggest verifying access
 - condition: no releases found | action: report "No releases found yet. Check back later."
 - condition: upgrade.sh exits non-zero | action: report failure output, suggest running script manually
 

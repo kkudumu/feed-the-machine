@@ -33,11 +33,11 @@
 
 - [ ] **Step 1: Fix check-version.sh**
 
-Replace `REPO="kkudumu/ftm-skills"` with `REPO="kkudumu/ftm-brain"` and update cache dir from `ftm-skills` to `ftm-brain`.
+Replace `REPO="yourorg/ftm-skills"` with `REPO="yourorg/ftm-brain"` and update cache dir from `ftm-skills` to `ftm-brain`.
 
 - [ ] **Step 2: Fix upgrade.sh**
 
-Replace `REPO="kkudumu/ftm-skills"` with `REPO="kkudumu/ftm-brain"` and update cache reference.
+Replace `REPO="yourorg/ftm-skills"` with `REPO="yourorg/ftm-brain"` and update cache reference.
 
 - [ ] **Step 3: Fix ftm-upgrade/SKILL.md**
 
@@ -45,7 +45,7 @@ Replace all `ftm-skills` references with `ftm-brain` (repo name in prose, cache 
 
 - [ ] **Step 4: Verify no stale references remain**
 
-Run: `grep -r "kkudumu/ftm-skills" --include="*.sh" --include="*.md" .`
+Run: `grep -r "yourorg/ftm-skills" --include="*.sh" --include="*.md" .`
 Expected: Only hits in package.json (npm name) and README (npx command), zero in scripts or SKILL.md files.
 
 - [ ] **Step 5: Commit**

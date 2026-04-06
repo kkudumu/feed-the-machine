@@ -29,7 +29,7 @@ def env(tmp_path):
         }
     }))
     (reg_dir / "jira.defaults.yml").write_text(yaml.dump({
-        "create_issue": {"assignee": "kioja@test.com", "board_id": 70},
+        "create_issue": {"assignee": "user@test.com", "board_id": 70},
     }))
 
     traces_dir = tmp_path / "traces"
@@ -48,7 +48,7 @@ def test_full_flow(env):
 
     tracer.add_event(TraceEvent(type="user_instruction", content="Do SSO onboarding for Linear"))
     tracer.add_event(TraceEvent(type="tool_call", tool="mcp__mcp-atlassian__jira_create_issue",
-        params={"project": "ITWORK2", "summary": "[SSO] Linear", "assignee": "kioja@test.com", "board_id": 70}))
+        params={"project": "ITWORK2", "summary": "[SSO] Linear", "assignee": "user@test.com", "board_id": 70}))
     tracer.add_event(TraceEvent(type="user_manual_action", content="Configured SAML in Okta",
         inferred_step="Configure SAML in IdP", action_binding="playwright", auth_note="Okta admin"))
     tracer.add_event(TraceEvent(type="tool_call", tool="mcp__slack__post_message",

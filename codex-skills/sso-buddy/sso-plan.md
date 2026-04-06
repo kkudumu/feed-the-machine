@@ -1,7 +1,7 @@
 # SSO Configuration Runbook
 
 ## Overview
-This runbook provides a step-by-step process for configuring Single Sign-On (SSO) and SCIM provisioning for new applications at Klaviyo. Follow each phase sequentially to ensure proper setup and testing.
+This runbook provides a step-by-step process for configuring Single Sign-On (SSO) and SCIM provisioning for new applications at your company. Follow each phase sequentially to ensure proper setup and testing.
 
 ---
 
@@ -45,11 +45,11 @@ This runbook provides a step-by-step process for configuring Single Sign-On (SSO
 ## Phase 2: Administrative Access Setup
 
 ### Step 2.1: Request Super Admin Access
-**Objective**: Ensure it.admin@klaviyo.com has necessary permissions for configuration
+**Objective**: Ensure it-admin@example.com has necessary permissions for configuration
 
 **Actions**:
 - [ ] Contact application vendor or customer admin
-- [ ] Request super admin privileges for it.admin@klaviyo.com
+- [ ] Request super admin privileges for it-admin@example.com
 - [ ] Verify access has been granted
 - [ ] Document access credentials in secure credential vault
 - [ ] Test login to confirm permissions
@@ -271,7 +271,7 @@ Alerts:
 **Objective**: Validate authentication and provisioning before user rollout
 
 **Actions**:
-- [ ] Create dedicated test user account in Okta: `test.sso@klaviyo.com`
+- [ ] Create dedicated test user account in Okta: `test-sso@example.com`
 - [ ] Assign test user to one of the new app groups
 - [ ] Wait for SCIM sync (or trigger manual sync)
 - [ ] Verify user provisioned in target application
@@ -384,7 +384,7 @@ Hello Team,
 We're excited to announce that [AppName] is now available with Single Sign-On (SSO) through Okta.
 
 What This Means:
-- Access [AppName] using your Klaviyo credentials
+- Access [AppName] using your company credentials
 - No separate password to remember
 - Enhanced security through centralized authentication
 - Easy access request process through IT Service Portal
@@ -400,7 +400,7 @@ How to Get Access:
 Resources:
 - User Guide: [Link]
 - FAQ: [Link]
-- Support: ITSupport@klaviyo.com
+- Support: it-support@example.com
 
 Questions? Reply to this email or contact IT Support.
 
@@ -542,11 +542,11 @@ If critical issues arise:
 
 ### C. Contact Information
 
-- **IT Provisioning Team**: provisioning@klaviyo.com
-- **Okta Admins**: okta-admins@klaviyo.com
-- **Freshservice Support**: servicedesk@klaviyo.com
-- **IT Security**: security@klaviyo.com
-- **Global IT**: globalit@klaviyo.com
+- **IT Provisioning Team**: provisioning@example.com
+- **Okta Admins**: okta-admins@example.com
+- **Freshservice Support**: servicedesk@example.com
+- **IT Security**: security@example.com
+- **Global IT**: global-it@example.com
 
 ---
 

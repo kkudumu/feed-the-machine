@@ -108,7 +108,7 @@ Ask the user focused questions to determine generalizability. DO NOT ask more th
 - "Should I parameterize [specific value] or hardcode it?"
 
 **Environment questions:**
-- "Does this only work in the ragnarok repo, or should it be repo-agnostic?"
+- "Does this only work in the your-tools-repo repo, or should it be repo-agnostic?"
 - "Are there API access requirements I should document?"
 
 ### Step 4: Write the Routine (`~/.ftm/routines/{name}.yml`)
@@ -317,7 +317,7 @@ eng-buddy's playbook engine reads from `~/.codex/eng-buddy/playbooks/`. Captured
 ### Environment Awareness
 
 When capturing, always note the environment context:
-- **If in `~/Documents/Code/ragnarok`**: Full API access to Okta, Freshservice, Slack, AWS (via shared_services). Prefer API over browser.
+- **If in `~/your-repo`**: Full API access to Okta, Freshservice, Slack, AWS (via shared_services). Prefer API over browser.
 - **If in other repos**: May not have API access. Default to browser automation or MCP tools.
 - **Always document**: Which APIs are used, what credentials are needed, what repo provides the client libraries.
 

@@ -1,5 +1,5 @@
 create_ticket:
-  requester: "kioja.kudumu@klaviyo.com"
+  requester: "user@example.com"
   workspace: "IT"
 
 send_ticket_reply:
