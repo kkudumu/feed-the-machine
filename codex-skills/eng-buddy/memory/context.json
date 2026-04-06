@@ -1,10 +1,18 @@
 {
   "role": "IT Systems Engineer",
   "team": "IT Engineering",
-  "company": "Klaviyo",
-  "manager": "ashley.kronstat",
-  "email": "kioja.kudumu@klaviyo.com",
-  "tools": ["Okta", "Jamf", "Freshservice", "Jira", "Slack", "ConductorOne", "Google Workspace"],
+  "company": "YourCompany",
+  "manager": "your.manager",
+  "email": "user@example.com",
+  "tools": [
+    "Okta",
+    "Jamf",
+    "Freshservice",
+    "Jira",
+    "Slack",
+    "ConductorOne",
+    "Google Workspace"
+  ],
   "preferences": {
     "response_tone": "friendly but concise",
     "never_auto_send": true,

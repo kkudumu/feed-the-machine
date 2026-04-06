@@ -1,6 +1,6 @@
 domains:
   okta_admin:
-    base_url: "https://klaviyo.okta.com/admin"
+    base_url: "https://yourorg.okta.com/admin"
     auth_method: stored_session
   google_admin:
     base_url: "https://admin.google.com"

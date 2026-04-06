@@ -35,7 +35,7 @@
       "number": 0,
       "description": "Open Portal Designer in headed Chrome session",
       "tool": "playwright_cli",
-      "command": "open https://klaviyo.freshservice.com/a/portals/15000014303/customise/ --headed",
+      "command": "open https://yourorg.freshservice.com/a/portals/15000000000/customise/ --headed",
       "session": "eng-buddy",
       "requires_human": false,
       "notes": "Start a headed browser session so Freshservice session cookies from the default Chrome profile are available. Must run before any other steps."
@@ -44,7 +44,7 @@
       "number": 1,
       "description": "Navigate to Freshservice Portal Designer",
       "tool": "playwright_cli",
-      "command": "goto https://klaviyo.freshservice.com/a/portals/15000014303/customise/",
+      "command": "goto https://yourorg.freshservice.com/a/portals/15000000000/customise/",
       "session": "eng-buddy",
       "requires_human": false,
       "notes": "Direct URL to Portal Designer. If redirected to login, Freshservice session cookie must be active in Playwright browser."
@@ -129,7 +129,7 @@
       "number": 10,
       "description": "Verify: Navigate to target catalog item and confirm element is hidden",
       "tool": "playwright_cli",
-      "command": "goto https://klaviyo.freshservice.com/support/catalog/items/{first_item_id}",
+      "command": "goto https://yourorg.freshservice.com/support/catalog/items/{first_item_id}",
       "session": "eng-buddy",
       "requires_human": false,
       "notes": "Navigate to the first target item to verify the element is hidden. Replace {first_item_id} with the first value from item_ids at runtime."
@@ -147,7 +147,7 @@
       "number": 12,
       "description": "SPA bleed test: Navigate to a DIFFERENT catalog item via in-app link (not direct URL) and confirm element IS visible there",
       "tool": "playwright_cli",
-      "command": "goto https://klaviyo.freshservice.com/support/catalog/items/1",
+      "command": "goto https://yourorg.freshservice.com/support/catalog/items/1",
       "session": "eng-buddy",
       "requires_human": false,
       "notes": "Navigate to any catalog item NOT in the target list. The Place Request button MUST be visible here. If hidden, the SPA bleed bug is back — revert immediately."
@@ -184,7 +184,7 @@
   "rollback": {
     "description": "To revert: Go to Portal Designer Head section, remove the <script> block for the target items, Save and Publish.",
     "steps": [
-      "Navigate to https://klaviyo.freshservice.com/a/portals/15000014303/customise/",
+      "Navigate to https://yourorg.freshservice.com/a/portals/15000000000/customise/",
       "Open Head section",
       "Read current content via CodeMirror API",
       "Remove the script block for the target catalog items",
@@ -217,11 +217,11 @@
   "source": "observed",
   "runbook_path": "~/.codex/eng-buddy/knowledge/runbooks/freshservice-hide-catalog-elements.md",
   "related_links": {
-    "portal_designer": "https://klaviyo.freshservice.com/a/portals/15000014303/customise/",
-    "service_desk_rebranding": "https://klaviyo.freshservice.com/admin/helpdesk-rebranding",
-    "catalog_item_604": "https://klaviyo.freshservice.com/support/catalog/items/604",
-    "catalog_item_607": "https://klaviyo.freshservice.com/support/catalog/items/607",
-    "jira_ticket": "https://gts-klaviyo.atlassian.net/browse/ITWORK2-7930",
+    "portal_designer": "https://yourorg.freshservice.com/a/portals/15000000000/customise/",
+    "service_desk_rebranding": "https://yourorg.freshservice.com/admin/helpdesk-rebranding",
+    "catalog_item_604": "https://yourorg.freshservice.com/support/catalog/items/604",
+    "catalog_item_607": "https://yourorg.freshservice.com/support/catalog/items/607",
+    "jira_ticket": "https://yourorg.atlassian.net/browse/ITWORK2-7930",
     "freshservice_api": "https://api.freshservice.com/#service-catalog"
   }
 }

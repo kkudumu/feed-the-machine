@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
-  await page.goto('https://klaviyo.okta.com/oauth2/v1/authorize?client_id=okta.2b1959c8-bcc0-56eb-a589-cfcfb7422f26&code_challenge=hzcKNdhGnRh50o3pt4-xX7i4hygxK5c_Sy5FaxTo9Bg&code_challenge_method=S256&nonce=70ncw0ISVC15M2UxkP0rPYvui2d4Rz6MnQkGIRszNuN8BKlU9fvc6nvIR0eUSGza&redirect_uri=https%3A%2F%2Fklaviyo.okta.com%2Fenduser%2Fcallback&response_type=code&state=d9cUzfoK3UOW7EYYEfyx0RvlXo4W8F7eRptsDJIrgL3xitvIsFUcLwrYOyHj9n3f&scope=openid%20profile%20email%20okta.users.read.self%20okta.users.manage.self%20okta.internal.enduser.read%20okta.internal.enduser.manage%20okta.enduser.dashboard.read%20okta.enduser.dashboard.manage%20okta.myAccount.sessions.manage%20okta.internal.navigation.enduser.read');
+  await page.goto('https://yourorg.okta.com/oauth2/v1/authorize?client_id=okta.2b1959c8-bcc0-56eb-a589-cfcfb7422f26&code_challenge=hzcKNdhGnRh50o3pt4-xX7i4hygxK5c_Sy5FaxTo9Bg&code_challenge_method=S256&nonce=70ncw0ISVC15M2UxkP0rPYvui2d4Rz6MnQkGIRszNuN8BKlU9fvc6nvIR0eUSGza&redirect_uri=https%3A%2F%2Fyourorg.okta.com%2Fenduser%2Fcallback&response_type=code&state=d9cUzfoK3UOW7EYYEfyx0RvlXo4W8F7eRptsDJIrgL3xitvIsFUcLwrYOyHj9n3f&scope=openid%20profile%20email%20okta.users.read.self%20okta.users.manage.self%20okta.internal.enduser.read%20okta.internal.enduser.manage%20okta.enduser.dashboard.read%20okta.enduser.dashboard.manage%20okta.myAccount.sessions.manage%20okta.internal.navigation.enduser.read');
   await page.getByRole('textbox', { name: 'Password' }).click();
-  await page.getByRole('textbox', { name: 'Password' }).fill('COTTONdickENERGY1234$');
+  await page.getByRole('textbox', { name: 'Password' }).fill('REDACTED_PASSWORD');
   await page.getByRole('textbox', { name: 'Password' }).press('Enter');
   await page.getByRole('button', { name: 'Verify' }).click();
   await page.getByRole('link', { name: 'Select Okta Verify.' }).click();
@@ -12,7 +12,7 @@ test('test', async ({ page }) => {
   const page1Promise = page.waitForEvent('popup');
   await page.getByRole('row', { name: 'launch app Freshworks' }).getByLabel('launch app Freshworks').click();
   const page1 = await page1Promise;
-  await page1.getByRole('link', { name: 'FreshService Klaviyo klaviyo.' }).click();
+  await page1.getByRole('link', { name: 'FreshService YourOrg yourorg.' }).click();
   await page1.getByRole('menuitem', { name: 'Admin' }).click();
   await page1.getByRole('textbox', { name: 'Search admin' }).click();
   await page1.getByRole('textbox', { name: 'Search admin' }).fill('servi');

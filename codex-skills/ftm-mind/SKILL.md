@@ -370,7 +370,7 @@ Orient must know the available MCPs and their contextual triggers.
 Use the smallest relevant MCP set.
 
 - Jira issue key or Atlassian URL -> `mcp-atlassian-personal`
-- "internal docs", "runbook", "Klaviyo", "Glean" -> `glean_default`
+- "internal docs", "runbook", "company name", "Glean" -> `glean_default`
 - "how do I use X library" -> `context7`
 - "calendar", "meeting", "free time" -> `google-calendar`
 - "Slack", "channel", "thread", "notify" -> `slack`
@@ -1220,7 +1220,7 @@ Orient must know the available MCPs and their contextual triggers.
 Use the smallest relevant MCP set.
 
 - Jira issue key or Atlassian URL -> `mcp-atlassian-personal`
-- "internal docs", "runbook", "Klaviyo", "Glean" -> `glean_default`
+- "internal docs", "runbook", "company name", "Glean" -> `glean_default`
 - "how do I use X library" -> `context7`
 - "calendar", "meeting", "free time" -> `google-calendar`
 - "Slack", "channel", "thread", "notify" -> `slack`

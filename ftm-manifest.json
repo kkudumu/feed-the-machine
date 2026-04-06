@@ -3685,7 +3685,7 @@
           "type": "tool",
           "name": "gh",
           "required": true,
-          "description": "GitHub CLI for querying releases from kkudumu/ftm-brain"
+          "description": "GitHub CLI for querying releases from kkudumu/feed-the-machine"
         },
         {
           "type": "reference",
@@ -3738,7 +3738,7 @@
           "action": "report \"Cannot reach GitHub. Check internet connection.\""
         },
         {
-          "condition": "kkudumu/ftm-brain repo not found",
+          "condition": "kkudumu/feed-the-machine repo not found",
           "action": "report repo not found, suggest verifying access"
         },
         {

@@ -83,7 +83,7 @@ def _normalize_project_path(path: str) -> str:
         return path
 
     # Heuristic: if the last component looks like a worktree slug
-    # (contains hyphens like a branch name, e.g. "klaviyokio/enthusiastic-cadet")
+    # (contains hyphens like a branch name, e.g. "user/feature-branch")
     # keep it as-is because it IS the project context.
     # We just use the last 2-3 parts for grouping.
     if len(parts) >= 2:

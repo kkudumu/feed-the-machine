@@ -107,7 +107,7 @@
 | Field | Detail |
 |-------|--------|
 | **Tools** | `chat`, `search`, `read_document` |
-| **When to use** | Searching internal Klaviyo knowledge base, finding internal docs, policies, runbooks, past decisions |
+| **When to use** | Searching internal internal knowledge base, finding internal docs, policies, runbooks, past decisions |
 | **When NOT to use** | External library docs (use context7); real-time web search (use WebSearch tool) |
 | **Approval required** | Auto: all read-only |
 
@@ -157,13 +157,13 @@
 | "email", "Gmail", "inbox", "draft", "reply to", "send to" | `gmail` | Communication |
 | "calendar", "meeting", "schedule", "free time", "invite", "block time" | `google-calendar` | Calendar |
 | "how do I use [library]", "API docs", "documentation for X framework" | `context7` | Ext. docs |
-| "find in internal docs", "Glean", "search Klaviyo", "company policy" | `glean_default` | Internal knowledge |
+| "find in internal docs", "Glean", "search internal", "company policy" | `glean_default` | Internal knowledge |
 | "screenshot", "test the UI", "click button", "E2E", "browser test" | `playwright` | Testing |
 | "find someone's email", "contact info", "company profile", "person lookup" | `lusha` | CRM/people |
 | "Swift docs", "SwiftUI", "UIKit", "Apple framework", "AppKit" | `apple-doc-mcp` | Apple dev |
 | "think through this", "complex analysis", "multi-step reasoning", "trade-offs" | `sequential-thinking` | Reasoning |
 | "debug browser", "network request", "Chrome DevTools", "performance profile" | `chrome-devtools` | Dev tools |
-| "who is oncall", "search internal", "Klaviyo runbook" | `glean_default` | Internal ops |
+| "who is oncall", "search internal", "internal runbook" | `glean_default` | Internal ops |
 | "IT admin", "org-wide Jira change", "admin Confluence" | `mcp-atlassian` | Admin ops |
 | "highlight", "saved article", "Readwise", "reading list" | *(Readwise — not configured in current settings)* | — |
 

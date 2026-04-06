@@ -33,8 +33,8 @@ over. The agent should:
 
 | Starting Point | URL Pattern | When to Use |
 |---|---|---|
-| Service Catalog list | `https://klaviyo.freshservice.com/ws/2/catalog/items` | Browsing/searching existing items |
-| Specific item (edit) | `https://klaviyo.freshservice.com/ws/2/catalog/items/{id}/edit` | Editing an existing item |
+| Service Catalog list | `https://yourorg.freshservice.com/ws/2/catalog/items` | Browsing/searching existing items |
+| Specific item (edit) | `https://yourorg.freshservice.com/ws/2/catalog/items/{id}/edit` | Editing an existing item |
 | Admin search | Admin → search "service" → "Service Catalog" link | When starting from admin panel |
 
 ## Template Strategy
@@ -161,7 +161,7 @@ in the service catalog item.
 - Navigate to Admin → Custom Objects → find the app's object
 - Create one record per role
 
-**Or via Ragnarok/Claude Code:**
+**Or via your-tools-repo/Claude Code:**
 - Use Freshservice API to create custom object records programmatically
 - Requires: app name, role names, Okta group IDs
 
@@ -182,11 +182,11 @@ request fulfillment.
 | Auto-assign on request | `auto_assign_upon_request` | Low-risk roles (e.g., Members) |
 
 **Reference:** Full list of custom triggers is maintained in an internal document
-(ask the team or check Ragnarok docs).
+(ask the team or check your-tools-repo docs).
 
 ### Creating the Trigger
 
-**Preferred method:** Ragnarok slash commands or Claude Code with Freshservice API
+**Preferred method:** your-tools-repo slash commands or Claude Code with Freshservice API
 
 **Required inputs:**
 - Service catalog item ID (from URL after creation, e.g., `/catalog/items/620/edit` → ID is `620`)
@@ -208,7 +208,7 @@ These are non-obvious behaviors discovered through usage:
 
 3. **Template overwrite risk:** If you click "Save" instead of "Save As" when editing a template, you overwrite the template. Always clone first.
 
-4. **Page context after SSO:** After Okta SSO login, the browser may land on the Okta dashboard, not Freshservice. The agent may need to: search for "Freshworks" in Okta app search → launch → click "FreshService Klaviyo" link.
+4. **Page context after SSO:** After Okta SSO login, the browser may land on the Okta dashboard, not Freshservice. The agent may need to: search for "Freshworks" in Okta app search → launch → click "FreshService YourOrg" link.
 
 5. **Popup windows:** Freshservice may open in a new tab/popup from Okta. The agent needs to handle tab switching (`$PB tabs` to list, then navigate in the correct tab).
 
@@ -230,8 +230,8 @@ These are non-obvious behaviors discovered through usage:
 11. Optionally add Access Scope content field
 12. Save & Publish
 13. Note the item ID from URL
-14. Create custom object records (via MCP or Ragnarok)
-15. Set up custom trigger (via Ragnarok or Workflow Automator)
+14. Create custom object records (via MCP or your-tools-repo)
+15. Set up custom trigger (via your-tools-repo or Workflow Automator)
 ```
 
 ## Key Selectors Reference

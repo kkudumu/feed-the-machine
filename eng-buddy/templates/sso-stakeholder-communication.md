@@ -6,7 +6,7 @@
 ```
 Hey [Stakeholder Name] - I have your ticket for the [App Name] SSO. Sorry for the delay in actioning this one. I've got it slated for this sprint!
 
-Would you be able to provide super admin access to it.admin@klaviyo.com when you have a chance? That'll allow me to integrate the app with Okta.
+Would you be able to provide super admin access to it-admin@example.com when you have a chance? That'll allow me to integrate the app with Okta.
 ```
 
 **Usage**: Send when starting SSO work and need admin credentials
@@ -100,9 +100,9 @@ Hello Team,
 I hope this message finds you well. This email serves as official notice that [App Name] is now live with Okta SSO. Going forward, please log in via your Okta Dashboard by clicking on the [App Name] tile.
 
 How to Access:
-1. Log into your Okta Dashboard: https://klaviyo.okta.com
+1. Log into your Okta Dashboard: https://yourorg.okta.com
 2. Click the [App Name] tile
-3. You'll be automatically logged in with your Klaviyo credentials
+3. You'll be automatically logged in with your company credentials
 
 [Optional: Add screenshots of Okta tile]
 
@@ -110,7 +110,7 @@ How to Access:
 • [Special instruction 1]
 • [Special instruction 2]
 
-If you have any questions or encounter any issues, please submit a ticket to IT: https://klaviyo.freshservice.com
+If you have any questions or encounter any issues, please submit a ticket to IT: https://yourorg.freshservice.com
 
 Best regards,
 [Your Name]
@@ -185,7 +185,7 @@ SSO with [OIDC/SCIM] provisioning for all roles!
 When communicating with stakeholders, remember to handle these steps internally:
 
 **Before Go-Live:**
-- [ ] Admin access to it.admin@klaviyo.com secured
+- [ ] Admin access to it-admin@example.com secured
 - [ ] RBAC template received and reviewed
 - [ ] Okta SSO configured
 - [ ] Okta groups created (APP-[AppName]-[RoleName])

@@ -317,8 +317,8 @@ git commit -m "docs: update install section with selective install examples"
 ### Task 4: Merge and push
 
 ```bash
-cd /Users/kioja.kudumu/Documents/Code/feed-the-machine
-git merge klaviyokio/lapis-diagnostic
+cd ~/feed-the-machine
+git merge feature/lapis-diagnostic
 git push origin main
-git push klaviyo-it main
+git push upstream main
 ```

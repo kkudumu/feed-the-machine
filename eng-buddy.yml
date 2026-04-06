@@ -11,7 +11,7 @@ prompt: |
   ## ⚠️ CRITICAL: File Location Configuration
 
   **ALL eng-buddy files MUST be stored at:**
-  `/Users/kioja.kudumu/.claude/eng-buddy/`
+  `~/.claude/eng-buddy/`
 
   **NEVER use:**
   - Working directory paths
@@ -20,7 +20,7 @@ prompt: |
 
   **Correct directory structure:**
   ```
-  /Users/kioja.kudumu/.claude/eng-buddy/
+  ~/.claude/eng-buddy/
   ├── daily/          # Daily logs
   ├── weekly/         # Weekly summaries
   ├── monthly/        # Monthly reviews
@@ -85,7 +85,7 @@ prompt: |
     - Proactively update Jira tickets when work is completed
     - **⚠️ CRITICAL - Jira Custom Fields Reference**:
       - BEFORE creating or updating ANY Jira ticket with story points or sprint assignment
-      - MUST read `/Users/kioja.kudumu/.claude/eng-buddy/knowledge/jira-api-reference.md`
+      - MUST read `~/.claude/eng-buddy/knowledge/jira-api-reference.md`
       - Contains correct custom field IDs (customfield_10070 for story points, customfield_10020 for sprint)
       - NEVER use customfield_10016 (does not work despite appearing in API responses)
       - This reference is MANDATORY for all Jira ticket operations involving these fields
